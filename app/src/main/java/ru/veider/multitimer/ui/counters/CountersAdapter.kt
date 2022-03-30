@@ -14,13 +14,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.veider.multitimer.R
 import ru.veider.multitimer.data.*
 import ru.veider.multitimer.databinding.ItemCounterBinding
+import ru.veider.multitimer.databinding.LayoutQueryBinding
+import ru.veider.multitimer.timeselector.TimeSelector
 import java.util.*
 
 
 class CountersAdapter(private val fragment: CountersFragment, private val viewModel: CountersViewModel) :
     ArrayAdapter<Counter>(
         fragment.requireContext(), R.layout.item_counter, viewModel.getCounters().value as Counters
-    ) {
+    ), TimeSelector.OnTimeSet {
 
 //    private val timerAdapterEvents: TimerAdapterEvents = fragment
     private var counters = viewModel.getCounters().value as Counters
@@ -37,14 +39,6 @@ class CountersAdapter(private val fragment: CountersFragment, private val viewMo
         this.counters = counters
         notifyDataSetChanged()
     }
-
-//    interface TimerAdapterEvents {
-//        fun onTimerStart(id: Int)
-//        fun onTimerPause(id: Int)
-//        fun onTimerStop(id: Int)
-//        //fun OnTimerSetValue(id: Int, seconds: Int)
-//    }
-
 
     inner class CounterHolder {
         lateinit var progressIndicator: CircularProgressIndicator
@@ -97,44 +91,44 @@ class CountersAdapter(private val fragment: CountersFragment, private val viewMo
                 }
                 sb.toString()
             }
-//            setOnClickListener {
-//                TimeSelector(
-//                    this@CountersAdapter,
-//                    position,
-//                    counters[position].currentProgress
-//                ).showNow(
-//                    (rowView.context as AppCompatActivity).supportFragmentManager,
-//                    "TAG"
-//                )
-//            }
+            setOnClickListener {
+                TimeSelector(
+                    this@CountersAdapter,
+                    position,
+                    counters[position].currentProgress
+                ).showNow(
+                    (rowView.context as AppCompatActivity).supportFragmentManager,
+                    "TAG"
+                )
+            }
             maxProgress = counters[position].maxProgress.toDouble()
             setCurrentProgress(counters[position].currentProgress.toDouble())
         }
-//        holder.titleTextView.apply {
-//            setOnClickListener {
-//                val inflater = LayoutInflater.from(holder.titleTextView.context)
-//                val binder = QueryLayoutBinding.inflate(inflater)
-//                MaterialAlertDialogBuilder(holder.titleTextView.context).apply {
-//                    setView(binder.root)
-//                    if (holder.titleTextView.text.isNotEmpty())
-//                        binder.inputText.setText(counters[position].title)
-//                    setPositiveButton(
-//                        R.string.button_text_accept.toRString(),
-//                        DialogInterface.OnClickListener { dialogInterface, i ->
-//                            if (holder.titleTextView.text.isNotEmpty()) {
-//                                counters[position].title = binder.inputText.text.toString()
-//                                viewModel.updateCounter(counters[position])
-//                            }
-//                        })
-//                    setNegativeButton(
-//                        R.string.button_text_cancel.toRString(),
-//                        DialogInterface.OnClickListener { dialogInterface, i ->
-//
-//                        })
-//                }.show()
-//            }
-//            text = counters[position].title
-//        }
+        holder.titleTextView.apply {
+            setOnClickListener {
+                val inflater = LayoutInflater.from(holder.titleTextView.context)
+                val binder = LayoutQueryBinding.inflate(inflater)
+                MaterialAlertDialogBuilder(holder.titleTextView.context).apply {
+                    setView(binder.root)
+                    if (holder.titleTextView.text.isNotEmpty())
+                        binder.inputText.setText(counters[position].title)
+                    setPositiveButton(
+                        R.string.button_text_accept.toRString(),
+                        DialogInterface.OnClickListener { dialogInterface, i ->
+                            if (holder.titleTextView.text.isNotEmpty()) {
+                                counters[position].title = binder.inputText.text.toString()
+                                //viewModel.updateCounter(counters[position])
+                            }
+                        })
+                    setNegativeButton(
+                        R.string.button_text_cancel.toRString(),
+                        DialogInterface.OnClickListener { dialogInterface, i ->
+
+                        })
+                }.show()
+            }
+            text = counters[position].title
+        }
         holder.buttonStart.setOnClickListener {
             val counter = counters[position].apply {
                 timeOfStart = Date().time
@@ -170,15 +164,15 @@ class CountersAdapter(private val fragment: CountersFragment, private val viewMo
         this.notifyDataSetChanged()
     }
 
-//    override fun TimeIsSelected(position: Int, seconds: Int) {
-//        with(counters[position]) {
-//            maxProgress = seconds
-//            currentProgress = seconds
-//        }
-//
-//        viewModel.updateCounters(counters)
-//        this.notifyDataSetChanged()
-//    }
+    override fun TimeIsSelected(position: Int, seconds: Int) {
+        with(counters[position]) {
+            maxProgress = seconds
+            currentProgress = seconds
+        }
+
+        //viewModel.updateCounters(counters)
+        this.notifyDataSetChanged()
+    }
 
     private fun Int.toRString(): String {
         return fragment.getString(this)
