@@ -23,7 +23,7 @@ class CountersFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
+        val viewModel =
             ViewModelProvider(this).get(CountersViewModel::class.java)
 
         _binding = FragmentCountersBinding.inflate(inflater, container, false)
@@ -34,10 +34,12 @@ class CountersFragment : Fragment() {
                 .setAction("Action", null).show()
         }
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
+        binding.countersList.adapter = CountersAdapter(this, viewModel)
+
+        //val textView: TextView = binding.textHome
+//        homeViewModel.text.observe(viewLifecycleOwner) {
+//            textView.text = it
+//        }
         return root
     }
 
