@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:api="http://schemas.android.com/tools"
+    android:id="@+id/counter"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="@dimen/counter_padding">
+
+    <antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
+        android:id="@+id/progress_indicator"
+        android:layout_width="@dimen/progress_bar_size"
+        android:layout_height="@dimen/progress_bar_size"
+        android:layout_gravity="center"
+        android:layout_marginRight="@dimen/progress_bar_margin_right"
+        android:elevation="@dimen/progress_bar_elevation"
+        app:dotColor="@color/black"
+        app:dotWidth="@dimen/progress_bar_dot_width"
+        app:drawDot="true"
+        app:enableProgressAnimation="false"
+        app:progressStrokeWidth="@dimen/progress_bar_stroke_width"
+        app:textSize="@dimen/progress_bar_text_size" />
+
+    <LinearLayout
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/title_hint"
+            android:paddingStart="@dimen/title_padding_start"
+            android:textSize="@dimen/title_text_size" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_start"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="@dimen/button_margin_horizontal"
+                android:layout_weight="1"
+                android:elevation="@dimen/button_elevation"
+                android:lines="1"
+                android:text="@string/button_text_start"
+                android:textSize="@dimen/button_text_size"
+                android:textColor="@color/black"
+                app:iconGravity="textStart" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_pause"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="@dimen/button_margin_horizontal"
+                android:layout_weight="1"
+                android:elevation="@dimen/button_elevation"
+                android:lines="1"
+                android:text="@string/button_text_pause"
+                android:textSize="@dimen/button_text_size"
+                android:textColor="@color/black"
+                app:iconGravity="textStart" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_stop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="@dimen/button_margin_horizontal"
+                android:layout_weight="1"
+                android:elevation="@dimen/button_elevation"
+                android:lines="1"
+                android:text="@string/button_text_stop"
+                android:textSize="@dimen/button_text_size"
+                android:textColor="@color/black"
+                app:iconGravity="textStart" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
