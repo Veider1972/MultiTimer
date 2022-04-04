@@ -6,9 +6,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.content.DialogInterface
 import androidx.fragment.app.DialogFragment
 import ru.veider.multitimer.R
+import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.databinding.LayoutTimeSelectBinding
 
-class TimeSelector(private var onTimeSet: OnTimeSet, private var position: Int, progress: Int) :
+class TimeSelector(private val timeSelectorEvent: TimeSelectorEvent, private val counter: Counter) :
     DialogFragment() {
     private var firstHours = 0
     private var secondHours = 0
@@ -17,12 +18,12 @@ class TimeSelector(private var onTimeSet: OnTimeSet, private var position: Int, 
     private var firstSeconds = 0
     private var secondSeconds = 0
 
-    interface OnTimeSet {
-        fun TimeIsSelected(position: Int, seconds: Int)
+    interface TimeSelectorEvent {
+        fun onTimeSelected(id: Int, maxProgress: Int)
     }
 
     init {
-        var currentProgress = progress
+        var currentProgress = counter.maxProgress
         val hours = (currentProgress / 3600)
         currentProgress %= 3600
         val minutes = (currentProgress / 60)
@@ -51,7 +52,7 @@ class TimeSelector(private var onTimeSet: OnTimeSet, private var position: Int, 
                     val seconds = 3600 * (10 * firstHours.value + secondHours.value) +
                             60 * (10 * firstMinutes.value + secondMinutes.value) +
                             (10 * firstSeconds.value + secondSeconds.value)
-                    onTimeSet.TimeIsSelected(position, seconds)
+                    timeSelectorEvent.onTimeSelected(counter.id, seconds)
                 }
             }
             setTitle(getString(R.string.time_set_dialog_title))

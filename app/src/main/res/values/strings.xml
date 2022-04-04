@@ -12,12 +12,12 @@
     <string name="notification_title">Мультитаймер запущен</string>
     <string name="notification_timer_status">Мультитаймер запущен</string>
     <string name="notification_next_timer">Таймер запущен:</string>
-    <string name="notification_alarm_status">Сработал таймер:\u0020</string>
+    <string name="notification_alarm_status">Сработал таймер: %s</string>
     <string name="notification_alarm_finished">Таймер сработал!</string>
     <string name="notification_alarm_title">Внимание</string>
-    <string name="counters_channel_id">Counters_Channel</string>
-    <string name="counters_channel_name">Отсчёт времени</string>
-    <string name="counters_channel_description">Counter Service Channel</string>
+    <string name="simple_channel_id">Counters_Channel</string>
+    <string name="simple_channel_name">Отсчёт времени</string>
+    <string name="simple_channel_description">Counter Service Channel</string>
     <string name="alarm_channel_id">Alarm_Channel</string>
     <string name="alarm_channel_name">Таймер сработал</string>
     <string name="alarm_channel_description">Counter Service Channel</string>
@@ -31,4 +31,7 @@
     <string name="menu_counters">Таймеры</string>
     <string name="menu_preferences">Настройка</string>
     <string name="menu_about">О программе</string>
+    <string name="time_rest_pattern">Осталось: %s</string>
+    <string name="time_min_sec_pattern">%d мин. %d сек.</string>
+    <string name="attention">Внимание!</string>
 </resources>

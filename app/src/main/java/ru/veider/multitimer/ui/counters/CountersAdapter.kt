@@ -1,182 +1,178 @@
 package ru.veider.multitimer.ui.counters
 
 import android.content.DialogInterface
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 import antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.veider.multitimer.R
-import ru.veider.multitimer.data.*
+import ru.veider.multitimer.data.Counter
+import ru.veider.multitimer.data.CounterState
+import ru.veider.multitimer.data.Counters
+import ru.veider.multitimer.data.TAG
 import ru.veider.multitimer.databinding.ItemCounterBinding
 import ru.veider.multitimer.databinding.LayoutQueryBinding
 import ru.veider.multitimer.timeselector.TimeSelector
-import java.util.*
 
 
-class CountersAdapter(private val fragment: CountersFragment, private val viewModel: CountersViewModel) :
-    ArrayAdapter<Counter>(
-        fragment.requireContext(), R.layout.item_counter, viewModel.getCounters().value as Counters
-    ), TimeSelector.OnTimeSet {
+class CountersAdapter(
+    fragment: CountersFragment,
+    private var counters: Counters
+) : RecyclerView.Adapter<CountersAdapter.CounterHolder>() {
 
-//    private val timerAdapterEvents: TimerAdapterEvents = fragment
-    private var counters = viewModel.getCounters().value as Counters
+    private val events: CountersAdapterEvents = fragment
 
-
-    private lateinit var holder: CounterHolder
-
-    init {
-        val observer = Observer<Counters> { counters -> isCountersChanged(counters) }
-        viewModel.getCounters().observe(fragment.viewLifecycleOwner, observer)
+    interface CountersAdapterEvents {
+        fun onTimerStart(id: Int)
+        fun onTimerPause(id: Int)
+        fun onTimerStop(id: Int)
+        fun onTimerTitleChange(id: Int, title: String)
+        fun onTimerSetValue(id: Int, seconds: Int)
     }
 
-    private fun isCountersChanged(counters: Counters) {
-        this.counters = counters
-        notifyDataSetChanged()
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CounterHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val view = layoutInflater.inflate(R.layout.item_counter, parent, false)
+        return CounterHolder(view)
     }
 
-    inner class CounterHolder {
-        lateinit var progressIndicator: CircularProgressIndicator
-        lateinit var buttonStart: MaterialButton
-        lateinit var buttonPause: MaterialButton
-        lateinit var buttonStop: MaterialButton
-        lateinit var titleTextView: TextView
-        lateinit var counter: Counter
-
+    override fun onBindViewHolder(holder: CounterHolder, position: Int) {
+        holder.onBind(counters[position])
     }
 
-    override fun getView(position: Int, counterView: View?, parent: ViewGroup): View {
-        var rowView = counterView
-        if (rowView == null) {
-            val layoutInflater = fragment.layoutInflater
-            val binder = ItemCounterBinding.inflate(layoutInflater,parent,false)
-            rowView = binder.root
-            holder = CounterHolder().apply {
-                counter = counters[position]
-                progressIndicator = binder.progressIndicator
-                titleTextView = binder.title
-                buttonStart = binder.buttonStart
-                buttonPause = binder.buttonPause
-                buttonStop = binder.buttonStop
-            }
-            rowView.setTag(holder)
+    override fun onBindViewHolder(holder: CounterHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isNotEmpty()) {
+            if (!holder.getTitle.text.equals(counters[position].title))
+                holder.getTitle.text = counters[position].title
+            if (holder.getProgressIndicator.progress.toInt() != counters[position].currentProgress)
+                holder.getProgressIndicator.setCurrentProgress(counters[position].currentProgress.toDouble())
         } else {
-            holder = rowView.tag as CounterHolder
+            super.onBindViewHolder(holder, position, payloads)
         }
-        holder.progressIndicator.apply {
-            setProgressTextAdapter { currentProgress: Double ->
-                var progress = currentProgress
-                val hours = (progress / 3600).toInt()
-                progress %= 3600.0
-                val minutes = (progress / 60).toInt()
-                val seconds = (progress % 60).toInt()
-                val sb = StringBuilder().apply {
-                    if (hours < 10) {
-                        append(0)
-                    }
-                    append(hours).append(":")
-                    if (minutes < 10) {
-                        append(0)
-                    }
-                    append(minutes).append(":")
-                    if (seconds < 10) {
-                        append(0)
-                    }
-                    append(seconds)
+    }
+
+    override fun getItemCount() = counters.size
+
+    fun swapItems(fromPosition: Int, toPosition: Int) {
+        counters.swap(fromPosition, toPosition)
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    //========== CounterHolder====================================================
+    inner class CounterHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        TimeSelector.TimeSelectorEvent {
+
+        private var title: TextView
+        val getTitle get() = title
+        private var progressIndicator: CircularProgressIndicator
+        val getProgressIndicator get() = progressIndicator
+        private var buttonStart: MaterialButton
+        private var buttonPause: MaterialButton
+        private var buttonStop: MaterialButton
+        lateinit var counter: Counter
+        private var binder = ItemCounterBinding.bind(itemView)
+
+        init {
+            title = binder.title.apply {
+                setOnClickListener {
+                    val inflater = LayoutInflater.from(this.context)
+                    val binder = LayoutQueryBinding.inflate(inflater)
+                    MaterialAlertDialogBuilder(this.context).apply {
+                        setView(binder.root)
+                        if (text.isNotEmpty())
+                            binder.inputText.setText(counter.title)
+                        setPositiveButton(
+                            resources.getString(R.string.button_text_accept),
+                            DialogInterface.OnClickListener { _, _ ->
+                                if (binder.inputText.text.toString().isNotEmpty()) {
+                                    counter.apply {
+                                        title = binder.inputText.text.toString()
+                                        events.onTimerTitleChange(counter.id, title)
+                                    }
+                                }
+                            })
+                        setNegativeButton(
+                            resources.getString(R.string.button_text_cancel),
+                            DialogInterface.OnClickListener { _, _ ->
+                            })
+                    }.show()
                 }
-                sb.toString()
             }
-            setOnClickListener {
-                TimeSelector(
-                    this@CountersAdapter,
-                    position,
-                    counters[position].currentProgress
-                ).showNow(
-                    (rowView.context as AppCompatActivity).supportFragmentManager,
-                    "TAG"
-                )
+            progressIndicator = binder.progressIndicator.apply {
+                setProgressTextAdapter { currentProgress: Double ->
+                    var progress = currentProgress
+                    val hours = (progress / 3600).toInt()
+                    progress %= 3600.0
+                    val minutes = (progress / 60).toInt()
+                    val seconds = (progress % 60).toInt()
+                    val sb = StringBuilder()
+                    if (hours < 10) {
+                        sb.append(0)
+                    }
+                    sb.append(hours).append(":")
+                    if (minutes < 10) {
+                        sb.append(0)
+                    }
+                    sb.append(minutes).append(":")
+                    if (seconds < 10) {
+                        sb.append(0)
+                    }
+                    sb.append(seconds)
+                    sb.toString()
+                }
+                setOnClickListener {
+                    TimeSelector(
+                        this@CounterHolder,
+                        counter
+                    ).showNow(
+                        (itemView.context as AppCompatActivity).supportFragmentManager,
+                        "TAG"
+                    )
+                }
             }
-            maxProgress = counters[position].maxProgress.toDouble()
-            setCurrentProgress(counters[position].currentProgress.toDouble())
-        }
-        holder.titleTextView.apply {
-            setOnClickListener {
-                val inflater = LayoutInflater.from(holder.titleTextView.context)
-                val binder = LayoutQueryBinding.inflate(inflater)
-                MaterialAlertDialogBuilder(holder.titleTextView.context).apply {
-                    setView(binder.root)
-                    if (holder.titleTextView.text.isNotEmpty())
-                        binder.inputText.setText(counters[position].title)
-                    setPositiveButton(
-                        R.string.button_text_accept.toRString(),
-                        DialogInterface.OnClickListener { dialogInterface, i ->
-                            if (holder.titleTextView.text.isNotEmpty()) {
-                                counters[position].title = binder.inputText.text.toString()
-                                //viewModel.updateCounter(counters[position])
-                            }
-                        })
-                    setNegativeButton(
-                        R.string.button_text_cancel.toRString(),
-                        DialogInterface.OnClickListener { dialogInterface, i ->
 
-                        })
-                }.show()
+            buttonStart = binder.buttonStart.apply {
+                setOnClickListener {
+                    Log.d(TAG, "startButton-" + counter.id)
+                    if (counter.state != CounterState.RUN) {
+                        events.onTimerStart(counter.id)
+                    }
+                }
             }
-            text = counters[position].title
-        }
-        holder.buttonStart.setOnClickListener {
-            val counter = counters[position].apply {
-                timeOfStart = Date().time
-                pausedAt = timeOfStart
-                state = CounterState.RUNNED
+            buttonPause = binder.buttonPause.apply {
+                setOnClickListener {
+                    Log.d(TAG, "pauseButton-" + counter.id)
+                    if (counter.state == CounterState.RUN)
+                        events.onTimerPause(counter.id)
+                }
             }
-//            viewModel.updateCounter(counter)
-            //timerAdapterEvents.onTimerStart(counters[position].id)
-        }
-//        holder.buttonPause.setOnClickListener {
-//            val counter = counters[position].apply {
-//                pausedAt = Date().time
-//                state = CounterState.PAUSED
-//            }
-//            viewModel.updateCounter(counter)
-//            //timerAdapterEvents.onTimerPause(counters[position].id)
-//        }
-//        holder.buttonStop.setOnClickListener {
-//            val counter = counters[position].apply {
-//                state = CounterState.FINISHED
-//                timeOfStart = 0
-//                currentProgress = maxProgress
-//                pausedAt = 0
-//            }
-//            viewModel.updateCounter(counter)
-//            //timerAdapterEvents.onTimerStop(counters[position].id)
-//        }
-        return rowView
-    }
-
-
-    fun updateCounter() {
-        this.notifyDataSetChanged()
-    }
-
-    override fun TimeIsSelected(position: Int, seconds: Int) {
-        with(counters[position]) {
-            maxProgress = seconds
-            currentProgress = seconds
+            buttonStop = binder.buttonStop.apply {
+                setOnClickListener {
+                    Log.d(TAG, "stopButton-" + counter.id)
+                    if (counter.state == CounterState.RUN)
+                        events.onTimerStop(counter.id)
+                }
+            }
         }
 
-        //viewModel.updateCounters(counters)
-        this.notifyDataSetChanged()
+        fun onBind(counter: Counter) {
+            this.counter = counter
+            binder.title.text = counter.title
+            binder.progressIndicator.setProgress(
+                counter.currentProgress.toDouble(),
+                counter.maxProgress.toDouble()
+            )
+        }
+
+        override fun onTimeSelected(id: Int, maxProgress: Int) {
+            events.onTimerSetValue(id, maxProgress)
+        }
+
     }
-
-    private fun Int.toRString(): String {
-        return fragment.getString(this)
-    }
-
-
 }

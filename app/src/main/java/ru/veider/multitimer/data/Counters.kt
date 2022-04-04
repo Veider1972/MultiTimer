@@ -1,9 +1,10 @@
 package ru.veider.multitimer.data
 
-import java.io.Serializable
-import java.util.*
+import kotlin.collections.ArrayList
 
-class Counters : LinkedList<Counter>(), Serializable {
+class Counters: ArrayList<Counter>() {
+
+    private val maxID get() = if (size > 0) last().id else 0
 
     fun getByID(id: Int): Counter {
         return get(getIndexByID(id))
@@ -13,19 +14,17 @@ class Counters : LinkedList<Counter>(), Serializable {
         removeAt(getIndexByID(id))
     }
 
-
     fun getIndexByID(id: Int): Int {
-        for (i in 0..this.size) {
+        for (i in 0..size) {
             if (id == this[i].id) return i
         }
         return -1
     }
 
-
     fun new(): Counter {
         val newID = maxID + 1
         val newCounter = Counter(newID)
-        this.add(newCounter)
+        add(newCounter)
         return newCounter
     }
 
@@ -33,22 +32,25 @@ class Counters : LinkedList<Counter>(), Serializable {
         set(getIndexByID(counter.id), counter)
     }
 
-    private val maxID: Int = if (size > 0) last().id else 0
+
 
     fun swap(fromPosition: Int, toPosition: Int): Boolean {
-        val fromCounter = this[fromPosition]
-        val toCounter = this[toPosition]
-        if (toPosition > fromPosition) {
-            removeAt(toPosition)
-            removeAt(fromPosition)
-            add(fromPosition, toCounter)
-            add(toPosition, fromCounter)
-        } else {
-            removeAt(fromPosition)
-            removeAt(toPosition)
-            add(toPosition, fromCounter)
-            add(fromPosition, toCounter)
-        }
+        val fromCounter = this[fromPosition].copy()
+        val toCounter = this[toPosition].copy()
+        this[fromPosition] = toCounter
+        this[toPosition] = fromCounter
+//        if (toPosition > fromPosition) {
+//            removeAt(toPosition)
+//            removeAt(fromPosition)
+//            add(fromPosition, toCounter)
+//            add(toPosition, fromCounter)
+//        } else {
+//            removeAt(fromPosition)
+//            removeAt(toPosition)
+//            add(toPosition, fromCounter)
+//            add(fromPosition, toCounter)
+//        }
         return true
     }
+
 }

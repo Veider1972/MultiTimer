@@ -51,7 +51,6 @@
                 android:elevation="@dimen/button_elevation"
                 android:lines="1"
                 android:text="@string/button_text_start"
-                android:textSize="@dimen/button_text_size"
                 android:textColor="@color/black"
                 app:iconGravity="textStart" />
 
@@ -65,7 +64,6 @@
                 android:elevation="@dimen/button_elevation"
                 android:lines="1"
                 android:text="@string/button_text_pause"
-                android:textSize="@dimen/button_text_size"
                 android:textColor="@color/black"
                 app:iconGravity="textStart" />
 
@@ -79,7 +77,6 @@
                 android:elevation="@dimen/button_elevation"
                 android:lines="1"
                 android:text="@string/button_text_stop"
-                android:textSize="@dimen/button_text_size"
                 android:textColor="@color/black"
                 app:iconGravity="textStart" />
         </LinearLayout>
