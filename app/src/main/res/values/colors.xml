@@ -6,6 +6,8 @@
     <color name="color_secondary">#689f38</color>
     <color name="color_secondary_variant">#99d066</color>
     <color name="color_on_secondary">#387002</color>
+    <color name="timer_alarm_color">#BF360C</color>
+    <color name="timer_simple_color">#D3D3D3</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="divider">?attr/colorPrimary</color>

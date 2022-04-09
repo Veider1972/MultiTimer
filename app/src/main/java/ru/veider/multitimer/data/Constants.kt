@@ -1,7 +1,7 @@
 package ru.veider.multitimer.data
 
 enum class CounterState {
-    PAUSED, RUN, FINISHED
+    PAUSED, RUN, FINISHED, ALARMED
 }
 
 const val COUNTERS_CHANNEL_ID : String = "Counters Channel"

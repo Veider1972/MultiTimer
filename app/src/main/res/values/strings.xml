@@ -12,7 +12,8 @@
     <string name="notification_title">Мультитаймер запущен</string>
     <string name="notification_timer_status">Мультитаймер запущен</string>
     <string name="notification_next_timer">Таймер запущен:</string>
-    <string name="notification_alarm_status">Сработал таймер: %s</string>
+    <string name="notification_alarm_with_title">Сработал таймер: %s</string>
+    <string name="notification_alarm_without_title">Таймер сработал</string>
     <string name="notification_alarm_finished">Таймер сработал!</string>
     <string name="notification_alarm_title">Внимание</string>
     <string name="simple_channel_id">Counters_Channel</string>

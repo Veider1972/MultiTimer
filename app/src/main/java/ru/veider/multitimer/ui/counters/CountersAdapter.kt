@@ -1,12 +1,12 @@
 package ru.veider.multitimer.ui.counters
 
 import android.content.DialogInterface
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
 import com.google.android.material.button.MaterialButton
@@ -15,14 +15,13 @@ import ru.veider.multitimer.R
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.data.CounterState
 import ru.veider.multitimer.data.Counters
-import ru.veider.multitimer.data.TAG
 import ru.veider.multitimer.databinding.ItemCounterBinding
 import ru.veider.multitimer.databinding.LayoutQueryBinding
 import ru.veider.multitimer.timeselector.TimeSelector
 
 
 class CountersAdapter(
-    fragment: CountersFragment,
+    val fragment: CountersFragment,
     private var counters: Counters
 ) : RecyclerView.Adapter<CountersAdapter.CounterHolder>() {
 
@@ -48,14 +47,27 @@ class CountersAdapter(
 
     override fun onBindViewHolder(holder: CounterHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
-            if (!holder.getTitle.text.equals(counters[position].title))
-                holder.getTitle.text = counters[position].title
-            if (holder.getProgressIndicator.progress.toInt() != counters[position].currentProgress)
-                holder.getProgressIndicator.setCurrentProgress(counters[position].currentProgress.toDouble())
+            counters[position].apply {
+                if (!holder.getTitle.text.equals(this.title))
+                    holder.getTitle.text = this.title
+                holder.getProgressIndicator.also {
+                    if (it.progress.toInt() != this.currentProgress)
+                        it.setProgress(this.currentProgress.toDouble(), this.maxProgress.toDouble())
+                    setProgressIndicatorBackgroundColor(it, this)
+                }
+            }
+
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
     }
+
+    private fun setProgressIndicatorBackgroundColor(progressIndicator: CircularProgressIndicator, counter: Counter) =
+            if (counter.state == CounterState.ALARMED)
+                progressIndicator.progressBackgroundColor = ContextCompat.getColor(fragment.requireContext(), R.color.timer_alarm_color)
+            else
+                progressIndicator.progressBackgroundColor = ContextCompat.getColor(fragment.requireContext(), R.color.timer_simple_color)
+
 
     override fun getItemCount() = counters.size
 
@@ -139,7 +151,6 @@ class CountersAdapter(
 
             buttonStart = binder.buttonStart.apply {
                 setOnClickListener {
-                    Log.d(TAG, "startButton-" + counter.id)
                     if (counter.state != CounterState.RUN) {
                         events.onTimerStart(counter.id)
                     }
@@ -147,15 +158,13 @@ class CountersAdapter(
             }
             buttonPause = binder.buttonPause.apply {
                 setOnClickListener {
-                    Log.d(TAG, "pauseButton-" + counter.id)
                     if (counter.state == CounterState.RUN)
                         events.onTimerPause(counter.id)
                 }
             }
             buttonStop = binder.buttonStop.apply {
                 setOnClickListener {
-                    Log.d(TAG, "stopButton-" + counter.id)
-                    if (counter.state == CounterState.RUN)
+                    if (counter.state == CounterState.RUN || counter.state == CounterState.ALARMED)
                         events.onTimerStop(counter.id)
                 }
             }
@@ -163,16 +172,20 @@ class CountersAdapter(
 
         fun onBind(counter: Counter) {
             this.counter = counter
-            binder.title.text = counter.title
-            binder.progressIndicator.setProgress(
-                counter.currentProgress.toDouble(),
-                counter.maxProgress.toDouble()
-            )
+            binder.apply {
+                title.text = counter.title
+                progressIndicator.apply {
+                    setProgress(
+                        counter.currentProgress.toDouble(),
+                        counter.maxProgress.toDouble()
+                    )
+                    setProgressIndicatorBackgroundColor(this, counter)
+                }
+            }
         }
 
         override fun onTimeSelected(id: Int, maxProgress: Int) {
             events.onTimerSetValue(id, maxProgress)
         }
-
     }
 }

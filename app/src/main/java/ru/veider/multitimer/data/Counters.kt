@@ -32,24 +32,11 @@ class Counters: ArrayList<Counter>() {
         set(getIndexByID(counter.id), counter)
     }
 
-
-
     fun swap(fromPosition: Int, toPosition: Int): Boolean {
         val fromCounter = this[fromPosition].copy()
         val toCounter = this[toPosition].copy()
         this[fromPosition] = toCounter
         this[toPosition] = fromCounter
-//        if (toPosition > fromPosition) {
-//            removeAt(toPosition)
-//            removeAt(fromPosition)
-//            add(fromPosition, toCounter)
-//            add(toPosition, fromCounter)
-//        } else {
-//            removeAt(fromPosition)
-//            removeAt(toPosition)
-//            add(toPosition, fromCounter)
-//            add(fromPosition, toCounter)
-//        }
         return true
     }
 

@@ -81,6 +81,7 @@ class CountersViewModel : ViewModel() {
 
     fun startCounter(id: Int) {
         val counter = counters[counters.getIndexByID(id)].apply {
+            if (currentProgress == 0) currentProgress = maxProgress
             state = CounterState.RUN
             startTime = Date().time
         }
@@ -90,7 +91,7 @@ class CountersViewModel : ViewModel() {
     fun pauseCounter(id: Int) {
         val counter = counters[counters.getIndexByID(id)].apply {
             state = CounterState.PAUSED
-            startTime = 0
+//            startTime = 0
         }
         serviceLiveData.postValue(counter)
     }
@@ -98,7 +99,8 @@ class CountersViewModel : ViewModel() {
     fun stopCounter(id: Int) {
         val counter = counters[counters.getIndexByID(id)].apply {
             state = CounterState.FINISHED
-            startTime = 0
+            currentProgress = maxProgress
+  //          startTime = 0
         }
         serviceLiveData.postValue(counter)
     }
@@ -110,11 +112,29 @@ class CountersViewModel : ViewModel() {
         }
     }
 
+    fun timerPause(id: Int) {
+        counters[counters.getIndexByID(id)].apply {
+            state = CounterState.PAUSED
+            startTime = 0
+            counterLiveData.postValue(this)
+        }
+    }
+
     fun timerFinish(id: Int) {
         counters[counters.getIndexByID(id)].apply {
-            currentProgress = maxProgress
             state = CounterState.FINISHED
+            currentProgress = maxProgress
             startTime = 0
+            counterLiveData.postValue(this)
+        }
+    }
+
+    fun timerAlarmed(id: Int) {
+        counters[counters.getIndexByID(id)].apply {
+            state = CounterState.ALARMED
+            currentProgress = 0
+            startTime = 0
+            db.updateCounter(this)
             counterLiveData.postValue(this)
         }
     }

@@ -3,6 +3,7 @@ package ru.veider.multitimer.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -18,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ViewModelProvider
+import ru.veider.multitimer.MultiTimer
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
@@ -25,9 +27,20 @@ import ru.veider.multitimer.data.CounterState
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.viewmodel.CountersViewModel
 import ru.veider.multitimer.viewmodel.CountersViewModelFactory
+import java.math.RoundingMode
 import java.util.*
 
 class CountersService : LifecycleAndViewStoreOwnerService() {
+
+    val ALARM_CHANNEL_ID = "ALARM_CHANNEL_ID"
+    val SIMPLE_CHANNEL_ID = "SIMPLE_CHANNEL_ID"
+    val COUNTER_ID = "COUNTER_ID"
+    val COUNTER = "COUNTER"
+    val EVENT = "EVENT"
+    val EVENT_BUTTON = "EVENT_BUTTON"
+    val EVENT_TIMER = "EVENT_TIMER"
+    val COUNTER_PAUSE = "COUNTER_PAUSE"
+    val COUNTER_STOP = "COUNTER_STOP"
 
     private lateinit var alarmChannelName: String
     private lateinit var alarmChannelDescription: String
@@ -57,7 +70,6 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
         val observer = Observer<Counter> { counter -> counterModeChanged(counter) }
         viewModel.serviceCounter().observe(this, observer)
         val counters = viewModel.getCounters
-        Log.d("TAG", viewModel.toString())
         checkCounters(counters)
         startForeground(-1, NotificationCompat.Builder(this, SIMPLE_CHANNEL_ID)
             .setContentTitle(resources.getString(R.string.notification_title))
@@ -72,9 +84,9 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
     }
 
     private fun counterModeChanged(counter: Counter?) {
-        Log.d(TAG, "CounterService CounterModeChanged " + counter?.id)
         counter?.apply {
             val intent = Intent(this@CountersService, CountersService::class.java).apply {
+                putExtra(EVENT, EVENT_BUTTON)
                 putExtra(COUNTER, Bundle().apply {
                     putParcelable(COUNTER, counter)
                 })
@@ -85,34 +97,58 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        intent?.getBundleExtra(COUNTER)?.apply {
-            (getParcelable(COUNTER) as Counter?)?.apply {
-                when (state) {
-                    CounterState.RUN      -> {
-                        timers[id]?.let {} ?: CounterTimer(this).also {
-                            it.start()
-                            timers[id] = it
-                        }
-                    }
-                    CounterState.PAUSED   -> {
-                        val timer: CounterTimer? = timers[id]
-                        if (timer != null) {
-                            timer.cancel()
-                            timers.remove(this.id)
-                        }
-                    }
-                    CounterState.FINISHED -> {
-                        val timer: CounterTimer? = timers[id]
-                        if (timer != null) {
-                            timer.cancel()
-                            timers.remove(this.id)
+        intent?.getStringExtra(EVENT)?.apply {
+            when (this) {
+                EVENT_BUTTON -> {
+                    getCounterFromBundle(intent)?.apply {
+                        when (state) {
+                            CounterState.RUN      -> {
+                                addTimer(this)
+                            }
+                            CounterState.PAUSED   -> {
+                                removeTimer(id)
+                                NotificationManagerCompat.from(this@CountersService).cancel(id)
+                                viewModel.timerPause(id)
+                            }
+                            CounterState.FINISHED -> {
+                                removeTimer(id)
+                                NotificationManagerCompat.from(this@CountersService).cancel(id)
+                                viewModel.timerFinish(id)
+                            }
                         }
                     }
                 }
+                EVENT_TIMER  -> {
+                    getCounterFromBundle(intent)?.apply {
+                        removeTimer(id)
+                        val message = if (title.isEmpty()) resources.getString(R.string.notification_alarm_without_title) else String.format(
+                            resources.getString(R.string.notification_alarm_with_title), title
+                        )
+                        sendAlarmNotification(id, resources.getString(R.string.attention), message)
+                        viewModel.timerAlarmed(id)
+                    }
+                }
             }
-
         }
+
         return START_STICKY
+    }
+
+    private fun getCounterFromBundle(intent: Intent?) = intent?.getBundleExtra(COUNTER)?.getParcelable(COUNTER) as Counter?
+
+    private fun addTimer(counter: Counter) {
+        timers[counter.id]?.let {} ?: CounterTimer(counter).also { timer ->
+            timer.start()
+            timers[counter.id] = timer
+        }
+    }
+
+    private fun removeTimer(id: Int) {
+        val timer: CounterTimer? = timers[id]
+        if (timer != null) {
+            timer.cancel()
+            timers.remove(id)
+        }
     }
 
     private fun runService(intent: Intent) {
@@ -158,9 +194,11 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
         message: String,
         notificationType: String
     ) {
+
+
         val notificationBuilder = NotificationCompat.Builder(this, notificationType).apply {
-            setCategory(Notification.CATEGORY_SERVICE)
-            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            setCategory(Notification.CATEGORY_ALARM)
+
             if (title.isNotEmpty()) setContentTitle(title)
             if (message.isNotEmpty()) setContentText(message)
             setStyle(NotificationCompat.BigTextStyle())
@@ -173,11 +211,16 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
                     NotificationCompat.PRIORITY_MIN
                 }
             } else {
+                val intent = Intent(this@CountersService, MultiTimer::class.java)
+                val pendingIntent = PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                setContentIntent(pendingIntent)
                 setOngoing(true)
+                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
                 setVibrate(vibroPattern)
                 setLights(Color.RED, 1000, 500)
                 setAutoCancel(true)
+                setUsesChronometer(true)
                 color = Color.RED
                 setSmallIcon(R.drawable.alarm)
                 priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -228,13 +271,15 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
             ).apply {
                 setDescription(description)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-//                if (channelId == alarmChannelId) {
-//                    enableVibration(true)
-//                    vibrationPattern = vibroPattern
-//                    enableLights(true)
-//                    lightColor = Color.WHITE
-//                    enableVibration(true)
-//                }
+                if (channelId == ALARM_CHANNEL_ID) {
+                    enableVibration(true)
+                    vibrationPattern = vibroPattern
+                    enableLights(true)
+                    lightColor = Color.WHITE
+                } else {
+                    enableVibration(false)
+                    enableLights(false)
+                }
             }
             (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
                 createNotificationChannel(notificationChannel)
@@ -244,25 +289,31 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
 
     inner class CounterTimer(val counter: Counter) : CountDownTimer(counter.currentProgress * 1000L, 1000) {
         override fun onTick(millisUntilFinished: Long) {
-            val currentProgress = (millisUntilFinished / 1000).toInt()
+            val currentProgress = Math.ceil((millisUntilFinished.toDouble() / 1000)).toInt()
             viewModel.timerTick(counter.id, currentProgress)
             sendSimpleNotification(counter.id, counter.title,
                                    String.format(resources.getString(R.string.time_rest_pattern), currentProgress.toMinSec())
             )
+            Log.d(TAG, "Отсчёт таймера: " + currentProgress)
         }
 
         override fun onFinish() {
-            viewModel.timerFinish(counter.id)
-            sendAlarmNotification(counter.id, resources.getString(R.string.attention),
-                                  String.format(resources.getString(R.string.notification_alarm_status) + counter.title)
-            )
+            //viewModel.timerFinish(counter.id)
+
+            val intent = Intent(this@CountersService, CountersService::class.java).apply {
+                putExtra(EVENT, EVENT_TIMER)
+                putExtra(COUNTER, Bundle().apply {
+                    putParcelable(COUNTER, counter)
+                })
+            }
+            runService(intent)
         }
 
     }
 
     fun Int.toMinSec(): String {
-        val minutes : Int = this / 60
-        val seconds : Int = this - 60 * minutes
+        val minutes: Int = this / 60
+        val seconds: Int = this - 60 * minutes
         return String.format(resources.getString(R.string.time_min_sec_pattern), minutes, seconds)
     }
 }

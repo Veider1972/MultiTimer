@@ -20,6 +20,7 @@
         app:drawDot="true"
         app:enableProgressAnimation="false"
         app:progressStrokeWidth="@dimen/progress_bar_stroke_width"
+        app:textColor="@color/black"
         app:textSize="@dimen/progress_bar_text_size" />
 
     <LinearLayout
@@ -35,6 +36,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/title_hint"
             android:paddingStart="@dimen/title_padding_start"
+            android:lines="1"
             android:textSize="@dimen/title_text_size" />
 
         <LinearLayout
@@ -47,12 +49,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginHorizontal="@dimen/button_margin_horizontal"
+                android:paddingHorizontal="-5sp"
                 android:layout_weight="1"
                 android:elevation="@dimen/button_elevation"
                 android:lines="1"
                 android:text="@string/button_text_start"
-                android:textColor="@color/black"
-                app:iconGravity="textStart" />
+                android:textColor="@color/black" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_pause"
@@ -60,12 +62,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginHorizontal="@dimen/button_margin_horizontal"
+                android:paddingHorizontal="-5sp"
                 android:layout_weight="1"
                 android:elevation="@dimen/button_elevation"
                 android:lines="1"
                 android:text="@string/button_text_pause"
-                android:textColor="@color/black"
-                app:iconGravity="textStart" />
+                android:textColor="@color/black" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_stop"
@@ -73,12 +75,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginHorizontal="@dimen/button_margin_horizontal"
+                android:paddingHorizontal="-5sp"
                 android:layout_weight="1"
                 android:elevation="@dimen/button_elevation"
                 android:lines="1"
                 android:text="@string/button_text_stop"
-                android:textColor="@color/black"
-                app:iconGravity="textStart" />
+                android:textColor="@color/black" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
