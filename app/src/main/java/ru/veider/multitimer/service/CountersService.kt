@@ -15,9 +15,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ViewModelProvider
 import ru.veider.multitimer.MultiTimer
 import ru.veider.multitimer.R
@@ -27,7 +25,6 @@ import ru.veider.multitimer.data.CounterState
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.viewmodel.CountersViewModel
 import ru.veider.multitimer.viewmodel.CountersViewModelFactory
-import java.math.RoundingMode
 import java.util.*
 
 class CountersService : LifecycleAndViewStoreOwnerService() {
@@ -169,7 +166,8 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
                     counter.currentProgress = (setTime - timePass).toInt()
                     val timer = CounterTimer(counter).apply { start() }
                     timers[counter.id] = timer
-
+                } else {
+                    onAlarmed(counter)
                 }
             }
         }
@@ -222,7 +220,7 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
                 setAutoCancel(true)
                 setUsesChronometer(true)
                 color = Color.RED
-                setSmallIcon(R.drawable.alarm)
+                setSmallIcon(R.drawable.animated_timer)
                 priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     NotificationManager.IMPORTANCE_HIGH
                 } else {
@@ -298,17 +296,18 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
         }
 
         override fun onFinish() {
-            //viewModel.timerFinish(counter.id)
-
-            val intent = Intent(this@CountersService, CountersService::class.java).apply {
-                putExtra(EVENT, EVENT_TIMER)
-                putExtra(COUNTER, Bundle().apply {
-                    putParcelable(COUNTER, counter)
-                })
-            }
-            runService(intent)
+            onAlarmed(counter)
         }
+    }
 
+    fun onAlarmed(counter: Counter){
+        val intent = Intent(this@CountersService, CountersService::class.java).apply {
+            putExtra(EVENT, EVENT_TIMER)
+            putExtra(COUNTER, Bundle().apply {
+                putParcelable(COUNTER, counter)
+            })
+        }
+        runService(intent)
     }
 
     fun Int.toMinSec(): String {
