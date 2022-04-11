@@ -48,8 +48,8 @@ class CountersAdapter(
     override fun onBindViewHolder(holder: CounterHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
             counters[position].apply {
-               // if (!holder.getTitle.text.equals(this.title))
-                    holder.getTitle.text = this.title + "  "+this.state.toString()
+                if (!holder.getTitle.text.equals(this.title))
+                    holder.getTitle.text = this.title
                 holder.getProgressIndicator.also {
                     if (it.progress.toInt() != this.currentProgress)
                         it.setProgress(this.currentProgress.toDouble(), this.maxProgress.toDouble())
@@ -151,7 +151,7 @@ class CountersAdapter(
 
             buttonStart = binder.buttonStart.apply {
                 setOnClickListener {
-                    if (counter.state != CounterState.RUN) {
+                    if (counter.state != CounterState.RUN && counter.state != CounterState.ALARMED) {
                         events.onTimerStart(counter.id)
                     }
                 }
@@ -164,7 +164,7 @@ class CountersAdapter(
             }
             buttonStop = binder.buttonStop.apply {
                 setOnClickListener {
-                    if (counter.state == CounterState.RUN || counter.state == CounterState.ALARMED)
+                    if (counter.state == CounterState.RUN && counter.state == CounterState.ALARMED && counter.state == CounterState.PAUSED)
                         events.onTimerStop(counter.id)
                 }
             }
@@ -173,7 +173,7 @@ class CountersAdapter(
         fun onBind(counter: Counter) {
             this.counter = counter
             binder.apply {
-                title.text = counter.title  + "  "+counter.state.toString()
+                title.text = counter.title
                 progressIndicator.apply {
                     setProgress(
                         counter.currentProgress.toDouble(),

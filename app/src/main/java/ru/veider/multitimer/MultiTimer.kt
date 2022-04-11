@@ -1,6 +1,7 @@
 package ru.veider.multitimer
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -10,6 +11,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import ru.veider.multitimer.const.COUNTER_ID
+import ru.veider.multitimer.const.TAG
 import ru.veider.multitimer.databinding.ActivityMultiTimerBinding
 
 class MultiTimer : AppCompatActivity() {
@@ -25,7 +28,6 @@ class MultiTimer : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMultiTimer.toolbar)
 
-
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_multi_timer)
@@ -37,6 +39,15 @@ class MultiTimer : AppCompatActivity() {
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
+        intent.extras?.apply {
+                val counterId : Int = intent.extras?.getInt(COUNTER_ID, -1) as Int
+            if (counterId>=0){
+                var bundle = Bundle()
+                bundle.putInt(COUNTER_ID,counterId)
+                navController.navigate(R.id.nav_counters,bundle)
+            }
+
+        }
         navView.setupWithNavController(navController)
     }
 

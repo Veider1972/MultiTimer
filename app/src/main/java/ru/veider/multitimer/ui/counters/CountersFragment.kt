@@ -2,10 +2,6 @@ package ru.veider.multitimer.ui.counters
 
 import android.R.attr
 import android.annotation.SuppressLint
-import android.content.DialogInterface
-import android.content.res.Resources
-import android.graphics.Canvas
-import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.veider.multitimer.R
-import ru.veider.multitimer.const.TAG
+import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.databinding.FragmentCountersBinding
@@ -62,7 +58,7 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         }
 
         val decorator = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL).apply {
-            ContextCompat.getDrawable(requireContext(), R.drawable.divider_drawable)?.also{
+            ContextCompat.getDrawable(requireContext(), R.drawable.divider_drawable)?.also {
                 this.setDrawable(it)
             }
         }
@@ -70,7 +66,7 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
 
         ItemTouchHelper(object : ItemTouchHelper.Callback() {
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-                val movementsFlag = ItemTouchHelper.START
+                val movementsFlag = ItemTouchHelper.START or ItemTouchHelper.END
                 val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
                 return makeMovementFlags(dragFlags, movementsFlag)
             }
@@ -104,6 +100,11 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
 
         binder.fab.setOnClickListener {
             viewModel.addCounter()
+        }
+
+        arguments?.let {
+            val counterId = it.getInt(COUNTER_ID, -1)
+            if (counterId >= 0) onTimerStop(counterId)
         }
 
         return binder.root
