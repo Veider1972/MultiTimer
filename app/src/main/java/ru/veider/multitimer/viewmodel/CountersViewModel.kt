@@ -1,12 +1,14 @@
 package ru.veider.multitimer.viewmodel
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.veider.multitimer.CountersApp
+import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.data.CounterState
 import ru.veider.multitimer.data.Counters
@@ -16,19 +18,16 @@ import java.util.*
 
 class CountersViewModel : ViewModel() {
 
-    private lateinit var counters: Counters
+    private var counters: Counters
     val getCounters get() = counters
-    val context: Context? = CountersApp.getInstance()?.applicationContext
 
     private val db = CountersRepositoryImpl.getInstance()
 
     private val countersLiveData: MutableLiveData<Counters> = MutableLiveData<Counters>()
     private val counterLiveData: MutableLiveData<Counter> = MutableLiveData<Counter>()
-    private val serviceLiveData: MutableLiveData<Counter> = MutableLiveData<Counter>()
 
     fun counters() = countersLiveData
     fun counter() = counterLiveData
-    fun serviceCounter() = serviceLiveData
 
     companion object {
         private var instance: CountersViewModel? = null
@@ -42,6 +41,7 @@ class CountersViewModel : ViewModel() {
         counters = db.getAll()
         if (counters.size == 0) addCounter()
         countersLiveData.postValue(counters)
+        runService(counters)
     }
 
     fun saveCounters() {
@@ -51,7 +51,7 @@ class CountersViewModel : ViewModel() {
         }
     }
 
-    fun updateCounters() {
+    private fun updateCounters() {
         countersLiveData.postValue(counters)
     }
 
@@ -61,13 +61,10 @@ class CountersViewModel : ViewModel() {
         }
     }
 
-    fun updateCounter(counter: Counter) {
-        counterLiveData.postValue(counter)
-    }
-
     fun deleteCounter(id: Int) {
         counters.delByID(id)
         countersLiveData.postValue(counters)
+        removeCounter(id)
     }
 
     fun updateTitle(id: Int, title: String) {
@@ -75,44 +72,50 @@ class CountersViewModel : ViewModel() {
             this.title = title
             counterLiveData.postValue(this)
         }
-
     }
 
     fun updateMaxProgress(id: Int, time: Int) {
-        val counter = counters[counters.getIndexByID(id)].apply {
+        counters[counters.getIndexByID(id)].apply {
             maxProgress = time
             currentProgress = time
+            counterLiveData.postValue(this)
         }
-        counterLiveData.postValue(counter)
     }
 
     fun startCounter(id: Int) {
-        runService()
-        val counter = counters[counters.getIndexByID(id)].apply {
-            if (currentProgress == 0) currentProgress = maxProgress
-            state = CounterState.RUN
-            startTime = Date().time
+        counters[counters.getIndexByID(id)].apply {
+            if (this.state == CounterState.PAUSED || this.state == CounterState.FINISHED) {
+                state = CounterState.RUN
+                startTime = Date().time
+            }
+        }.apply {
+            storeCounter(this)
+            updateService(this)
         }
-        serviceLiveData.postValue(counter)
+
     }
 
     fun pauseCounter(id: Int) {
-        runService()
-        val counter = counters[counters.getIndexByID(id)].apply {
-            state = CounterState.PAUSED
-//            startTime = 0
+        counters[counters.getIndexByID(id)].apply {
+            if (this.state == CounterState.RUN) {
+                state = CounterState.PAUSED
+            }
+        }.apply {
+            storeCounter(this)
+            updateService(this)
         }
-        serviceLiveData.postValue(counter)
     }
 
     fun stopCounter(id: Int) {
-        runService()
-        val counter = counters[counters.getIndexByID(id)].apply {
-            state = CounterState.FINISHED
-            currentProgress = maxProgress
-            //          startTime = 0
+        counters[counters.getIndexByID(id)].apply {
+            if (this.state != CounterState.FINISHED) {
+                state = CounterState.FINISHED
+                currentProgress = maxProgress
+            }
+        }.apply {
+            storeCounter(this)
+            updateService(this)
         }
-        serviceLiveData.postValue(counter)
     }
 
     fun timerTick(id: Int, progress: Int) {
@@ -126,6 +129,7 @@ class CountersViewModel : ViewModel() {
         counters[counters.getIndexByID(id)].apply {
             state = CounterState.PAUSED
             startTime = 0
+//            storeCounter(this)
             counterLiveData.postValue(this)
         }
     }
@@ -135,6 +139,7 @@ class CountersViewModel : ViewModel() {
             state = CounterState.FINISHED
             currentProgress = maxProgress
             startTime = 0
+            //storeCounter(this)
             counterLiveData.postValue(this)
         }
     }
@@ -144,18 +149,49 @@ class CountersViewModel : ViewModel() {
             state = CounterState.ALARMED
             currentProgress = 0
             startTime = 0
-            db.updateCounter(this)
+            storeCounter(this)
             counterLiveData.postValue(this)
         }
     }
 
-    fun runService() {
-        context?.let{
-            val intent = Intent(context, CountersService::class.java)
+    private fun removeCounter(id: Int) {
+        Thread {
+            db.deleteCounter(id)
+            Log.d(TAG, "Удалён счётчик: $id")
+        }.start()
+    }
+
+    private fun storeCounter(counter: Counter) {
+        Thread {
+            db.updateCounter(counter)
+            Log.d(TAG, "Сохранён счётчик: $counter")
+        }.start()
+    }
+
+    private fun runService(counters: Counters) {
+        startService(Intent(CountersApp.getInstance()?.applicationContext, CountersService::class.java).apply {
+            putExtra(EVENT, EVENT_START)
+            putExtra(COUNTERS, Bundle().apply {
+                putParcelable(COUNTERS, counters)
+            })
+        })
+    }
+
+    private fun updateService(counter: Counter) {
+        startService(Intent(CountersApp.getInstance()?.applicationContext, CountersService::class.java).apply {
+            putExtra(EVENT, EVENT_BUTTON)
+            putExtra(COUNTER, Bundle().apply {
+                putParcelable(COUNTER, counter)
+            })
+        })
+    }
+
+    private fun startService(intent: Intent) {
+        CountersApp.getInstance()?.applicationContext?.apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                ContextCompat.startForegroundService(context, intent)
+                ContextCompat.startForegroundService(this, intent)
             else
-                context.startService(intent)
+                this.startService(intent)
         }
     }
 

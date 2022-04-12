@@ -1,18 +1,18 @@
 package ru.veider.multitimer
 
 import android.os.Bundle
-import android.util.Log
-import android.view.Menu
-import com.google.android.material.navigation.NavigationView
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import ru.veider.multitimer.const.COUNTER_ID
-import ru.veider.multitimer.const.TAG
+import com.google.android.material.navigation.NavigationView
+
+import ru.veider.multitimer.const.*
 import ru.veider.multitimer.databinding.ActivityMultiTimerBinding
 
 class MultiTimer : AppCompatActivity() {
@@ -35,26 +35,31 @@ class MultiTimer : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_counters, R.id.nav_settings, R.id.nav_about
+                R.id.nav_counters, R.id.nav_about
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         intent.extras?.apply {
-                val counterId : Int = intent.extras?.getInt(COUNTER_ID, -1) as Int
-            if (counterId>=0){
-                var bundle = Bundle()
-                bundle.putInt(COUNTER_ID,counterId)
-                navController.navigate(R.id.nav_counters,bundle)
+            val counterId: Int = intent.extras?.getInt(COUNTER_ID, -1) as Int
+            if (counterId >= 0) {
+                val bundle = Bundle()
+                bundle.putInt(COUNTER_ID, counterId)
+                navController.navigate(R.id.nav_counters, bundle)
             }
 
         }
         navView.setupWithNavController(navController)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.multi_timer, menu)
-        return true
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId==android.R.id.home){
+            val drawerLayout = binding.drawerLayout
+            if (drawerLayout.isDrawerOpen(GravityCompat.START))
+                drawerLayout.closeDrawer(GravityCompat.START)
+            else
+                drawerLayout.openDrawer(GravityCompat.START)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {

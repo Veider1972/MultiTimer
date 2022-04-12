@@ -28,9 +28,9 @@ class CountersAdapter(
     private val events: CountersAdapterEvents = fragment
 
     interface CountersAdapterEvents {
-        fun onTimerStart(id: Int)
-        fun onTimerPause(id: Int)
-        fun onTimerStop(id: Int)
+        fun onClickStartButton(id: Int)
+        fun onClickPauseButton(id: Int)
+        fun onClickStopButton(id: Int)
         fun onTimerTitleChange(id: Int, title: String)
         fun onTimerSetValue(id: Int, seconds: Int)
     }
@@ -151,21 +151,17 @@ class CountersAdapter(
 
             buttonStart = binder.buttonStart.apply {
                 setOnClickListener {
-                    if (counter.state != CounterState.RUN && counter.state != CounterState.ALARMED) {
-                        events.onTimerStart(counter.id)
-                    }
+                    events.onClickStartButton(counter.id)
                 }
             }
             buttonPause = binder.buttonPause.apply {
                 setOnClickListener {
-                    if (counter.state == CounterState.RUN)
-                        events.onTimerPause(counter.id)
+                    events.onClickPauseButton(counter.id)
                 }
             }
             buttonStop = binder.buttonStop.apply {
                 setOnClickListener {
-                    if (counter.state == CounterState.RUN && counter.state == CounterState.ALARMED && counter.state == CounterState.PAUSED)
-                        events.onTimerStop(counter.id)
+                    events.onClickStopButton(counter.id)
                 }
             }
         }

@@ -2,8 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/add_new_counter"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:title="@string/adding_new_counter"
+        android:icon="@drawable/add_alarm"
+        android:iconTint="@color/black"
+        app:showAsAction="always" />
 </menu>

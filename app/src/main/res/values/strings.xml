@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Мультитаймер</string>
-    <string name="adding_new_timer">Добавить новый таймер</string>
+    <string name="adding_new_counter">Добавить новый таймер</string>
     <string name="title_hint">Название события</string>
     <string name="button_text_stop">Стоп</string>
     <string name="button_text_pause">Пауза</string>
@@ -34,5 +34,6 @@
     <string name="menu_about">О программе</string>
     <string name="time_rest_pattern">Осталось: %s</string>
     <string name="time_min_sec_pattern">%d мин. %d сек.</string>
+    <string name="time_hours_min_sec_pattern">%d ч. %d мин. %d сек.</string>
     <string name="attention">Внимание!</string>
 </resources>

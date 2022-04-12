@@ -54,18 +54,18 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
             this.viewModelStore,
             CountersViewModelFactory.getInstance()
         )[CountersViewModel::class.java]
-        val observer = Observer<Counter> { counter -> counterModeChanged(counter) }
-        viewModel.serviceCounter().observe(this, observer)
-        val counters = viewModel.getCounters
-        checkCounters(counters)
+//        val observer = Observer<Counter> { counter -> counterModeChanged(counter) }
+//        viewModel.serviceCounter().observe(this, observer)
+//        val counters = viewModel.getCounters
         createSimpleNotificationChannel()
         createAlarmNotificationChannel()
         setIdleMessage()
+//        checkCounters(counters)
     }
 
     fun setIdleMessage() {
         startForeground(-1, NotificationCompat.Builder(this, SIMPLE_CHANNEL_ID)
-            .setContentTitle(resources.getString(R.string.notification_title))
+            .setContentText(resources.getString(R.string.notification_title))
             .build()
         )
     }
@@ -79,17 +79,17 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
         super.onTaskRemoved(rootIntent)
     }
 
-    private fun counterModeChanged(counter: Counter?) {
-        counter?.apply {
-            val intent = Intent(this@CountersService, CountersService::class.java).apply {
-                putExtra(EVENT, EVENT_BUTTON)
-                putExtra(COUNTER, Bundle().apply {
-                    putParcelable(COUNTER, counter)
-                })
-            }
-            runService(intent)
-        }
-    }
+//    private fun counterModeChanged(counter: Counter?) {
+//        counter?.apply {
+//            val intent = Intent(this@CountersService, CountersService::class.java).apply {
+//                putExtra(EVENT, EVENT_BUTTON)
+//                putExtra(COUNTER, Bundle().apply {
+//                    putParcelable(COUNTER, counter)
+//                })
+//            }
+//            runService(intent)
+//        }
+//    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
@@ -105,7 +105,7 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
                             CounterState.PAUSED   -> {
                                 removeTimer(this)
                                 NotificationManagerCompat.from(this@CountersService).cancel(id)
-                                viewModel.timerPause(id)
+                                if (timers.size == 0 && alarmes.size == 0) stopSelf()
                                 removeIdleMessage()
                             }
                             CounterState.FINISHED -> {
@@ -113,6 +113,7 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
                                 removeAlarmed(this)
                                 NotificationManagerCompat.from(this@CountersService).cancel(id)
                                 viewModel.timerFinish(id)
+                                if (timers.size == 0 && alarmes.size == 0) stopSelf()
                                 removeIdleMessage()
                             }
                         }
@@ -126,13 +127,46 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
                         viewModel.timerAlarmed(id)
                     }
                 }
+                EVENT_STOP   -> {
+                    stopSelf()
+                }
+                EVENT_START  -> {
+                    getCountersFromBundle(intent)?.apply {
+                        var hasRunCounters = false
+                        for (counter in this) {
+                            when (counter.state) {
+                                CounterState.RUN     -> {
+                                    hasRunCounters = true
+                                    val currentTime = Date().time
+                                    val startTime = counter.startTime
+                                    val timePass = (currentTime - startTime) / 1000
+                                    val setTime = counter.maxProgress
+                                    if (timePass < setTime) {
+                                        counter.currentProgress = (setTime - timePass).toInt()
+                                        val timer = CounterTimer(counter).apply { start() }
+                                        timers[counter.id] = timer
+                                    } else {
+                                        onAlarmed(counter)
+                                    }
+                                }
+                                CounterState.ALARMED -> {
+                                    hasRunCounters = true
+                                    onAlarmed(counter)
+                                }
+                            }
+                        }
+                        if (!hasRunCounters) {
+                            stopSelf()
+                        }
+                    }
+                }
             }
         }
-        if (timers.size == 0 && alarmes.size == 0) setIdleMessage()
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     private fun getCounterFromBundle(intent: Intent?) = intent?.getBundleExtra(COUNTER)?.getParcelable(COUNTER) as Counter?
+    private fun getCountersFromBundle(intent: Intent?) = intent?.getBundleExtra(COUNTERS)?.getParcelable(COUNTERS) as Counters?
 
     private fun addAlarmed(counter: Counter) {
         alarmes[counter.id]?.let {} ?: AlarmTimer(counter).apply {
@@ -176,9 +210,11 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
     }
 
     private fun checkCounters(counters: Counters) {
+        var hasRunCounters = false
         for (counter in counters) {
             when (counter.state) {
                 CounterState.RUN     -> {
+                    hasRunCounters = true
                     val currentTime = Date().time
                     val startTime = counter.startTime
                     val timePass = (currentTime - startTime) / 1000
@@ -192,9 +228,16 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
                     }
                 }
                 CounterState.ALARMED -> {
+                    hasRunCounters = true
                     onAlarmed(counter)
                 }
             }
+        }
+        if (!hasRunCounters) {
+            val intent = Intent(this@CountersService, CountersService::class.java).apply {
+                putExtra(EVENT, EVENT_STOP)
+            }
+            runService(intent)
         }
     }
 
@@ -319,7 +362,7 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
         }
     }
 
-    inner class AlarmTimer(val counter: Counter) : CountDownTimer(10 * 1000L, 3 * 1000L) {
+    inner class AlarmTimer(val counter: Counter) : CountDownTimer(3600 * 1000L, 3 * 1000L) {
         override fun onTick(millisUntilFinished: Long) {
             sendAlarmMessage(counter)
         }
@@ -354,8 +397,13 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
     }
 
     fun Int.toMinSec(): String {
-        val minutes: Int = this / 60
-        val seconds: Int = this - 60 * minutes
-        return String.format(resources.getString(R.string.time_min_sec_pattern), minutes, seconds)
+        val hours: Int = this / 3600
+        val minutes: Int = (this - hours * 3600) / 60
+        val seconds: Int = this - hours * 3600 - 60 * minutes
+        return if (hours == 0)
+            String.format(resources.getString(R.string.time_min_sec_pattern), minutes, seconds)
+        else
+            String.format(resources.getString(R.string.time_hours_min_sec_pattern), hours, minutes, seconds
+            )
     }
 }

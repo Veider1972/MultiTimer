@@ -3,10 +3,7 @@ package ru.veider.multitimer.ui.counters
 import android.R.attr
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -42,7 +39,6 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         savedInstanceState: Bundle?
     ): View {
         viewModel = ViewModelProvider(this, CountersViewModelFactory.getInstance())[CountersViewModel::class.java]
-        Log.d("TAG", viewModel.toString())
         val countersObserver = Observer<Counters> { counters -> isCountersChanged(counters) }
         viewModel.counters().observe(this.viewLifecycleOwner, countersObserver)
 
@@ -80,39 +76,34 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                if (attr.direction == ItemTouchHelper.START) {
-                    val position = viewHolder.adapterPosition
-                    val counterID: Int = (viewHolder as CounterHolder).counter.id
-                    val dialog = MaterialAlertDialogBuilder(this@CountersFragment.requireContext())
-                    dialog.setMessage("Вы подтверждаете удаление таймера?")
-                    dialog.setPositiveButton("Да") { _, _ ->
-                        viewModel.deleteCounter(counterID)
-                        (binder.listView.adapter as CountersAdapter).notifyItemRemoved(position)
-                    }
-                    dialog.setNegativeButton("Нет"
-                    ) { _, _ ->
-                        (binder.listView.adapter as CountersAdapter).notifyItemChanged(position)
-                    }
-                    dialog.show()
+                val position = viewHolder.adapterPosition
+                val counterID: Int = (viewHolder as CounterHolder).counter.id
+                val dialog = MaterialAlertDialogBuilder(this@CountersFragment.requireContext())
+                dialog.setMessage("Вы подтверждаете удаление таймера?")
+                dialog.setPositiveButton("Да") { _, _ ->
+                    viewModel.deleteCounter(counterID)
+                    (binder.listView.adapter as CountersAdapter).notifyItemRemoved(position)
                 }
+                dialog.setNegativeButton("Нет"
+                ) { _, _ ->
+                    (binder.listView.adapter as CountersAdapter).notifyItemChanged(position)
+                }
+                dialog.show()
             }
         }).attachToRecyclerView(binder.listView)
 
-        binder.fab.setOnClickListener {
-            viewModel.addCounter()
-        }
-
         arguments?.let {
             val counterId = it.getInt(COUNTER_ID, -1)
-            if (counterId >= 0) onTimerStop(counterId)
+            if (counterId >= 0) onClickStopButton(counterId)
         }
 
+        setHasOptionsMenu(true)
         return binder.root
     }
 
+
     private fun isCounterChanged(counter: Counter?) {
         counter?.let {
-            Log.d(TAG, "isCounterChanged " + counter.id)
             binder.listView.adapter?.apply {
                 notifyItemChanged(viewModel.getCounters.getIndexByID(counter.id), 1)
             }
@@ -121,9 +112,20 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
 
     private fun isCountersChanged(counters: Counters?) {
         counters?.let {
-            Log.d(TAG, "isCountersChanged all")
             binder.listView.adapter = CountersAdapter(this, counters)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.multi_timer, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.add_new_counter -> viewModel.addCounter()
+        }
+        return true
     }
 
     override fun onPause() {
@@ -136,15 +138,15 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         _binder = null
     }
 
-    override fun onTimerStart(id: Int) {
+    override fun onClickStartButton(id: Int) {
         viewModel.startCounter(id)
     }
 
-    override fun onTimerPause(id: Int) {
+    override fun onClickPauseButton(id: Int) {
         viewModel.pauseCounter(id)
     }
 
-    override fun onTimerStop(id: Int) {
+    override fun onClickStopButton(id: Int) {
         viewModel.stopCounter(id)
     }
 
@@ -155,6 +157,5 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
     override fun onTimerSetValue(id: Int, seconds: Int) {
         viewModel.updateMaxProgress(id, seconds)
     }
-
 
 }
