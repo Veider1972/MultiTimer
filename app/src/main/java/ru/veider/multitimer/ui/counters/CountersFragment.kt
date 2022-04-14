@@ -1,6 +1,5 @@
 package ru.veider.multitimer.ui.counters
 
-import android.R.attr
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
@@ -27,8 +26,6 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
 
     private var _binder: FragmentCountersBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binder get() = _binder!!
     private lateinit var viewModel: CountersViewModel
 
@@ -39,6 +36,7 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         savedInstanceState: Bundle?
     ): View {
         viewModel = ViewModelProvider(this, CountersViewModelFactory.getInstance())[CountersViewModel::class.java]
+
         val countersObserver = Observer<Counters> { counters -> isCountersChanged(counters) }
         viewModel.counters().observe(this.viewLifecycleOwner, countersObserver)
 
@@ -100,7 +98,6 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         setHasOptionsMenu(true)
         return binder.root
     }
-
 
     private fun isCounterChanged(counter: Counter?) {
         counter?.let {

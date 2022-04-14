@@ -3,10 +3,8 @@ package ru.veider.multitimer.repository
 import androidx.room.Room
 import ru.veider.multitimer.CountersApp
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.data.CounterState
+import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.data.Counters
-import java.util.*
-import kotlin.collections.ArrayList
 
 private const val DB_NAME = "Counters.db"
 

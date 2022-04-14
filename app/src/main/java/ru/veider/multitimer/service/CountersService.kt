@@ -1,5 +1,6 @@
 package ru.veider.multitimer.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -11,24 +12,22 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import ru.veider.multitimer.MultiTimer
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.data.CounterState
+import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.viewmodel.CountersViewModel
 import ru.veider.multitimer.viewmodel.CountersViewModelFactory
 import java.util.*
+import kotlin.math.ceil
 
 class CountersService : LifecycleAndViewStoreOwnerService() {
-
 
     private lateinit var alarmChannelName: String
     private lateinit var alarmChannelDescription: String
@@ -37,40 +36,34 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
     private val vibroPattern =
             arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()
 
-
     private var timers: Hashtable<Int, CountersService.CounterTimer> = Hashtable()
     private var alarmes: Hashtable<Int, CountersService.AlarmTimer> = Hashtable()
     private lateinit var viewModel: CountersViewModel
 
     override fun onCreate() {
+        super.onCreate()
         alarmChannelName = resources.getString(R.string.alarm_channel_name)
         alarmChannelDescription = resources.getString(R.string.alarm_channel_description)
         simpleChannelName = resources.getString(R.string.simple_channel_name)
         simpleChannelDescription = resources.getString(R.string.simple_channel_description)
-        super.onCreate()
-//        sendSimpleNotification(resources.getString(R.string.notification_timer_status), "")
 
         viewModel = ViewModelProvider(
             this.viewModelStore,
             CountersViewModelFactory.getInstance()
         )[CountersViewModel::class.java]
-//        val observer = Observer<Counter> { counter -> counterModeChanged(counter) }
-//        viewModel.serviceCounter().observe(this, observer)
-//        val counters = viewModel.getCounters
         createSimpleNotificationChannel()
         createAlarmNotificationChannel()
         setIdleMessage()
-//        checkCounters(counters)
     }
 
-    fun setIdleMessage() {
+    private fun setIdleMessage() {
         startForeground(-1, NotificationCompat.Builder(this, SIMPLE_CHANNEL_ID)
             .setContentText(resources.getString(R.string.notification_title))
             .build()
         )
     }
 
-    fun removeIdleMessage() {
+    private fun removeIdleMessage() {
         NotificationManagerCompat.from(this@CountersService).cancel(-1)
     }
 
@@ -78,18 +71,6 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
         viewModel.saveCounters()
         super.onTaskRemoved(rootIntent)
     }
-
-//    private fun counterModeChanged(counter: Counter?) {
-//        counter?.apply {
-//            val intent = Intent(this@CountersService, CountersService::class.java).apply {
-//                putExtra(EVENT, EVENT_BUTTON)
-//                putExtra(COUNTER, Bundle().apply {
-//                    putParcelable(COUNTER, counter)
-//                })
-//            }
-//            runService(intent)
-//        }
-//    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
@@ -209,38 +190,6 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
             startService(intent)
     }
 
-    private fun checkCounters(counters: Counters) {
-        var hasRunCounters = false
-        for (counter in counters) {
-            when (counter.state) {
-                CounterState.RUN     -> {
-                    hasRunCounters = true
-                    val currentTime = Date().time
-                    val startTime = counter.startTime
-                    val timePass = (currentTime - startTime) / 1000
-                    val setTime = counter.maxProgress
-                    if (timePass < setTime) {
-                        counter.currentProgress = (setTime - timePass).toInt()
-                        val timer = CounterTimer(counter).apply { start() }
-                        timers[counter.id] = timer
-                    } else {
-                        onAlarmed(counter)
-                    }
-                }
-                CounterState.ALARMED -> {
-                    hasRunCounters = true
-                    onAlarmed(counter)
-                }
-            }
-        }
-        if (!hasRunCounters) {
-            val intent = Intent(this@CountersService, CountersService::class.java).apply {
-                putExtra(EVENT, EVENT_STOP)
-            }
-            runService(intent)
-        }
-    }
-
     override fun onDestroy() {
         NotificationManagerCompat.from(this).cancelAll()
         super.onDestroy()
@@ -261,14 +210,13 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
         sendNotification(channel, title, message, ALARM_CHANNEL_ID)
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     private fun sendNotification(
         channel: Int,
         title: String,
         message: String,
         notificationType: String
     ) {
-
-
         val notificationBuilder = NotificationCompat.Builder(this, notificationType).apply {
             setCategory(Notification.CATEGORY_ALARM)
 
@@ -374,7 +322,7 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
 
     inner class CounterTimer(val counter: Counter) : CountDownTimer(counter.currentProgress * 1000L, 1000) {
         override fun onTick(millisUntilFinished: Long) {
-            val currentProgress = Math.ceil((millisUntilFinished.toDouble() / 1000)).toInt()
+            val currentProgress = ceil((millisUntilFinished.toDouble() / 1000)).toInt()
             viewModel.timerTick(counter.id, currentProgress)
             sendSimpleNotification(counter.id, counter.title,
                                    String.format(resources.getString(R.string.time_rest_pattern), currentProgress.toMinSec())

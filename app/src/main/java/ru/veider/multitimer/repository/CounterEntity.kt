@@ -2,7 +2,6 @@ package ru.veider.multitimer.repository
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import ru.veider.multitimer.data.CounterState
 
 @Entity
 data class CounterEntity (

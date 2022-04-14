@@ -1,17 +1,18 @@
 package ru.veider.multitimer.const
 
+enum class CounterState {
+    PAUSED, RUN, FINISHED, ALARMED
+}
 
-// Utils
 const val TAG = "TAG"
 
-// Service
-val ALARM_CHANNEL_ID = "ALARM_CHANNEL_ID"
-val SIMPLE_CHANNEL_ID = "SIMPLE_CHANNEL_ID"
-val COUNTER_ID = "COUNTER_ID"
-val COUNTER = "COUNTER"
-val COUNTERS = "COUNTERS"
-val EVENT = "EVENT"
-val EVENT_BUTTON = "EVENT_BUTTON"
-val EVENT_TIMER = "EVENT_TIMER"
-val EVENT_STOP = "EVENT_STOP"
-val EVENT_START = "EVENT_STOP"
+const val ALARM_CHANNEL_ID = "ALARM_CHANNEL_ID"
+const val SIMPLE_CHANNEL_ID = "SIMPLE_CHANNEL_ID"
+const val COUNTER_ID = "COUNTER_ID"
+const val COUNTER = "COUNTER"
+const val COUNTERS = "COUNTERS"
+const val EVENT = "EVENT"
+const val EVENT_BUTTON = "EVENT_BUTTON"
+const val EVENT_TIMER = "EVENT_TIMER"
+const val EVENT_STOP = "EVENT_STOP"
+const val EVENT_START = "EVENT_STOP"

@@ -1,6 +1,5 @@
 package ru.veider.multitimer.ui.counters
 
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,18 +9,17 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.veider.multitimer.R
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.data.CounterState
+import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.databinding.ItemCounterBinding
-import ru.veider.multitimer.databinding.LayoutQueryBinding
-import ru.veider.multitimer.timeselector.TimeSelector
+import ru.veider.multitimer.ui.timeselector.TimeSelector
+import ru.veider.multitimer.ui.inputdialog.InputDialog
 
 
 class CountersAdapter(
-    val fragment: CountersFragment,
+    private val fragment: CountersFragment,
     private var counters: Counters
 ) : RecyclerView.Adapter<CountersAdapter.CounterHolder>() {
 
@@ -56,7 +54,6 @@ class CountersAdapter(
                     setProgressIndicatorBackgroundColor(it, this)
                 }
             }
-
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -68,7 +65,6 @@ class CountersAdapter(
             else
                 progressIndicator.progressBackgroundColor = ContextCompat.getColor(fragment.requireContext(), R.color.timer_simple_color)
 
-
     override fun getItemCount() = counters.size
 
     fun swapItems(fromPosition: Int, toPosition: Int) {
@@ -77,8 +73,7 @@ class CountersAdapter(
     }
 
     //========== CounterHolder====================================================
-    inner class CounterHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-        TimeSelector.TimeSelectorEvent {
+    inner class CounterHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private var title: TextView
         val getTitle get() = title
@@ -93,27 +88,9 @@ class CountersAdapter(
         init {
             title = binder.title.apply {
                 setOnClickListener {
-                    val inflater = LayoutInflater.from(this.context)
-                    val binder = LayoutQueryBinding.inflate(inflater)
-                    MaterialAlertDialogBuilder(this.context).apply {
-                        setView(binder.root)
-                        if (text.isNotEmpty())
-                            binder.inputText.setText(counter.title)
-                        setPositiveButton(
-                            resources.getString(R.string.button_text_accept),
-                            DialogInterface.OnClickListener { _, _ ->
-                                if (binder.inputText.text.toString().isNotEmpty()) {
-                                    counter.apply {
-                                        title = binder.inputText.text.toString()
-                                        events.onTimerTitleChange(counter.id, title)
-                                    }
-                                }
-                            })
-                        setNegativeButton(
-                            resources.getString(R.string.button_text_cancel),
-                            DialogInterface.OnClickListener { _, _ ->
-                            })
-                    }.show()
+                    InputDialog.getInstance(counter).show((itemView.context as AppCompatActivity).supportFragmentManager,
+                                                          "TAG"
+                    )
                 }
             }
             progressIndicator = binder.progressIndicator.apply {
@@ -139,10 +116,7 @@ class CountersAdapter(
                     sb.toString()
                 }
                 setOnClickListener {
-                    TimeSelector(
-                        this@CounterHolder,
-                        counter
-                    ).showNow(
+                    TimeSelector.getInstance(counter).show(
                         (itemView.context as AppCompatActivity).supportFragmentManager,
                         "TAG"
                     )
@@ -178,10 +152,6 @@ class CountersAdapter(
                     setProgressIndicatorBackgroundColor(this, counter)
                 }
             }
-        }
-
-        override fun onTimeSelected(id: Int, maxProgress: Int) {
-            events.onTimerSetValue(id, maxProgress)
         }
     }
 }

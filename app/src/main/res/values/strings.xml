@@ -42,4 +42,5 @@
     <string name="about_email">veider@inbox.ru</string>
     <string name="about_date">Апрель, 2022</string>
     <string name="about_version">Версия 1.0.0</string>
+    <string name="query_text_hint">Название события</string>
 </resources>

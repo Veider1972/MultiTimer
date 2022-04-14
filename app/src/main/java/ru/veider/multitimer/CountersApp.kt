@@ -3,7 +3,6 @@ package ru.veider.multitimer
 import android.app.Application
 import android.content.Intent
 import android.os.Build
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import ru.veider.multitimer.service.CountersService
 

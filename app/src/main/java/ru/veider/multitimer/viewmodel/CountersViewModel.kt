@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import ru.veider.multitimer.CountersApp
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.data.CounterState
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.repository.CountersRepositoryImpl
 import ru.veider.multitimer.service.CountersService
@@ -31,10 +30,7 @@ class CountersViewModel : ViewModel() {
 
     companion object {
         private var instance: CountersViewModel? = null
-        fun getInstance() =
-                instance ?: synchronized(CountersViewModel::class.java) {
-                    instance ?: CountersViewModel().also { instance = it }
-                }
+        fun getInstance() = instance?.apply {} ?: CountersViewModel().also { instance = it }
     }
 
     init {
@@ -92,7 +88,6 @@ class CountersViewModel : ViewModel() {
             storeCounter(this)
             updateService(this)
         }
-
     }
 
     fun pauseCounter(id: Int) {
@@ -125,21 +120,11 @@ class CountersViewModel : ViewModel() {
         }
     }
 
-    fun timerPause(id: Int) {
-        counters[counters.getIndexByID(id)].apply {
-            state = CounterState.PAUSED
-            startTime = 0
-//            storeCounter(this)
-            counterLiveData.postValue(this)
-        }
-    }
-
     fun timerFinish(id: Int) {
         counters[counters.getIndexByID(id)].apply {
             state = CounterState.FINISHED
             currentProgress = maxProgress
             startTime = 0
-            //storeCounter(this)
             counterLiveData.postValue(this)
         }
     }
@@ -194,5 +179,4 @@ class CountersViewModel : ViewModel() {
                 this.startService(intent)
         }
     }
-
 }

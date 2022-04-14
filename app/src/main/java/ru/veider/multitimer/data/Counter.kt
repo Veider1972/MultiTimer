@@ -2,6 +2,7 @@ package ru.veider.multitimer.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import ru.veider.multitimer.const.CounterState
 
 @Parcelize
 data class Counter(

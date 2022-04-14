@@ -9,10 +9,6 @@ class Counters: ArrayList<Counter>(), Parcelable {
 
     private val maxID get() = if (size > 0) last().id else 0
 
-    fun getByID(id: Int): Counter {
-        return get(getIndexByID(id))
-    }
-
     fun delByID(id: Int) {
         removeAt(getIndexByID(id))
     }
@@ -29,10 +25,6 @@ class Counters: ArrayList<Counter>(), Parcelable {
         val newCounter = Counter(newID)
         add(newCounter)
         return newCounter
-    }
-
-    fun update(counter: Counter) {
-        set(getIndexByID(counter.id), counter)
     }
 
     fun swap(fromPosition: Int, toPosition: Int): Boolean {

@@ -1,15 +1,17 @@
-package ru.veider.multitimer.timeselector
+package ru.veider.multitimer.ui.timeselector
 
 import android.app.Dialog
 import android.os.Bundle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import android.content.DialogInterface
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import ru.veider.multitimer.R
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.databinding.LayoutTimeSelectBinding
+import ru.veider.multitimer.viewmodel.CountersViewModel
+import ru.veider.multitimer.viewmodel.CountersViewModelFactory
 
-class TimeSelector(private val timeSelectorEvent: TimeSelectorEvent, private val counter: Counter) :
+class TimeSelector :
     DialogFragment() {
     private var firstHours = 0
     private var secondHours = 0
@@ -17,12 +19,21 @@ class TimeSelector(private val timeSelectorEvent: TimeSelectorEvent, private val
     private var secondMinutes = 0
     private var firstSeconds = 0
     private var secondSeconds = 0
+    private lateinit var viewModel: CountersViewModel
+    private var _binder: LayoutTimeSelectBinding? = null
+    private val binder get() = _binder!!
 
-    interface TimeSelectorEvent {
-        fun onTimeSelected(id: Int, maxProgress: Int)
+    companion object {
+        private var instance: TimeSelector? = null
+        private lateinit var counter: Counter
+        fun getInstance(counter: Counter): TimeSelector {
+            this.counter = counter
+            return instance?.apply {} ?: TimeSelector().also { instance = it }
+        }
     }
 
-    init {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        viewModel = ViewModelProvider(this, CountersViewModelFactory.getInstance())[CountersViewModel::class.java]
         var currentProgress = counter.maxProgress
         val hours = (currentProgress / 3600)
         currentProgress %= 3600
@@ -34,10 +45,7 @@ class TimeSelector(private val timeSelectorEvent: TimeSelectorEvent, private val
         secondMinutes = minutes - firstMinutes * 10
         firstSeconds = (seconds / 10)
         secondSeconds = seconds - firstSeconds * 10
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binder = LayoutTimeSelectBinding.inflate(layoutInflater).apply {
+        _binder = LayoutTimeSelectBinding.inflate(layoutInflater).apply {
             firstHours.value = this@TimeSelector.firstHours
             secondHours.value = this@TimeSelector.secondHours
             firstMinutes.value = this@TimeSelector.firstMinutes
@@ -46,14 +54,9 @@ class TimeSelector(private val timeSelectorEvent: TimeSelectorEvent, private val
             secondSeconds.value = this@TimeSelector.secondSeconds
         }
         val dialog = MaterialAlertDialogBuilder(requireContext()).apply {
-            setNegativeButton(getString(R.string.button_text_cancel)) { dialogInterface: DialogInterface?, which: Int -> }
-            setPositiveButton(getString(R.string.button_text_set)) { dialogInterface: DialogInterface?, which: Int ->
-                with(binder) {
-                    val seconds = 3600 * (10 * firstHours.value + secondHours.value) +
-                            60 * (10 * firstMinutes.value + secondMinutes.value) +
-                            (10 * firstSeconds.value + secondSeconds.value)
-                    timeSelectorEvent.onTimeSelected(counter.id, seconds)
-                }
+            setNegativeButton(getString(R.string.button_text_cancel), null)
+            setPositiveButton(getString(R.string.button_text_set)) { _, _ ->
+                viewModel.updateMaxProgress(counter.id, getSeconds())
             }
             setTitle(getString(R.string.time_set_dialog_title))
             setView(binder.root)
@@ -61,10 +64,24 @@ class TimeSelector(private val timeSelectorEvent: TimeSelectorEvent, private val
         return dialog.show()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        counter.maxProgress = getSeconds()
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onStart() {
         this.dialog?.setCanceledOnTouchOutside(false)
         super.onStart()
     }
 
+    override fun onDestroy() {
+        _binder = null
+        super.onDestroy()
+    }
 
+    private fun getSeconds(): Int {
+        return 3600 * (10 * binder.firstHours.value + binder.secondHours.value) +
+                60 * (10 * binder.firstMinutes.value + binder.secondMinutes.value) +
+                (10 * binder.firstSeconds.value + binder.secondSeconds.value)
+    }
 }
