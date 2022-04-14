@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Мультитаймер</string>
     <string name="adding_new_counter">Добавить новый таймер</string>
-    <string name="title_hint">Название события</string>
+    <string name="title_hint">Без названия</string>
     <string name="button_text_stop">Стоп</string>
     <string name="button_text_pause">Пауза</string>
     <string name="button_text_start">Старт</string>
@@ -25,9 +25,7 @@
     <string name="title_activity_main2">MainActivity2</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Мультитаймер</string>
     <string name="nav_header_subtitle">veider@inbox.ru</string>
-    <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="menu_counters">Таймеры</string>
     <string name="menu_preferences">Настройка</string>
@@ -36,4 +34,12 @@
     <string name="time_min_sec_pattern">%d мин. %d сек.</string>
     <string name="time_hours_min_sec_pattern">%d ч. %d мин. %d сек.</string>
     <string name="attention">Внимание!</string>
+    <string name="about_copyrights">Copyright © by Vadim Korkhovoy, 2022</string>
+    <string name="about_guide">Сортировка - перетаскиванием\nУдаление - смахиванием\nВсё остальное - нажатием</string>
+    <string name="about_guide_title">Управление</string>
+    <string name="about_description">Программа написана по мотивам игры Xcraft во имя игроков кланов \u0022AURUS\u0022 и \u0022Phoenix Star Sindicate - Private\u0022.\nАвтор - игрок Ko4ubey</string>
+    <string name="about_description_title">Описание</string>
+    <string name="about_email">veider@inbox.ru</string>
+    <string name="about_date">Апрель, 2022</string>
+    <string name="about_version">Версия 1.0.0</string>
 </resources>

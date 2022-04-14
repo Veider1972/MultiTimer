@@ -3,9 +3,9 @@
     // Button
     <color name="color_on_surface">#000000</color>
     <color name="color_primary">#8BC34A</color>
-    <color name="color_primary_dark">#33691E</color>
-    <color name="color_on_primary">#FEFEFE</color>
-    <color name="color_primary_container">#C3F0A0</color>
+    <color name="color_primary_dark">#4F702A</color>
+    <color name="color_on_primary">#000000</color>
+    <color name="color_primary_container">#5D7342</color>
     <color name="color_on_primary_container">#0B2004</color>
     <color name="color_secondary">#4CAF50</color>
     <color name="color_on_secondary">#FEFEFE</color>
@@ -20,5 +20,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="divider">?attr/colorPrimary</color>
-    <color name="text_color">#000000</color>
+    <color name="text_color">#FFFFFF</color>
 </resources>

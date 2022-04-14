@@ -1,4 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name= "ThemeOverlay.Material3.Button.ElevatedButton">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:elevation">@dimen/global_elevation</item>
+        <item name="singleLine">true</item>
+        <item name="backgroundTint">?colorPrimary</item>
+    </style>
+
+    <style name="TextView">
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <style name="TextView.Navigation">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TextView.Navigation.Header">
+        <item name="android:paddingTop">@dimen/single_padding</item>
+        <item name="textAllCaps">true</item>
+        <item name="android:textSize">@dimen/nav_header_title_text_size</item>
+    </style>
+
+    <style name="TextView.Navigation.Email">
+        <item name="android:textSize">@dimen/nav_header_description_text_size</item>
+    </style>
+
+    <style name="TextView.Title">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">@dimen/button_margin_horizontal</item>
+        <item name="paddingStart">@dimen/title_padding_start</item>
+        <item name="singleLine">true</item>
+        <item name="android:textSize">@dimen/title_text_size</item>
+    </style>
+
+    <style name="TextView.About">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TextView.About.Title">
+        <item name="textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">@dimen/title_text_size</item>
+    </style>
+
+    <style name="TextView.About.Version">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">@dimen/about_description_text_size</item>
+    </style>
+
+    <style name="TextView.About.Date">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">@dimen/about_date_text_size</item>
+    </style>
+
+    <style name="TextView.About.Email">
+        <item name="android:textStyle">italic</item>
+        <item name="android:autoLink">email</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="TextView.About.Header">
+        <item name="android:layout_marginTop">@dimen/single_padding</item>
+        <item name="android:textSize">@dimen/about_title_text_size</item>
+        <item name="android:textAlignment">textStart</item>
+        <item name="textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextView.About.Description">
+        <item name="maxWidth">200dp</item>
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:textSize">@dimen/about_description_text_size</item>
+    </style>
+
+    <style name="TextView.About.Copyrights">
+        <item name="android:layout_marginTop">@dimen/double_padding</item>
+        <item name="layout_constraintBottom_toBottomOf">parent</item>
+        <item name="android:textSize">@dimen/about_copyright_text_size</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="LineSpacer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:background">?colorPrimaryDark</item>
+    </style>
+
+    <style name="CircularProgressIndicator" parent="Widget.MaterialComponents.CircularProgressIndicator">
+        <item name="android:layout_width">@dimen/progress_bar_size</item>
+        <item name="android:layout_height">@dimen/progress_bar_size</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginRight">@dimen/progress_bar_margin_right</item>
+        <item name="elevation">@dimen/global_elevation</item>
+        <item name="dotWidth">@dimen/progress_bar_dot_width</item>
+        <item name="drawDot">true</item>
+        <item name="dotColor">?colorPrimaryDark</item>
+        <item name="enableProgressAnimation">false</item>
+        <item name="progressStrokeWidth">@dimen/progress_bar_stroke_width</item>
+        <item name="trackColor">?colorPrimary</item>
+        <item name="textSize">@dimen/progress_bar_text_size</item>
+        <item name="textColor">@color/text_color</item>
+    </style>
 </resources>

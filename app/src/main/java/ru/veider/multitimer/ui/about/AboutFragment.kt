@@ -1,12 +1,14 @@
 package ru.veider.multitimer.ui.about
 
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import ru.veider.multitimer.R
 import ru.veider.multitimer.databinding.FragmentAboutBinding
 
 class AboutFragment : Fragment() {
@@ -22,16 +24,12 @@ class AboutFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val slideshowViewModel =
-            ViewModelProvider(this).get(AboutViewModel::class.java)
+//        val slideshowViewModel =
+//            ViewModelProvider(this).get(AboutViewModel::class.java)
 
         _binding = FragmentAboutBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSlideshow
-        slideshowViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
         return root
     }
 

@@ -1,22 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="top"
+    android:orientation="vertical"
+    android:padding="@dimen/double_padding"
     tools:context=".ui.about.AboutFragment">
 
-    <TextView
-        android:id="@+id/text_slideshow"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="@dimen/single_padding"
+            android:src="@drawable/about_timer" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextView.About.Title"
+                android:text="@string/app_name" />
+
+            <TextView
+                style="@style/TextView.About.Version"
+                android:text="@string/about_version" />
+
+            <TextView
+                style="@style/TextView.About.Date"
+                android:text="@string/about_date" />
+
+            <TextView
+                style="@style/TextView.About.Email"
+                android:text="@string/about_email" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <TextView
+        style="@style/TextView.About.Header"
+        android:text="@string/about_description_title" />
+
+    <LinearLayout style="@style/LineSpacer" />/>
+
+    <TextView
+        style="@style/TextView.About.Description"
+        android:text="@string/about_description" />
+
+    <TextView
+        style="@style/TextView.About.Header"
+        android:text="@string/about_guide_title" />
+
+    <LinearLayout style="@style/LineSpacer" />
+
+    <TextView
+        style="@style/TextView.About.Description"
+        android:text="@string/about_guide" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom">
+        <TextView
+            style="@style/TextView.About.Copyrights"
+            android:text="@string/about_copyrights" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</LinearLayout>
