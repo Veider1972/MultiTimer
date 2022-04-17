@@ -16,3 +16,6 @@ const val EVENT_BUTTON = "EVENT_BUTTON"
 const val EVENT_TIMER = "EVENT_TIMER"
 const val EVENT_STOP = "EVENT_STOP"
 const val EVENT_START = "EVENT_STOP"
+const val DB_NAME = "Counters.db"
+const val PRIMARY_KEY = 1L
+val vibroPattern = arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()

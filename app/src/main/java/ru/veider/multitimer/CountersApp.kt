@@ -22,5 +22,4 @@ class CountersApp : Application() {
             this.startService(intent)
         super.onCreate()
     }
-
 }

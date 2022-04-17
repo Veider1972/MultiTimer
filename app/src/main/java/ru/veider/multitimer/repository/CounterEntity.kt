@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class CounterEntity (
     @PrimaryKey(autoGenerate = true)
-    var key: Int=0,
+    var key: Long=0,
     var id : Int = 0,
     var currentProgress: Int = 0,
     var maxProgress: Int = 0,

@@ -83,8 +83,6 @@
     </style>
 
     <style name="TextView.About.Copyrights">
-        <item name="android:layout_marginTop">@dimen/double_padding</item>
-        <item name="layout_constraintBottom_toBottomOf">parent</item>
         <item name="android:textSize">@dimen/about_copyright_text_size</item>
         <item name="android:textAlignment">center</item>
     </style>

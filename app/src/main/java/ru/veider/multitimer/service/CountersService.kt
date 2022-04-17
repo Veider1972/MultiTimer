@@ -33,12 +33,12 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
     private lateinit var alarmChannelDescription: String
     private lateinit var simpleChannelName: String
     private lateinit var simpleChannelDescription: String
-    private val vibroPattern =
-            arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()
-
     private var timers: Hashtable<Int, CountersService.CounterTimer> = Hashtable()
     private var alarmes: Hashtable<Int, CountersService.AlarmTimer> = Hashtable()
-    private lateinit var viewModel: CountersViewModel
+    private val viewModel: CountersViewModel by lazy {
+        ViewModelProvider(this.viewModelStore, CountersViewModelFactory.getInstance()
+        )[CountersViewModel::class.java]
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -47,10 +47,6 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
         simpleChannelName = resources.getString(R.string.simple_channel_name)
         simpleChannelDescription = resources.getString(R.string.simple_channel_description)
 
-        viewModel = ViewModelProvider(
-            this.viewModelStore,
-            CountersViewModelFactory.getInstance()
-        )[CountersViewModel::class.java]
         createSimpleNotificationChannel()
         createAlarmNotificationChannel()
         setIdleMessage()
