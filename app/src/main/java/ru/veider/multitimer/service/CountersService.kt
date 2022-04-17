@@ -33,27 +33,22 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
     private lateinit var alarmChannelDescription: String
     private lateinit var simpleChannelName: String
     private lateinit var simpleChannelDescription: String
-    private val vibroPattern =
-            arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()
-
     private var timers: Hashtable<Int, CountersService.CounterTimer> = Hashtable()
     private var alarmes: Hashtable<Int, CountersService.AlarmTimer> = Hashtable()
     private lateinit var viewModel: CountersViewModel
 
     override fun onCreate() {
         super.onCreate()
+        viewModel = ViewModelProvider(this.viewModelStore, CountersViewModelFactory.getInstance())[CountersViewModel::class.java]
         alarmChannelName = resources.getString(R.string.alarm_channel_name)
         alarmChannelDescription = resources.getString(R.string.alarm_channel_description)
         simpleChannelName = resources.getString(R.string.simple_channel_name)
         simpleChannelDescription = resources.getString(R.string.simple_channel_description)
 
-        viewModel = ViewModelProvider(
-            this.viewModelStore,
-            CountersViewModelFactory.getInstance()
-        )[CountersViewModel::class.java]
         createSimpleNotificationChannel()
         createAlarmNotificationChannel()
         setIdleMessage()
+        checkCounters(viewModel.getCounters)
     }
 
     private fun setIdleMessage() {
@@ -111,43 +106,44 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
                 EVENT_STOP   -> {
                     stopSelf()
                 }
-                EVENT_START  -> {
-                    getCountersFromBundle(intent)?.apply {
-                        var hasRunCounters = false
-                        for (counter in this) {
-                            when (counter.state) {
-                                CounterState.RUN     -> {
-                                    hasRunCounters = true
-                                    val currentTime = Date().time
-                                    val startTime = counter.startTime
-                                    val timePass = (currentTime - startTime) / 1000
-                                    val setTime = counter.maxProgress
-                                    if (timePass < setTime) {
-                                        counter.currentProgress = (setTime - timePass).toInt()
-                                        val timer = CounterTimer(counter).apply { start() }
-                                        timers[counter.id] = timer
-                                    } else {
-                                        onAlarmed(counter)
-                                    }
-                                }
-                                CounterState.ALARMED -> {
-                                    hasRunCounters = true
-                                    onAlarmed(counter)
-                                }
-                            }
-                        }
-                        if (!hasRunCounters) {
-                            stopSelf()
-                        }
-                    }
-                }
             }
         }
         return START_NOT_STICKY
     }
 
     private fun getCounterFromBundle(intent: Intent?) = intent?.getBundleExtra(COUNTER)?.getParcelable(COUNTER) as Counter?
-    private fun getCountersFromBundle(intent: Intent?) = intent?.getBundleExtra(COUNTERS)?.getParcelable(COUNTERS) as Counters?
+
+    private fun checkCounters(counters: Counters) {
+        var hasRunCounters = false
+        for (counter in counters) {
+            when (counter.state) {
+                CounterState.RUN     -> {
+                    hasRunCounters = true
+                    val currentTime = Date().time
+                    val startTime = counter.startTime
+                    val timePass = (currentTime - startTime) / 1000
+                    val setTime = counter.maxProgress
+                    if (timePass < setTime) {
+                        counter.currentProgress = (setTime - timePass).toInt()
+                        val timer = CounterTimer(counter).apply { start() }
+                        timers[counter.id] = timer
+                    } else {
+                        onAlarmed(counter)
+                    }
+                }
+                CounterState.ALARMED -> {
+                    hasRunCounters = true
+                    onAlarmed(counter)
+                }
+            }
+        }
+        if (!hasRunCounters) {
+            val intent = Intent(this@CountersService, CountersService::class.java).apply {
+                putExtra(EVENT, EVENT_STOP)
+            }
+            runService(intent)
+        }
+    }
 
     private fun addAlarmed(counter: Counter) {
         alarmes[counter.id]?.let {} ?: AlarmTimer(counter).apply {
@@ -175,12 +171,6 @@ class CountersService : LifecycleAndViewStoreOwnerService() {
             this.cancel()
             timers.remove(counter.id)
         }
-//
-//        val timer: CounterTimer? = timers[id]
-//        if (timer != null) {
-//            timer.cancel()
-//            timers.remove(id)
-//        }
     }
 
     private fun runService(intent: Intent) {

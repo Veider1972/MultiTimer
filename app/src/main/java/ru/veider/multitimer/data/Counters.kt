@@ -4,8 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlin.collections.ArrayList
 
-@Parcelize
-class Counters: ArrayList<Counter>(), Parcelable {
+class Counters: ArrayList<Counter>() {
 
     private val maxID get() = if (size > 0) last().id else 0
 

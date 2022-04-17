@@ -87,11 +87,7 @@ class CountersAdapter(
 
         init {
             title = binder.title.apply {
-                setOnClickListener {
-                    InputDialog.getInstance(counter).show((itemView.context as AppCompatActivity).supportFragmentManager,
-                                                          "TAG"
-                    )
-                }
+                setOnClickListener { InputDialog.getInstance(counter).show((itemView.context as AppCompatActivity).supportFragmentManager, "TAG") }
             }
             progressIndicator = binder.progressIndicator.apply {
                 setProgressTextAdapter { currentProgress: Double ->
@@ -100,26 +96,17 @@ class CountersAdapter(
                     progress %= 3600.0
                     val minutes = (progress / 60).toInt()
                     val seconds = (progress % 60).toInt()
-                    val sb = StringBuilder()
-                    if (hours < 10) {
-                        sb.append(0)
+                    val sb = StringBuilder().apply {
+                        append("${firstZero(hours)}:${firstZero(minutes)}:${firstZero(seconds)}")
                     }
-                    sb.append(hours).append(":")
-                    if (minutes < 10) {
-                        sb.append(0)
-                    }
-                    sb.append(minutes).append(":")
-                    if (seconds < 10) {
-                        sb.append(0)
-                    }
-                    sb.append(seconds)
                     sb.toString()
                 }
                 setOnClickListener {
-                    TimeSelector.getInstance(counter).show(
-                        (itemView.context as AppCompatActivity).supportFragmentManager,
-                        "TAG"
-                    )
+                    if (counter.state == CounterState.FINISHED)
+                        TimeSelector.getInstance(counter).show(
+                            (itemView.context as AppCompatActivity).supportFragmentManager,
+                            "TAG"
+                        )
                 }
             }
 
@@ -139,6 +126,8 @@ class CountersAdapter(
                 }
             }
         }
+
+        private fun firstZero(n: Int) = if (n in 0..9) "0$n" else "$n"
 
         fun onBind(counter: Counter) {
             this.counter = counter

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -35,13 +34,10 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel = ViewModelProvider(this, CountersViewModelFactory.getInstance())[CountersViewModel::class.java]
-
-        val countersObserver = Observer<Counters> { counters -> isCountersChanged(counters) }
-        viewModel.counters().observe(this.viewLifecycleOwner, countersObserver)
-
-        val counterObserver = Observer<Counter> { counter -> isCounterChanged(counter) }
-        viewModel.counter().observe(this.viewLifecycleOwner, counterObserver)
+        viewModel = ViewModelProvider(this, CountersViewModelFactory.getInstance())[CountersViewModel::class.java].apply {
+            counters().observe(this@CountersFragment.viewLifecycleOwner) { counters -> isCountersChanged(counters) }
+            counter().observe(this@CountersFragment.viewLifecycleOwner) { counter -> isCounterChanged(counter) }
+        }
 
         _binder = FragmentCountersBinding.inflate(inflater, container, false)
         binder.listView.apply {
@@ -125,12 +121,8 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         return true
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.saveCounters()
-    }
-
     override fun onDestroyView() {
+        viewModel.saveCounters()
         super.onDestroyView()
         _binder = null
     }
@@ -154,5 +146,4 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
     override fun onTimerSetValue(id: Int, seconds: Int) {
         viewModel.updateMaxProgress(id, seconds)
     }
-
 }

@@ -11,7 +11,7 @@ import ru.veider.multitimer.CountersApp
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.data.Counters
-import ru.veider.multitimer.repository.CountersRepositoryImpl
+import ru.veider.multitimer.repository.CountersDataSource
 import ru.veider.multitimer.service.CountersService
 import java.util.*
 
@@ -20,7 +20,7 @@ class CountersViewModel : ViewModel() {
     private var counters: Counters
     val getCounters get() = counters
 
-    private val db = CountersRepositoryImpl.getInstance()
+    private val db = CountersDataSource.getInstance()
 
     private val countersLiveData: MutableLiveData<Counters> = MutableLiveData<Counters>()
     private val counterLiveData: MutableLiveData<Counter> = MutableLiveData<Counter>()
@@ -154,12 +154,7 @@ class CountersViewModel : ViewModel() {
     }
 
     private fun runService(counters: Counters) {
-        startService(Intent(CountersApp.getInstance()?.applicationContext, CountersService::class.java).apply {
-            putExtra(EVENT, EVENT_START)
-            putExtra(COUNTERS, Bundle().apply {
-                putParcelable(COUNTERS, counters)
-            })
-        })
+        startService(Intent(CountersApp.getInstance()?.applicationContext, CountersService::class.java))
     }
 
     private fun updateService(counter: Counter) {
