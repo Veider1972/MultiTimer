@@ -121,6 +121,11 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         return true
     }
 
+    override fun onPause() {
+        viewModel.saveCounters()
+        super.onPause()
+    }
+
     override fun onDestroyView() {
         viewModel.saveCounters()
         super.onDestroyView()
