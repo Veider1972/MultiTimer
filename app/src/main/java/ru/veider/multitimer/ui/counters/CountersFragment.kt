@@ -127,7 +127,7 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
     }
 
     override fun onDestroyView() {
-        viewModel.saveCounters()
+//        viewModel.saveCounters()
         super.onDestroyView()
         _binder = null
     }
