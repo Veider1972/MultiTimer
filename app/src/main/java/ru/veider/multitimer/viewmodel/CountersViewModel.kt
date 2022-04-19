@@ -3,11 +3,13 @@ package ru.veider.multitimer.viewmodel
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import ru.veider.multitimer.CountersApp
+import ru.veider.multitimer.R
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.data.Counters
@@ -15,10 +17,11 @@ import ru.veider.multitimer.repository.CountersDataSource
 import ru.veider.multitimer.service.CountersService
 import java.util.*
 
-class CountersViewModel : ViewModel() {
+@OptIn(DelicateCoroutinesApi::class) class CountersViewModel : ViewModel() {
 
     private var counters: Counters
     val getCounters get() = counters
+    private val context get() = CountersApp.getInstance()?.applicationContext
 
     private val db = CountersDataSource.getInstance()
 
@@ -33,22 +36,30 @@ class CountersViewModel : ViewModel() {
         fun getInstance() = instance?.apply {} ?: CountersViewModel().also { instance = it }
     }
 
+
     init {
         counters = db.getAll()
-        if (counters.size == 0) addCounter()
+
+        if (counters.size == 0) {
+            addCounter()
+            saveCounters()
+        }
         countersLiveData.postValue(counters)
-        runService(counters)
+        onStartProgram()
     }
 
     fun saveCounters() {
-        db.deleteAllCounter()
-        for (counter in counters) {
-            db.addCounter(counter)
+        GlobalScope.run {
+            db.deleteAllCounter()
+            for (counter in counters) {
+                db.addCounter(counter)
+            }
         }
     }
 
     private fun updateCounters() {
         countersLiveData.postValue(counters)
+        saveCounters()
     }
 
     fun addCounter() {
@@ -67,6 +78,7 @@ class CountersViewModel : ViewModel() {
         counters[counters.getIndexByID(id)].apply {
             this.title = title
             counterLiveData.postValue(this)
+            storeCounter(this)
         }
     }
 
@@ -75,41 +87,39 @@ class CountersViewModel : ViewModel() {
             maxProgress = time
             currentProgress = time
             counterLiveData.postValue(this)
+            storeCounter(this)
         }
     }
 
     fun startCounter(id: Int) {
-        counters[counters.getIndexByID(id)].apply {
+        with(counters[counters.getIndexByID(id)]) {
             if (this.state == CounterState.PAUSED || this.state == CounterState.FINISHED) {
                 state = CounterState.RUN
                 startTime = Date().time
+                storeCounter(this)
+                sendToService(this, ON_RUN_CLICK)
             }
-        }.apply {
-            storeCounter(this)
-            updateService(this)
         }
     }
 
     fun pauseCounter(id: Int) {
-        counters[counters.getIndexByID(id)].apply {
+        with(counters[counters.getIndexByID(id)]) {
             if (this.state == CounterState.RUN) {
                 state = CounterState.PAUSED
+                storeCounter(this)
+                sendToService(this, ON_PAUSE_CLICK)
             }
-        }.apply {
-            storeCounter(this)
-            updateService(this)
         }
     }
 
     fun stopCounter(id: Int) {
-        counters[counters.getIndexByID(id)].apply {
+        with(counters[counters.getIndexByID(id)]) {
             if (this.state != CounterState.FINISHED) {
                 state = CounterState.FINISHED
                 currentProgress = maxProgress
+                storeCounter(this)
+                sendToService(this, ON_STOP_CLICK)
             }
-        }.apply {
-            storeCounter(this)
-            updateService(this)
         }
     }
 
@@ -140,29 +150,33 @@ class CountersViewModel : ViewModel() {
     }
 
     private fun removeCounter(id: Int) {
-        Thread {
+        GlobalScope.run {
             db.deleteCounter(id)
-            Log.d(TAG, "Удалён счётчик: $id")
-        }.start()
+        }
     }
 
     private fun storeCounter(counter: Counter) {
-        Thread {
+        GlobalScope.run {
             db.updateCounter(counter)
-            Log.d(TAG, "Сохранён счётчик: $counter")
-        }.start()
+        }
     }
 
-    private fun runService(counters: Counters) {
-        startService(Intent(CountersApp.getInstance()?.applicationContext, CountersService::class.java))
-    }
-
-    private fun updateService(counter: Counter) {
-        startService(Intent(CountersApp.getInstance()?.applicationContext, CountersService::class.java).apply {
-            putExtra(EVENT, EVENT_BUTTON)
-            putExtra(COUNTER, Bundle().apply {
-                putParcelable(COUNTER, counter)
+    private fun onStartProgram() {
+        val intent = Intent(context, CountersService::class.java).apply {
+            putExtra(EVENT, ON_START_SERVICE)
+            putExtra(COUNTERS, Bundle().apply {
+                putSerializable(COUNTERS_BUNDLE, counters)
             })
+        }
+        startService(intent)
+    }
+
+    private fun sendToService(counter: Counter, event: String) {
+        if (event != ON_RUN_CLICK && event != ON_PAUSE_CLICK && event != ON_STOP_CLICK && event != ON_ALARM_TIMER)
+            throw Exception(context?.resources?.getString(R.string.error_service_event))
+        startService(Intent(context, CountersService::class.java).apply {
+            putExtra(EVENT, event)
+            putExtra(COUNTER, counter)
         })
     }
 

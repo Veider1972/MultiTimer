@@ -3,8 +3,9 @@ package ru.veider.multitimer.data
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import ru.veider.multitimer.const.CounterState
+import java.io.Serializable
 
-@Parcelize
+
 data class Counter(
     val id: Int,
     var currentProgress: Int,
@@ -12,7 +13,7 @@ data class Counter(
     var startTime: Long,
     var state: CounterState,
     var title: String
-) : Parcelable, Cloneable {
+) : Serializable {
 
     constructor(id:Int) : this(id, 0,  0, 0, CounterState.FINISHED, "")
 

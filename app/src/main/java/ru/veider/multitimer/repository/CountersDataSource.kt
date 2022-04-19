@@ -1,10 +1,12 @@
 package ru.veider.multitimer.repository
 
+import android.util.Log
 import androidx.room.Room
 import ru.veider.multitimer.CountersApp
 import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.const.DB_NAME
 import ru.veider.multitimer.const.PRIMARY_KEY
+import ru.veider.multitimer.const.TAG
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.data.Counters
 
@@ -13,7 +15,7 @@ class CountersDataSource {
 
     companion object {
         private var instance: CountersDataSource? = null
-        fun getInstance() = instance?.apply {  } ?: CountersDataSource().also {instance = it}
+        fun getInstance() = instance?.apply { } ?: CountersDataSource().also { instance = it }
     }
 
     init {
@@ -47,7 +49,13 @@ class CountersDataSource {
         counter.title
     )
 
-    fun getAll() = db.countersDao().getAll().mapTo(Counters()){ entity -> counterFromEntity(entity) }
+    fun getAll() =
+            db
+                .countersDao()
+                .getAll()
+                .mapTo(Counters()) { entity -> counterFromEntity(entity) }.also {
+                    Log.d(TAG, "Считаны счётчики: $it")
+                }
 
     fun updateCounter(counter: Counter) {
         counter.apply {
@@ -59,18 +67,21 @@ class CountersDataSource {
                 state.ordinal,
                 title
             )
+            Log.d(TAG, "Сохранён счётчик: $this")
         }
     }
 
     fun addCounter(counter: Counter) {
         db.countersDao().addCounter(entityFromCounter(counter))
+        Log.d(TAG, "Добавлен счётчик: $counter")
     }
 
     fun deleteCounter(id: Int) {
         db.countersDao().deleteCounter(id)
+        Log.d(TAG, "Удалён счётчик: $id")
     }
 
-    fun deleteAllCounter(){
+    fun deleteAllCounter() {
         db.countersDao().deleteAllCounter()
     }
 }

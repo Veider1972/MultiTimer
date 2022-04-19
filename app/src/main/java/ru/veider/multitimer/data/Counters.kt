@@ -2,9 +2,10 @@ package ru.veider.multitimer.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.lang.StringBuilder
 import kotlin.collections.ArrayList
 
-class Counters: ArrayList<Counter>() {
+class Counters : ArrayList<Counter>() {
 
     private val maxID get() = if (size > 0) last().id else 0
 
@@ -34,4 +35,12 @@ class Counters: ArrayList<Counter>() {
         return true
     }
 
+    override fun toString(): String {
+        val sb = StringBuilder()
+        for (i in 0..size-1) {
+            sb.append("(${this[i]})")
+            if ((size > 1) && (i < size - 1)) sb.append(",  ")
+        }
+        return sb.toString()
+    }
 }
