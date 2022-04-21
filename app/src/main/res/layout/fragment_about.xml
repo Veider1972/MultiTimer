@@ -38,12 +38,13 @@
                 android:text="@string/about_version" />
 
             <TextView
+                android:id="@+id/date"
                 style="@style/TextView.About.Date"
                 android:text="@string/about_date" />
 
             <TextView
                 style="@style/TextView.About.Email"
-                android:text="@string/about_email" />
+                android:text="@string/my_email" />
         </LinearLayout>
 
     </LinearLayout>

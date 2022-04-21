@@ -6,8 +6,10 @@ enum class CounterState {
 
 const val TAG = "TAG"
 
-const val ALARM_CHANNEL_ID = "ALARM_CHANNEL_ID"
 const val SIMPLE_CHANNEL_ID = "SIMPLE_CHANNEL_ID"
+const val SIMPLE_CHANNEL_NUM = 1
+const val ALARM_CHANNEL_ID = "ALARM_CHANNEL_ID"
+const val ALARM_CHANNEL_NUM = 2
 const val COUNTER_ID = "COUNTER_ID"
 const val COUNTER = "COUNTER"
 const val COUNTERS = "COUNTERS"

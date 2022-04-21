@@ -1,6 +1,5 @@
 package ru.veider.multitimer.service
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -20,7 +19,6 @@ import ru.veider.multitimer.R
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.const.CounterState
-import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.viewmodel.CountersViewModel
 import ru.veider.multitimer.viewmodel.CountersViewModelFactory
 import java.util.*
@@ -63,7 +61,6 @@ class CountersService : LifecycleService(),
         createSimpleNotificationChannel()
         createAlarmNotificationChannel()
         setIdleMessage()
-//        checkCounters(viewModel.getCounters)
     }
 
     private fun setIdleMessage() {
@@ -95,7 +92,8 @@ class CountersService : LifecycleService(),
                 ON_PAUSE_CLICK   -> {
                     getCounterFromBundle(intent)?.apply {
                         removeTimer(this)
-                        NotificationManagerCompat.from(this@CountersService).cancel(id)
+                        if (timers.size == 0)
+                            NotificationManagerCompat.from(this@CountersService).cancel(SIMPLE_CHANNEL_NUM)
                         removeIdleMessage()
                         if (timers.size == 0 && alarmes.size == 0) stopSelf()
                     }
@@ -104,7 +102,11 @@ class CountersService : LifecycleService(),
                     getCounterFromBundle(intent)?.apply {
                         removeTimer(this)
                         removeAlarmed(this)
-                        NotificationManagerCompat.from(this@CountersService).cancel(id)
+                        if (alarmes.size==0)
+                            NotificationManagerCompat.from(this@CountersService).cancel(ALARM_CHANNEL_NUM)
+                        if (timers.size == 0)
+                            NotificationManagerCompat.from(this@CountersService).cancel(SIMPLE_CHANNEL_NUM)
+
                         viewModel.timerFinish(id)
                         removeIdleMessage()
                         if (timers.size == 0 && alarmes.size == 0) stopSelf()
@@ -115,7 +117,9 @@ class CountersService : LifecycleService(),
                     getCounterFromBundle(intent)?.apply {
                         removeTimer(this)
                         addAlarmed(this)
-                        //sendAlarmMessage(this)
+                        if (timers.size == 0)
+                            NotificationManagerCompat.from(this@CountersService).cancel(SIMPLE_CHANNEL_NUM)
+                        sendAlarmNotification()
                         viewModel.timerAlarmed(id)
                     }
                 }
@@ -160,17 +164,10 @@ class CountersService : LifecycleService(),
     }
 
     private fun getCounterFromBundle(intent: Intent?) =
-            intent?.
-            getSerializableExtra(COUNTER) as Counter?
+            intent?.getSerializableExtra(COUNTER) as Counter?
 
     private fun getCountersFromBundle(intent: Intent?) =
-            intent?.
-            getBundleExtra(COUNTERS)?.
-            getSerializable(COUNTERS_BUNDLE) as ArrayList<Counter>?
-
-    private fun checkCounters(counters: Counters) {
-
-    }
+            intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE) as ArrayList<Counter>?
 
     private fun addAlarmed(counter: Counter) {
         if (!alarmes.containsKey(counter.id))
@@ -212,67 +209,81 @@ class CountersService : LifecycleService(),
         super.onDestroy()
     }
 
-    private fun sendAlarmMessage(counter: Counter) {
-        val message = if (counter.title.isEmpty()) resources.getString(R.string.notification_alarm_without_title) else String.format(
-            resources.getString(R.string.notification_alarm_with_title), counter.title
-        )
-        sendAlarmNotification(counter.id, resources.getString(R.string.attention), message)
-    }
-
-    private fun sendSimpleNotification(channel: Int, title: String, message: String) {
-        sendNotification(channel, title, message, SIMPLE_CHANNEL_ID)
-    }
-
-    private fun sendAlarmNotification(channel: Int, title: String, message: String) {
-        sendNotification(channel, title, message, ALARM_CHANNEL_ID)
-    }
-
-    @SuppressLint("UnspecifiedImmutableFlag")
-    private fun sendNotification(
-        channel: Int,
-        title: String,
-        message: String,
-        notificationType: String
-    ) {
-        val notificationBuilder = NotificationCompat.Builder(this, notificationType).apply {
+    private fun sendTickNotification() {
+        val notificationBuilder = NotificationCompat.Builder(this, SIMPLE_CHANNEL_ID).apply {
             setCategory(Notification.CATEGORY_ALARM)
+            setContentTitle(resources.getText(R.string.notification_title))
 
-            if (title.isNotEmpty()) setContentTitle(title)
-            if (message.isNotEmpty()) setContentText(message)
-            setStyle(NotificationCompat.BigTextStyle())
-
-            if (notificationType == SIMPLE_CHANNEL_ID) {
-                setSmallIcon(R.drawable.clock)
-                priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationManager.IMPORTANCE_NONE
-                } else {
-                    NotificationCompat.PRIORITY_MIN
-                }
-            } else {
-                val intent = Intent(this@CountersService, MultiTimer::class.java).apply {
-                    putExtra(COUNTER_ID, channel)
-                }
-                val pendingIntent = PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-                setContentIntent(pendingIntent)
-                setOngoing(true)
-                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-                setVibrate(vibroPattern)
-                setLights(Color.RED, 1000, 500)
-                setAutoCancel(true)
-                setUsesChronometer(true)
-                color = Color.RED
-                setSmallIcon(R.drawable.animated_timer)
-                priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationManager.IMPORTANCE_HIGH
-                } else {
-                    NotificationCompat.PRIORITY_MAX
-                }
+            val notificationStyle = NotificationCompat.InboxStyle()
+            var minTime = Int.MAX_VALUE
+            var i = 1
+            for (timer in timers.toSortedMap()) {
+                val title = if (timer.value.counter.title.isEmpty()) "Таймер ${i}" else timer.value.counter.title
+                val message = timer.value.counter.currentProgress.toMinSec()
+                notificationStyle.addLine("${title}: ${message}")
+                notificationStyle.setBigContentTitle(resources.getText(R.string.notification_title))
+                i++
+                if (timer.value.counter.currentProgress < minTime)
+                    minTime = timer.value.counter.currentProgress
             }
+            setContentText("${resources.getText(R.string.notification_description)}${minTime.toMinSec()}")
+
+            setStyle(notificationStyle)
+
+            setSmallIcon(R.drawable.clock)
+            priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationManager.IMPORTANCE_NONE
+            } else {
+                NotificationCompat.PRIORITY_MIN
+            }
+            val intent = Intent(this@CountersService, MultiTimer::class.java)
+            val pendingIntent = PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            setContentIntent(pendingIntent)
         }
         with(NotificationManagerCompat.from(this)) {
-            notify(channel, notificationBuilder.build())
+            notify(SIMPLE_CHANNEL_NUM, notificationBuilder.build())
         }
+    }
+
+
+    private fun sendAlarmNotification() {
+        val notificationBuilder = NotificationCompat.Builder(this, ALARM_CHANNEL_ID).apply {
+            setCategory(Notification.CATEGORY_ALARM)
+            setContentTitle(if (alarmes.size == 1)
+                                resources.getText(R.string.notification_alarm_finished)
+                            else
+                                resources.getText(R.string.notification_alarm_multi_finished)
+            )
+
+            setStyle(NotificationCompat.InboxStyle().also {
+                var i = 1
+                for (timer in alarmes.toSortedMap()) {
+                    it.addLine(if (timer.value.counter.title.isEmpty()) "Таймер ${i}" else timer.value.counter.title)
+                    i++
+                }
+            })
+            setOngoing(true)
+            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
+            setVibrate(vibroPattern)
+            setLights(Color.RED, 1000, 500)
+            setAutoCancel(true)
+            color = Color.RED
+            setSmallIcon(R.drawable.animated_timer)
+            priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationManager.IMPORTANCE_HIGH
+            } else {
+                NotificationCompat.PRIORITY_MAX
+            }
+            val intent = Intent(this@CountersService, MultiTimer::class.java)
+            val pendingIntent = PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            setContentIntent(pendingIntent)
+        }
+        with(NotificationManagerCompat.from(this))
+        {
+            notify(ALARM_CHANNEL_NUM, notificationBuilder.build())
+        }
+
     }
 
     private fun createAlarmNotificationChannel() {
@@ -327,28 +338,39 @@ class CountersService : LifecycleService(),
         }
     }
 
-    inner class AlarmTimer(val counter: Counter) : CountDownTimer(3600 * 1000L, 3 * 1000L) {
-        override fun onTick(millisUntilFinished: Long) {
-            sendAlarmMessage(counter)
+    abstract inner class Timer(millisInFuture:Long, countDownInterval:Long): CountDownTimer(millisInFuture, countDownInterval), Comparator<Counter>{
+        override fun compare(counter0: Counter?, counter1: Counter?): Int {
+            if (counter0!=null || counter1!=null)
+                return counter0!!.currentProgress-counter1!!.currentProgress
+            return 0
         }
 
-        override fun onFinish() {
-            onAlarmed(counter)
-        }
     }
 
-    inner class CounterTimer(val counter: Counter) : CountDownTimer(counter.currentProgress * 1000L, 1000) {
+    inner class AlarmTimer(val counter: Counter) : Timer(600 * 1000L, 10 * 1000L) {
         override fun onTick(millisUntilFinished: Long) {
-            val currentProgress = ceil((millisUntilFinished.toDouble() / 1000)).toInt()
-            viewModel.timerTick(counter.id, currentProgress)
-            sendSimpleNotification(counter.id, counter.title,
-                                   String.format(resources.getString(R.string.time_rest_pattern), currentProgress.toMinSec())
-            )
+            sendAlarmNotification()
         }
 
         override fun onFinish() {
             onAlarmed(counter)
         }
+
+    }
+
+    inner class CounterTimer(val counter: Counter) : Timer(counter.currentProgress * 1000L, 1000) {
+        override fun onTick(millisUntilFinished: Long) {
+            val currentProgress = ceil((millisUntilFinished.toDouble() / 1000)).toInt()
+            counter.currentProgress = currentProgress
+            viewModel.timerTick(counter.id, currentProgress)
+            sendTickNotification()
+        }
+
+        override fun onFinish() {
+            if (timers.size == 1) NotificationManagerCompat.from(this@CountersService).cancel(1)
+            onAlarmed(counter)
+        }
+
     }
 
     fun onAlarmed(counter: Counter) {
@@ -376,4 +398,5 @@ class CountersService : LifecycleService(),
             mFactory = it
         }
     }
+
 }

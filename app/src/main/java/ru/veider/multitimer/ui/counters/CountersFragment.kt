@@ -126,6 +126,11 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         super.onPause()
     }
 
+    override fun onResume() {
+        binder.listView.adapter?.notifyDataSetChanged()
+        super.onResume()
+    }
+
     override fun onDestroyView() {
 //        viewModel.saveCounters()
         super.onDestroyView()
