@@ -1,9 +1,12 @@
 package ru.veider.multitimer.service
 
+import android.R.attr.data
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -16,14 +19,14 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import ru.veider.multitimer.MultiTimer
 import ru.veider.multitimer.R
+import ru.veider.multitimer.SingleAppWidget
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.viewmodel.CountersViewModel
 import ru.veider.multitimer.viewmodel.CountersViewModelFactory
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.ceil
+
 
 class CountersService : LifecycleService(),
     ViewModelStoreOwner, HasDefaultViewModelProviderFactory {
@@ -44,6 +47,7 @@ class CountersService : LifecycleService(),
 
     override fun onCreate() {
         super.onCreate()
+        setWidget(100,100,SingleAppWidget.Companion.WidgetStatus.stop.toString())
         lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 if (source.lifecycle.currentState == Lifecycle.State.DESTROYED) {
@@ -110,6 +114,7 @@ class CountersService : LifecycleService(),
                         viewModel.timerFinish(id)
                         removeIdleMessage()
                         if (timers.size == 0 && alarmes.size == 0) stopSelf()
+                        setWidget(0,0,SingleAppWidget.Companion.WidgetStatus.stop.toString())
                     }
                 }
 
@@ -148,6 +153,7 @@ class CountersService : LifecycleService(),
                                     if (alarmes.containsKey(counter.id)) continue
                                     onAlarmed(counter)
                                 }
+                                else                 -> {}
                             }
                         }
                         if (!hasRunCounters) {
@@ -161,6 +167,16 @@ class CountersService : LifecycleService(),
             }
         }
         return START_NOT_STICKY
+    }
+
+    private fun setWidget(currentTime: Int, maxTime: Int, status:String){
+        val updateIntent = Intent().apply {
+            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            putExtra(SingleAppWidget.WIDGET_CURRENT_TIME, currentTime)
+            putExtra(SingleAppWidget.WIDGET_MAX_TIME, maxTime)
+            putExtra(SingleAppWidget.WIDGET_STATUS,status)
+        }
+        sendBroadcast(updateIntent)
     }
 
     private fun getCounterFromBundle(intent: Intent?) =
@@ -216,6 +232,7 @@ class CountersService : LifecycleService(),
 
             val notificationStyle = NotificationCompat.InboxStyle()
             var minTime = Int.MAX_VALUE
+            var setTime = Int.MAX_VALUE
             var i = 1
             for (timer in timers.toSortedMap()) {
                 val title = if (timer.value.counter.title.isEmpty()) "Таймер ${i}" else timer.value.counter.title
@@ -223,10 +240,13 @@ class CountersService : LifecycleService(),
                 notificationStyle.addLine("${title}: ${message}")
                 notificationStyle.setBigContentTitle(resources.getText(R.string.notification_title))
                 i++
-                if (timer.value.counter.currentProgress < minTime)
+                if (timer.value.counter.currentProgress < minTime) {
                     minTime = timer.value.counter.currentProgress
+                    setTime = timer.value.counter.maxProgress
+                }
             }
             setContentText("${resources.getText(R.string.notification_description)}${minTime.toMinSec()}")
+            setWidget(minTime,setTime,SingleAppWidget.Companion.WidgetStatus.run.toString())
 
             setStyle(notificationStyle)
 
@@ -283,6 +303,7 @@ class CountersService : LifecycleService(),
         {
             notify(ALARM_CHANNEL_NUM, notificationBuilder.build())
         }
+        setWidget(0,0,SingleAppWidget.Companion.WidgetStatus.alarm.toString())
 
     }
 
