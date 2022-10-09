@@ -22,5 +22,26 @@ const val ON_ALARM_TIMER = "ON_ALARM_TIMER"
 const val ON_START_SERVICE = "ON_START_SERVICE"
 const val ON_STOP_SERVICE = "ON_STOP_SERVICE"
 const val DB_NAME = "Counters.db"
+
+
+fun firstZero(n: Int) = if (n in 0..9) "0$n" else "$n"
+fun Int.toTime():String{
+    var progress = this
+    val hours = (progress / 3600)
+    progress %= 3600
+    val minutes = (progress / 60)
+    val seconds = (progress % 60)
+    return "${firstZero(hours)}:${firstZero(minutes)}:${firstZero(seconds)}"
+}
+
+fun Int.toShortTime():String{
+    var progress = this
+    val hours = (progress / 3600)
+    progress %= 3600
+    val minutes = (progress / 60)
+    val seconds = (progress % 60)
+    return if (hours>=1) "${firstZero(hours)}:${firstZero(minutes)}" else "${firstZero(minutes)}:${firstZero(seconds)}"
+}
+
 var PRIMARY_KEY = 0L
 val vibroPattern = arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()

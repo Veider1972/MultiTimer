@@ -12,6 +12,8 @@ import com.google.android.material.button.MaterialButton
 import ru.veider.multitimer.R
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.const.CounterState
+import ru.veider.multitimer.const.firstZero
+import ru.veider.multitimer.const.toTime
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.databinding.ItemCounterBinding
 import ru.veider.multitimer.ui.timeselector.TimeSelector
@@ -91,15 +93,7 @@ class CountersAdapter(
             }
             progressIndicator = binder.progressIndicator.apply {
                 setProgressTextAdapter { currentProgress: Double ->
-                    var progress = currentProgress
-                    val hours = (progress / 3600).toInt()
-                    progress %= 3600.0
-                    val minutes = (progress / 60).toInt()
-                    val seconds = (progress % 60).toInt()
-                    val sb = StringBuilder().apply {
-                        append("${firstZero(hours)}:${firstZero(minutes)}:${firstZero(seconds)}")
-                    }
-                    sb.toString()
+                    currentProgress.toInt().toTime()
                 }
                 setOnClickListener {
                     if (counter.state == CounterState.FINISHED)
@@ -126,8 +120,6 @@ class CountersAdapter(
                 }
             }
         }
-
-        private fun firstZero(n: Int) = if (n in 0..9) "0$n" else "$n"
 
         fun onBind(counter: Counter) {
             this.counter = counter
