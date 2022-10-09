@@ -21,4 +21,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="divider">?attr/colorPrimary</color>
     <color name="text_color">#FFFFFF</color>
+    <color name="widget_color">#000000</color>
 </resources>
