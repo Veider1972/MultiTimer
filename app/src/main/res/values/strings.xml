@@ -23,10 +23,10 @@
     // layout -> fragment_about.xml
     // app_name
     <string name="about_version">Версия</string>
-    <string name="about_date">Апрель, 2022</string>
+    <string name="about_date">Октябрь, 2022</string>
     // my_email
     <string name="about_description_title">Описание</string>
-    <string name="about_description">Программа написана по мотивам игры Xcraft во имя игроков кланов \u0022AURUS\u0022 и \u0022Phoenix Star Sindicate - Private\u0022.\nАвтор - игрок Ko4ubey</string>
+    <string name="about_description">Программа предназначена для тех, кто не хочет пропустить важные события. Количество таймеров не ограничено.\nДля каждого таймера можно задать своё название.\nВиджет программы ведёт отсчёт времени до ближайшего работающего таймера.</string>
     <string name="about_guide_title">Управление</string>
     <string name="about_guide">Сортировка - перетаскиванием\nУдаление - смахиванием\nВсё остальное - нажатием</string>
     <string name="about_copyrights">Copyright © by Vadim Korkhovoy, 2022</string>
