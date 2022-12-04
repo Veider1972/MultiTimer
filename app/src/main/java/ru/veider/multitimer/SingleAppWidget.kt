@@ -127,9 +127,9 @@ class SingleAppWidget : AppWidgetProvider() {
                 }
             }
         }
-        val minSize = widgetLandWidth.coerceAtMost(widgetPortWidth).coerceAtMost(widgetLandHeight).coerceAtMost(widgetPortHeight)
+        val maxSize = Math.max(Math.max(widgetPortWidth, widgetLandWidth), Math.max(widgetPortHeight, widgetLandHeight))
 
-        return context.dip(minSize).toFloat()
+        return context.dip(maxSize).toFloat()
     }
 
     private fun Context.dip(value: Int): Int = (value * resources.displayMetrics.density).toInt()
@@ -164,7 +164,7 @@ class SingleAppWidget : AppWidgetProvider() {
     }
 
     override fun onEnabled(context: Context) {
-        // Enter relevant functionality for when the first widget is created
+        onReceive(context, Intent())// Enter relevant functionality for when the first widget is created
     }
 
     override fun onDisabled(context: Context) {
