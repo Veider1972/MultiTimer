@@ -23,6 +23,7 @@ import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.viewmodel.CountersViewModel
 import ru.veider.multitimer.viewmodel.CountersViewModelFactory
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.ceil
 
 
@@ -45,7 +46,7 @@ class CountersService : LifecycleService(),
 
     override fun onCreate() {
         super.onCreate()
-        setWidget(100,100,SingleAppWidget.Companion.WidgetStatus.STOP.toString())
+        setWidget(100, 100, SingleAppWidget.Companion.WidgetStatus.STOP.toString())
         lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 if (source.lifecycle.currentState == Lifecycle.State.DESTROYED) {
@@ -104,7 +105,7 @@ class CountersService : LifecycleService(),
                     getCounterFromBundle(intent)?.apply {
                         removeTimer(this)
                         removeAlarmed(this)
-                        if (alarmes.size==0)
+                        if (alarmes.size == 0)
                             NotificationManagerCompat.from(this@CountersService).cancel(ALARM_CHANNEL_NUM)
                         if (timers.size == 0)
                             NotificationManagerCompat.from(this@CountersService).cancel(SIMPLE_CHANNEL_NUM)
@@ -112,7 +113,7 @@ class CountersService : LifecycleService(),
                         viewModel.timerFinish(id)
                         removeIdleMessage()
                         if (timers.size == 0 && alarmes.size == 0) stopSelf()
-                        setWidget(0,0,SingleAppWidget.Companion.WidgetStatus.STOP.toString())
+                        setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.STOP.toString())
                     }
                 }
 
@@ -167,21 +168,28 @@ class CountersService : LifecycleService(),
         return START_NOT_STICKY
     }
 
-    private fun setWidget(currentTime: Int, maxTime: Int, status:String){
+    private fun setWidget(currentTime: Int, maxTime: Int, status: String) {
         val updateIntent = Intent().apply {
             action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             putExtra(SingleAppWidget.WIDGET_CURRENT_TIME, currentTime)
             putExtra(SingleAppWidget.WIDGET_MAX_TIME, maxTime)
-            putExtra(SingleAppWidget.WIDGET_STATUS,status)
+            putExtra(SingleAppWidget.WIDGET_STATUS, status)
         }
         sendBroadcast(updateIntent)
     }
 
     private fun getCounterFromBundle(intent: Intent?) =
-            intent?.getSerializableExtra(COUNTER) as Counter?
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+                intent?.getSerializableExtra(COUNTER) as Counter?
+            else
+                intent?.getSerializableExtra(COUNTER, Counter::class.java)
 
-    private fun getCountersFromBundle(intent: Intent?) =
-            intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE) as ArrayList<Counter>?
+    private fun getCountersFromBundle(intent: Intent?): ArrayList<Counter>? =
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+                intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE) as ArrayList<Counter>?
+            else
+                intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE, arrayListOf<Counter>()::class.java)
+
 
     private fun addAlarmed(counter: Counter) {
         if (!alarmes.containsKey(counter.id))
@@ -233,7 +241,7 @@ class CountersService : LifecycleService(),
             var setTime = Int.MAX_VALUE
             var i = 1
             for (timer in timers.toSortedMap()) {
-                val title = if (timer.value.counter.title.isEmpty()) "Таймер $i" else timer.value.counter.title
+                val title = timer.value.counter.title.ifEmpty { "Таймер $i" }
                 val message = timer.value.counter.currentProgress.toMinSec()
                 notificationStyle.addLine("$title: $message")
                 notificationStyle.setBigContentTitle(resources.getText(R.string.notification_title))
@@ -244,7 +252,7 @@ class CountersService : LifecycleService(),
                 }
             }
             setContentText("${resources.getText(R.string.notification_description)}${minTime.toMinSec()}")
-            setWidget(minTime,setTime,SingleAppWidget.Companion.WidgetStatus.RUN.toString())
+            setWidget(minTime, setTime, SingleAppWidget.Companion.WidgetStatus.RUN.toString())
 
             setStyle(notificationStyle)
 
@@ -255,7 +263,7 @@ class CountersService : LifecycleService(),
                 NotificationCompat.PRIORITY_MIN
             }
             val intent = Intent(this@CountersService, MultiTimer::class.java)
-            val pendingIntent = PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent = PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             setContentIntent(pendingIntent)
         }
         with(NotificationManagerCompat.from(this)) {
@@ -276,7 +284,7 @@ class CountersService : LifecycleService(),
             setStyle(NotificationCompat.InboxStyle().also {
                 var i = 1
                 for (timer in alarmes.toSortedMap()) {
-                    it.addLine(if (timer.value.counter.title.isEmpty()) "Таймер $i" else timer.value.counter.title)
+                    it.addLine(timer.value.counter.title.ifEmpty { "Таймер $i" })
                     i++
                 }
             })
@@ -294,14 +302,15 @@ class CountersService : LifecycleService(),
                 NotificationCompat.PRIORITY_MAX
             }
             val intent = Intent(this@CountersService, MultiTimer::class.java)
-            val pendingIntent = PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent =
+                    PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             setContentIntent(pendingIntent)
         }
         with(NotificationManagerCompat.from(this))
         {
             notify(ALARM_CHANNEL_NUM, notificationBuilder.build())
         }
-        setWidget(0,0,SingleAppWidget.Companion.WidgetStatus.ALARM.toString())
+        setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.ALARM.toString())
 
     }
 
@@ -357,10 +366,11 @@ class CountersService : LifecycleService(),
         }
     }
 
-    abstract inner class Timer(millisInFuture:Long, countDownInterval:Long): CountDownTimer(millisInFuture, countDownInterval), Comparator<Counter>{
+    abstract inner class Timer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer(millisInFuture, countDownInterval),
+        Comparator<Counter> {
         override fun compare(counter0: Counter?, counter1: Counter?): Int {
-            if (counter0!=null || counter1!=null)
-                return counter0!!.currentProgress-counter1!!.currentProgress
+            if (counter0 != null || counter1 != null)
+                return counter0!!.currentProgress - counter1!!.currentProgress
             return 0
         }
 
