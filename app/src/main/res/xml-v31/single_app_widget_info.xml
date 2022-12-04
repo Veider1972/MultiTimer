@@ -3,9 +3,15 @@
     android:description="@string/app_widget_description"
     android:initialKeyguardLayout="@layout/single_app_widget"
     android:initialLayout="@layout/single_app_widget"
+    android:maxResizeWidth="120dp"
     android:minResizeWidth="30dp"
+    android:maxResizeHeight="120dp"
     android:minResizeHeight="30dp"
     android:previewImage="@drawable/timer_widget"
+    android:previewLayout="@layout/single_app_widget"
     android:resizeMode="none"
+
+    android:targetCellWidth="1"
+    android:targetCellHeight="1"
     android:updatePeriodMillis="86400000"
     android:widgetCategory="home_screen" />
