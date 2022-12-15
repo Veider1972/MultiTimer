@@ -2,9 +2,9 @@
 <resources>
     // Button
     <color name="color_on_surface">#000000</color>
-    <color name="color_primary">#8BC34A</color>
+    <color name="color_primary">#7CAA46</color>
     <color name="color_primary_dark">#33691E</color>
-    <color name="color_on_primary">#FEFEFE</color>
+    <color name="color_on_primary">#FFFFFF</color>
     <color name="color_primary_container">#C3F0A0</color>
     <color name="color_on_primary_container">#0B2004</color>
     <color name="color_secondary">#4CAF50</color>
@@ -21,7 +21,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="divider">?attr/colorPrimary</color>
     <color name="text_color">#000000</color>
-    <color name="widget_color">#FFFFFF</color>
     <color name="light_blue_50">#FFE1F5FE</color>
     <color name="light_blue_200">#FF81D4FA</color>
     <color name="light_blue_600">#FF039BE5</color>

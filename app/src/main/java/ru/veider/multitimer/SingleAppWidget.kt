@@ -11,6 +11,7 @@ import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
 import ru.veider.multitimer.const.toShortTime
+import kotlin.math.max
 
 class SingleAppWidget : AppWidgetProvider() {
 
@@ -26,12 +27,14 @@ class SingleAppWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (widgetId in appWidgetIds) {
-            val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, Intent(context, MultiTimer::class.java),
-                                                                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+            val pendingIntent = getPendingIntent(context)
             val views = RemoteViews(context.packageName, R.layout.single_app_widget).apply {
                 setOnClickPendingIntent(R.id.widgetText, pendingIntent)
-                setImageViewBitmap(R.id.widgetProgressBody, getWidgetBitmap(context, getWidgetSize(context, widgetId).toInt(), 1.0f)
+                setImageViewBitmap(R.id.widgetProgressBody,
+                                   getWidgetBitmap(context,
+                                                   getWidgetSize(context, widgetId).toInt(),
+                                                   1.0f
+                                   )
                 )
             }
 
@@ -44,9 +47,7 @@ class SingleAppWidget : AppWidgetProvider() {
 
         intent?.let {
 
-            val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, Intent(context, MultiTimer::class.java),
-                                                                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+            val pendingIntent = getPendingIntent(context)
             val widgetManager = AppWidgetManager.getInstance(context)
             val widgetIds = widgetManager.getAppWidgetIds(ComponentName(context, SingleAppWidget::class.java))
             val views = RemoteViews(context.packageName, R.layout.single_app_widget).apply {
@@ -71,7 +72,10 @@ class SingleAppWidget : AppWidgetProvider() {
                                 setViewVisibility(R.id.widgetText, View.VISIBLE)
                                 setViewVisibility(R.id.widgetBell, View.GONE)
                                 setImageViewBitmap(R.id.widgetProgressBody,
-                                                   getWidgetBitmap(context, getWidgetSize(context, widgetId).toInt(), currentTime.toFloat() / maxTime)
+                                                   getWidgetBitmap(context,
+                                                                   getWidgetSize(context, widgetId).toInt(),
+                                                                   currentTime.toFloat() / maxTime
+                                                   )
                                 )
                                 setTextViewText(R.id.widgetText, currentTime.toShortTime())
                             }
@@ -83,7 +87,10 @@ class SingleAppWidget : AppWidgetProvider() {
                             views.apply {
                                 setViewVisibility(R.id.widgetText, View.GONE)
                                 setImageViewBitmap(R.id.widgetProgressBody,
-                                                   getWidgetBitmap(context, getWidgetSize(context, widgetId).toInt(), 1.0f)
+                                                   getWidgetBitmap(context,
+                                                                   getWidgetSize(context, widgetId).toInt(),
+                                                                   1.0f
+                                                   )
                                 )
                                 setViewVisibility(R.id.widgetBell, View.VISIBLE)
                             }
@@ -97,7 +104,10 @@ class SingleAppWidget : AppWidgetProvider() {
                                 setViewVisibility(R.id.widgetText, View.VISIBLE)
                                 setViewVisibility(R.id.widgetBell, View.GONE)
                                 setImageViewBitmap(R.id.widgetProgressBody,
-                                                   getWidgetBitmap(context, getWidgetSize(context, widgetId).toInt(), 1.0f)
+                                                   getWidgetBitmap(context,
+                                                                   getWidgetSize(context, widgetId).toInt(),
+                                                                   1.0f
+                                                   )
                                 )
                                 setTextViewText(R.id.widgetText, 0.toShortTime())
                             }
@@ -111,23 +121,30 @@ class SingleAppWidget : AppWidgetProvider() {
         super.onReceive(context, intent)
     }
 
+    private fun getPendingIntent(context: Context): PendingIntent =
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+                PendingIntent.getActivity(context, 0, Intent(context, MultiTimer::class.java),
+                                          PendingIntent.FLAG_UPDATE_CURRENT
+                ) else
+                PendingIntent.getActivity(context, 0, Intent(context, MultiTimer::class.java),
+                                          PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
     private fun getWidgetSize(context: Context, widgetId: Int): Float {
         val providerInfo = AppWidgetManager.getInstance(context).getAppWidgetInfo(widgetId)
         var widgetLandWidth = providerInfo.minWidth
         var widgetPortHeight = providerInfo.minHeight
         var widgetPortWidth = providerInfo.minWidth
         var widgetLandHeight = providerInfo.minHeight
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            AppWidgetManager.getInstance(context).getAppWidgetOptions(widgetId)?.run {
-                if (getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) > 0) {
-                    widgetPortWidth = getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-                    widgetLandWidth = getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
-                    widgetLandHeight = getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
-                    widgetPortHeight = getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
-                }
+        AppWidgetManager.getInstance(context).getAppWidgetOptions(widgetId)?.run {
+            if (getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) > 0) {
+                widgetPortWidth = getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+                widgetLandWidth = getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+                widgetLandHeight = getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+                widgetPortHeight = getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
             }
         }
-        val maxSize = Math.max(Math.max(widgetPortWidth, widgetLandWidth), Math.max(widgetPortHeight, widgetLandHeight))
+        val maxSize = max(max(widgetPortWidth, widgetLandWidth), max(widgetPortHeight, widgetLandHeight))
 
         return context.dip(maxSize).toFloat()
     }
@@ -136,29 +153,35 @@ class SingleAppWidget : AppWidgetProvider() {
 
     private fun getWidgetBitmap(context: Context, size: Int, percentage: Float): Bitmap {
         val strokeWidth = context.resources.getInteger(R.integer.widget_stroke_width) / 100.0f * size
-        val paint = Paint(Paint.FILTER_BITMAP_FLAG and Paint.DITHER_FLAG and Paint.ANTI_ALIAS_FLAG).apply {
+
+
+        val strokeBold = strokeWidth * 1.5f
+        val arc = RectF().apply {
+            set(strokeBold / 2, strokeBold / 2, size - strokeBold / 2, size - strokeBold / 2)
+        }
+
+//        val paintBold = Paint(Paint.FILTER_BITMAP_FLAG and Paint.DITHER_FLAG and Paint.ANTI_ALIAS_FLAG).apply {
+//            setStrokeWidth(strokeBold)
+//            style = Paint.Style.STROKE
+//            strokeCap = Paint.Cap.ROUND
+//            color = context.resources.getColor(R.color.color_on_primary, context.theme)
+//        }
+        val paintLight = Paint(Paint.FILTER_BITMAP_FLAG and Paint.DITHER_FLAG and Paint.ANTI_ALIAS_FLAG).apply {
             setStrokeWidth(strokeWidth)
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
-        }
-        val arc = RectF().apply {
-            set((strokeWidth / 2), (strokeWidth / 2), size - (strokeWidth / 2), size - (strokeWidth / 2))
+            color =
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+                        context.resources.getColor(R.color.color_primary)
+                    else
+                        context.resources.getColor(R.color.color_primary, context.theme)
         }
 
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        paint.apply {
-            style = Paint.Style.FILL
-            color = context.resources.getColor(R.color.white, context.theme)
-        }
-        canvas.drawOval(arc, paint)
 
-        paint.apply {
-            style = Paint.Style.STROKE
-            color = context.resources.getColor(R.color.color_primary, context.theme)
-        }
         val startAngle = 270 - 360 * percentage
-        canvas.drawArc(arc, startAngle, 360 * percentage, false, paint)
+        canvas.drawArc(arc, startAngle, 360 * percentage, false, paintLight)
 
         return bitmap
     }
