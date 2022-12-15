@@ -12,12 +12,19 @@
         android:layout_height="wrap_content">
 
         <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/circle" />
+        <ImageView
             android:id="@+id/widgetProgressBody"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:scaleType="fitCenter"
             android:src="@drawable/circle" />
+
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -42,7 +49,7 @@
                 android:contentDescription="@string/appwidget_hours_minutes_text"
                 android:gravity="center"
                 android:text="@string/appwidget_hours_minutes_text"
-                android:textColor="@color/black"
+                android:textColor="@color/color_on_surface"
                 android:autoSizeTextType="uniform"
                 android:textStyle="bold"
                 android:visibility="visible" />

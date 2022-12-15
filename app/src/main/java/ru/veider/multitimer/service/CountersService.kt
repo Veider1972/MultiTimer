@@ -220,7 +220,7 @@ class CountersService : LifecycleService(),
     }
 
     private fun runService(intent: Intent) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
             ContextCompat.startForegroundService(this, intent)
         else
             startService(intent)
@@ -268,10 +268,10 @@ class CountersService : LifecycleService(),
                 }
                 val intent = Intent(this@CountersService, MultiTimer::class.java)
                 val pendingIntent =
-                        PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                        PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
                 setContentIntent(pendingIntent)
             }
-           NotificationManagerCompat.from(this).notify(SIMPLE_CHANNEL_NUM, notificationBuilder.build())
+            NotificationManagerCompat.from(this).notify(SIMPLE_CHANNEL_NUM, notificationBuilder.build())
         } else {
             val notificationBuilder = Notification.Builder(this, SIMPLE_CHANNEL_ID).apply {
                 setCategory(Notification.CATEGORY_ALARM)
@@ -285,8 +285,8 @@ class CountersService : LifecycleService(),
                     val title = timer.value.counter.title.ifEmpty { "Таймер ${i++}" }
                     val message = timer.value.counter.currentProgress.toMinSec()
                     with(notificationStyle) {
-                        addLine("$title: $message")
                         setBigContentTitle(resources.getText(R.string.notification_title))
+                        addLine("$title: $message")
                     }
                     if (timer.value.counter.currentProgress < minTime) {
                         with(timer.value.counter) {
@@ -314,18 +314,34 @@ class CountersService : LifecycleService(),
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             val notificationBuilder = NotificationCompat.Builder(this, ALARM_CHANNEL_ID).apply {
                 setCategory(Notification.CATEGORY_ALARM)
-                setContentTitle(if (alarmes.size == 1)
-                                    resources.getText(R.string.notification_alarm_finished)
-                                else
-                                    resources.getText(R.string.notification_alarm_multi_finished)
-                )
+                setContentTitle(getAlarmTitle(alarmes.size))
 
-                setStyle(NotificationCompat.InboxStyle().also {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    val sb = StringBuilder()
+                    val sortedAlarms = alarmes.toSortedMap()
                     var i = 1
-                    for (timer in alarmes.toSortedMap()) {
-                        it.addLine(timer.value.counter.title.ifEmpty { "Таймер ${i++}" })
+                    for (timer in sortedAlarms) {
+                        sb.append(timer.value.counter.title.ifEmpty { "Таймер ${i++}" })
+                        if (timer.key != sortedAlarms.lastKey()) sb.append(", ")
                     }
-                })
+                    setContentText(sb.toString())
+                } else {
+                    setStyle(NotificationCompat.InboxStyle().also {
+                        var i = 1
+                        it.setBigContentTitle(getAlarmTitle(alarmes.size))
+                        for (timer in alarmes.toSortedMap()) {
+                            val text = timer.value.counter.title.ifEmpty { "Таймер ${i++}" }
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                                if (alarmes.size == 1)
+                                    setContentText(text)
+                                else
+                                    it.addLine(text)
+                            } else {
+                                it.addLine(text)
+                            }
+                        }
+                    })
+                }
                 setOngoing(true)
                 setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
@@ -338,7 +354,7 @@ class CountersService : LifecycleService(),
                 val intent = Intent(this@CountersService, MultiTimer::class.java)
                 val pendingIntent =
                         PendingIntent.getActivity(this@CountersService, 0, intent,
-                                                  PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                                  PendingIntent.FLAG_UPDATE_CURRENT
                         )
                 setContentIntent(pendingIntent)
             }
@@ -346,18 +362,29 @@ class CountersService : LifecycleService(),
         } else {
             val notificationBuilder = Notification.Builder(this, ALARM_CHANNEL_ID).apply {
                 setCategory(Notification.CATEGORY_ALARM)
-                setContentTitle(if (alarmes.size == 1)
-                                    resources.getText(R.string.notification_alarm_finished)
-                                else
-                                    resources.getText(R.string.notification_alarm_multi_finished)
-                )
+                setContentTitle(getAlarmTitle(alarmes.size))
 
-                style = Notification.InboxStyle().also {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    val sb = StringBuilder()
+                    val sortedAlarms = alarmes.toSortedMap()
                     var i = 1
-                    for (timer in alarmes.toSortedMap()) {
-                        it.addLine(timer.value.counter.title.ifEmpty { "Таймер ${i++}" })
+                    for (timer in sortedAlarms) {
+                        sb.append(timer.value.counter.title.ifEmpty { "Таймер ${i++}" })
+                        if (timer.key != sortedAlarms.lastKey()) sb.append(", ")
+                    }
+                    setContentText(sb.toString())
+                } else {
+                    style = Notification.InboxStyle().also {
+                        var i = 1
+                        it.setBigContentTitle(getAlarmTitle(alarmes.size))
+
+                        for (timer in alarmes.toSortedMap()) {
+                            it.addLine(timer.value.counter.title.ifEmpty { "Таймер ${i++}" })
+                        }
                     }
                 }
+
+
                 setOngoing(true)
                 setVisibility(Notification.VISIBILITY_PUBLIC)
                 setAutoCancel(true)
@@ -374,6 +401,12 @@ class CountersService : LifecycleService(),
         }
         setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.ALARM.toString())
     }
+
+    private fun getAlarmTitle(count: Int) =
+            if (count == 1)
+                resources.getText(R.string.notification_alarm_finished)
+            else
+                resources.getText(R.string.notification_alarm_multi_finished)
 
     private fun createAlarmNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

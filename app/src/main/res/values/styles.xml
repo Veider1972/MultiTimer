@@ -13,7 +13,7 @@
     </style>
 
     <style name="TextView">
-        <item name="android:textColor">@color/text_color</item>
+        <item name="textColor">@color/color_on_surface</item>
     </style>
 
     <style name="TextView.Navigation">
@@ -106,7 +106,7 @@
         <item name="progressStrokeWidth">@dimen/progress_bar_stroke_width</item>
         <item name="trackColor">?colorPrimary</item>
         <item name="textSize">@dimen/progress_bar_text_size</item>
-        <item name="textColor">@color/text_color</item>
+        <item name="textColor">@color/color_on_surface</item>
     </style>
 
     <style name="Widget.MultiTimer.AppWidget.Container" parent="android:Widget">
