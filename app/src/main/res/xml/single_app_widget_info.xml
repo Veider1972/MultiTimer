@@ -4,8 +4,6 @@
     android:initialLayout="@layout/single_app_widget"
     android:minResizeWidth="30dp"
     android:minResizeHeight="30dp"
-    android:minHeight="30dp"
-    android:minWidth="30dp"
     android:previewImage="@drawable/timer_widget"
     android:resizeMode="none"
     android:updatePeriodMillis="86400000"

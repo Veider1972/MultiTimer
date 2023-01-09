@@ -1,65 +1,67 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/widgetContainer"
     style="@style/Widget.MultiTimer.AppWidget.Container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:gravity="center"
+    android:padding="0dp"
     android:theme="@style/Theme.MultiTimer.NoActionBar.AppWidgetContainer">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/circle" />
         <ImageView
             android:id="@+id/widgetProgressBody"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_background" />
+
+        <ImageView
+            android:id="@+id/widgetBell"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/circle" />
+            android:src="@drawable/notifications"
+            android:visibility="gone" />
 
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/widgetText"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_centerInParent="true"
+            android:singleLine="true"
+            android:textAlignment="center"
+            android:contentDescription="@string/appwidget_hours_minutes_text"
+            android:text="@string/appwidget_hours_minutes_text"
+            android:textColor="@color/color_on_surface"
+            android:textSize="13.5sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/widgetBell"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/notifications"
-                android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="@style/CircularProgressIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:indeterminateOnly="false"
 
+            android:max="100"
+            android:progress="100"
+            android:progressDrawable="@drawable/progress_background"
+            android:scaleX="-1.3"
+            android:scaleY="1.3" />
 
-            <TextView
-                android:id="@+id/widgetText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/appwidget_hours_minutes_text"
-                android:gravity="center"
-                android:text="@string/appwidget_hours_minutes_text"
-                android:textColor="@color/color_on_surface"
-                android:autoSizeTextType="uniform"
-                android:textStyle="bold"
-                android:visibility="visible" />
-
-
-        </RelativeLayout>
     </RelativeLayout>
 <!--    <TextView-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
+<!--        style="@style/Widget.MaterialComponents.TextView"-->
+<!--        android:singleLine="true"-->
 <!--        android:text="@string/app_name"/>-->
 
 

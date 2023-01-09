@@ -17,12 +17,14 @@
     <color name="color_on_tertiary_container">#081E20</color>
     <color name="timer_alarm_color">#BF360C</color>
     <color name="timer_simple_color">#D3D3D3</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
     <color name="divider">?attr/colorPrimary</color>
     <color name="text_color">#000000</color>
-    <color name="light_blue_50">#FFE1F5FE</color>
-    <color name="light_blue_200">#FF81D4FA</color>
-    <color name="light_blue_600">#FF039BE5</color>
-    <color name="light_blue_900">#FF01579B</color>
+    <color name="light_blue_50">#E1F5FE</color>
+    <color name="light_blue_200">#81D4FA</color>
+    <color name="light_blue_600">#039BE5</color>
+    <color name="light_blue_900">#01579B</color>
+    <color name="widget_background_color_start">#BFBFBF</color>
+    <color name="widget_background_color_end">#FFFFFF</color>
 </resources>

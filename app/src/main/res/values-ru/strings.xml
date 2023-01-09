@@ -1,0 +1,64 @@
+<resources>
+
+    // menu -> multi_timer.xml
+    <string name="adding_new_counter">Добавить новый таймер</string>
+
+    // menu -> activity_main_drawer.xml
+    <string name="menu_counters">Таймеры</string>
+    <string name="menu_about">О программе</string>
+
+    // layout -> navigation_header.xml
+    <string name="app_name">Мультитаймер</string>
+    <string name="my_email">veider@inbox.ru</string>
+
+    // layout -> layout_query.xml
+    <string name="query_text_hint">Название события</string>
+
+    // layout -> item_counter.xml
+    <string name="title_hint">Без названия</string>
+    <string name="button_text_start">Старт</string>
+    <string name="button_text_pause">Пауза</string>
+    <string name="button_text_stop">Стоп</string>
+
+    // layout -> fragment_about.xml
+    // app_name
+    <string name="about_version">Версия</string>
+    <string name="about_date">Январь, 2023</string>
+    // my_email
+    <string name="about_description_title">Описание</string>
+    <string name="about_description">Программа разработана для тех, кто не хочет пропустить важные события. Количество таймеров не ограничено.\nДля каждого таймера можно задать своё название.\nВиджет программы ведёт отсчёт оставшегося времени до ближайшего работающего таймера.</string>
+    <string name="about_guide_title">Краткое руководство</string>
+    <string name="about_guide">Сортировка таймеров - перетаскиванием\nУдаление таймеров - смахиванием\nОстальные действия - нажатием</string>
+    <string name="about_copyrights">Copyright © by Vadim Korkhovoy, 2023</string>
+
+    // CountersService.kt
+    <string name="alarm_channel_name">Уведомление сработавшего таймера</string>
+    <string name="alarm_channel_description">Alarm Service Channel</string>
+    <string name="simple_channel_name">Счётчик обратного отсчёта</string>
+    <string name="simple_channel_description">Counter Service Channel</string>
+    <string name="notification_title">Мультитаймер запущен</string>
+    <string name="notification_description">"Ближайший через: "</string>
+    <string name="notification_alarm_with_title">Сработал таймер: %s</string>
+    <string name="notification_alarm_without_title">Таймер сработал</string>
+    <string name="attention">Внимание!</string>
+    <string name="simple_channel_title">Таймер работает</string>
+    <string name="notification_alarm_finished">Таймер сработал!</string>
+    <string name="notification_alarm_multi_finished">Таймеры сработали!</string>
+    <string name="time_min_sec_pattern">%d мин. %d сек.</string>
+    <string name="time_hours_min_sec_pattern">%d ч. %d мин. %d сек.</string>
+
+    // CountersViewModel.kt
+    <string name="error_service_event">Код ошибки</string>
+
+    // InputDialog.kt
+    <string name="button_text_accept">Принять</string>
+    <string name="button_text_cancel">Отменить</string>
+
+    // TimeSelector.kt
+    <string name="button_text_set">Задать</string>
+    <string name="time_set_dialog_title">Установка таймера</string>
+    <string name="appwidget_hours_minutes_text">00:00</string>
+    <string name="appwidget_seconds_text">00</string>
+    <string name="add_widget">Добавить виджет</string>
+
+</resources>

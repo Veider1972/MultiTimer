@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     // Button
-    <color name="color_on_surface">#B4B4B4</color>
+    <color name="color_on_surface">#DBDBDB</color>
     <color name="color_primary">#8BC34A</color>
     <color name="color_primary_dark">#4F702A</color>
     <color name="color_on_primary">#000000</color>
@@ -17,8 +17,10 @@
     <color name="color_on_tertiary_container">#081E20</color>
     <color name="timer_alarm_color">#BF360C</color>
     <color name="timer_simple_color">#D3D3D3</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
     <color name="divider">?attr/colorPrimary</color>
     <color name="text_color">#FFFFFF</color>
+    <color name="widget_background_color_start">#000000</color>
+    <color name="widget_background_color_end">#404040</color>
 </resources>
