@@ -1,5 +1,3 @@
-package ru.veider.multitimer.ui.counters
-
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
@@ -11,12 +9,15 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.databinding.FragmentCountersBinding
 import ru.veider.multitimer.ui.counters.CountersAdapter.CounterHolder
+import ru.veider.multitimer.utils.BootUpCounter
 import ru.veider.multitimer.viewmodel.CountersViewModel
 import ru.veider.multitimer.viewmodel.CountersViewModelFactory
 

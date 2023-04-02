@@ -23,7 +23,7 @@
     // layout -> fragment_about.xml
     // app_name
     <string name="about_version">Версия</string>
-    <string name="about_date">Январь, 2023</string>
+    <string name="about_date">Апрель, 2023</string>
     // my_email
     <string name="about_description_title">Описание</string>
     <string name="about_description">Программа разработана для тех, кто не хочет пропустить важные события. Количество таймеров не ограничено.\nДля каждого таймера можно задать своё название.\nВиджет программы ведёт отсчёт оставшегося времени до ближайшего работающего таймера.</string>
@@ -60,5 +60,8 @@
     <string name="appwidget_hours_minutes_text">00:00</string>
     <string name="appwidget_seconds_text">00</string>
     <string name="add_widget">Добавить виджет</string>
+
+    //Review Flow
+    <string name="review_complete">Спасибо за оценку приложения!</string>
 
 </resources>

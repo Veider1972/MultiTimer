@@ -23,7 +23,7 @@
     // layout -> fragment_about.xml
     // app_name
     <string name="about_version">Version</string>
-    <string name="about_date">January, 2023</string>
+    <string name="about_date">April, 2023</string>
     // my_email
     <string name="about_description_title">About</string>
     <string name="about_description">The program was designed for those who do not want to miss important events. The number of timers is not limited.\nYou can set any name for each timer.\nThe program\'s widget shows the rest of the time.</string>
@@ -60,5 +60,8 @@
     <string name="appwidget_hours_minutes_text">00:00</string>
     <string name="appwidget_seconds_text">00</string>
     <string name="add_widget">Add Multitimer\'s widget</string>
+
+    //Review Flow
+    <string name="review_complete">Thank you for rating the app!</string>
 
 </resources>
