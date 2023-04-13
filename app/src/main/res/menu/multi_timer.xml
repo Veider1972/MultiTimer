@@ -6,6 +6,7 @@
         android:orderInCategory="100"
         android:title="@string/adding_new_counter"
         android:icon="@drawable/add_alarm"
+        android:contentDescription="@string/add_timer"
         android:iconTint="@color/black"
         app:showAsAction="always" />
 </menu>

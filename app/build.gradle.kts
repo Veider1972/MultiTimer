@@ -14,8 +14,8 @@ android {
         minSdk =23
         targetSdk =33
         // Не забыть обновить about_date
-        versionCode = 12
-        versionName = "1.2.0"
+        versionCode = 19
+        versionName = "1.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
@@ -54,6 +54,9 @@ android {
         create("rustore") {
             dimension = "store"
         }
+        create("google") {
+            dimension = "store"
+        }
         create("free") {
             dimension = "cost"
         }
@@ -75,8 +78,11 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.lifecycle:lifecycle-service:2.5.1")
-    //Rustore
+    // Rustore review
     implementation("ru.rustore.sdk:review:0.1.5")
+    // Google review
+    implementation("com.google.android.play:review:2.0.1")
+    implementation("com.google.android.play:review-ktx:2.0.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

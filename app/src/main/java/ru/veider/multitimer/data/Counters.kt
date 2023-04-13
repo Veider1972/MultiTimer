@@ -14,9 +14,10 @@ class Counters : ArrayList<Counter>() {
     }
 
     fun getIndexByID(id: Int): Int {
-        for (i in 0..size) {
-            if (id == this[i].id) return i
-        }
+        if (this.isNotEmpty())
+            for (i in 0..size) {
+                if (id == this[i].id) return i
+            }
         return -1
     }
 
@@ -37,7 +38,7 @@ class Counters : ArrayList<Counter>() {
 
     override fun toString(): String {
         val sb = StringBuilder()
-        for (i in 0..size-1) {
+        for (i in 0..size - 1) {
             sb.append("(${this[i]})")
             if ((size > 1) && (i < size - 1)) sb.append(",  ")
         }

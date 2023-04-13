@@ -11,9 +11,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.play.core.review.ReviewException
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.android.play.core.review.model.ReviewErrorCode
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import ru.rustore.sdk.core.tasks.OnCompleteListener
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
@@ -23,8 +25,6 @@ import ru.veider.multitimer.ui.counters.CountersAdapter.CounterHolder
 import ru.veider.multitimer.utils.BootUpCounter
 import ru.veider.multitimer.viewmodel.CountersViewModel
 import ru.veider.multitimer.viewmodel.CountersViewModelFactory
-import ru.vk.store.sdk.review.RuStoreReviewManagerFactory
-import ru.vk.store.sdk.review.model.ReviewInfo
 
 
 class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
@@ -67,7 +67,11 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
                 return makeMovementFlags(dragFlags, movementsFlag)
             }
 
-            override fun onMove(recyclerView: RecyclerView, fromViewHolder: RecyclerView.ViewHolder, toViewHolder: RecyclerView.ViewHolder): Boolean {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                fromViewHolder: RecyclerView.ViewHolder,
+                toViewHolder: RecyclerView.ViewHolder
+            ): Boolean {
                 val fromPosition: Int = fromViewHolder.adapterPosition
                 val toPosition: Int = toViewHolder.adapterPosition
                 (binder.listView.adapter as CountersAdapter).swapItems(fromPosition, toPosition)
@@ -84,7 +88,8 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
                     viewModel.deleteCounter(counterID)
                     (binder.listView.adapter as CountersAdapter).notifyItemRemoved(position)
                 }
-                dialog.setNegativeButton("Нет"
+                dialog.setNegativeButton(
+                    "Нет"
                 ) { _, _ ->
                     (binder.listView.adapter as CountersAdapter).notifyItemChanged(position)
                 }
@@ -147,25 +152,17 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         viewModel.startCounter(id)
         GlobalScope.launch {
             val counter = BootUpCounter.getBootCounts(requireContext())
-            if (counter==10 || counter%50==0){
-                RuStoreReviewManagerFactory.create(requireContext()).run{
-                    requestReviewFlow().addOnCompleteListener(object : OnCompleteListener<ReviewInfo> {
-                        override fun onFailure(throwable: Throwable) {
-                            // Handle error
+            if (counter == 10 || counter % 50 == 0) {
+                ReviewManagerFactory.create(requireContext()).run {
+                    requestReviewFlow().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            launchReviewFlow(requireActivity(), task.result).addOnCompleteListener {
+                                BootUpCounter.setMarked(requireContext())
+                            }
+                        } else {
+                            @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
                         }
-
-                        override fun onSuccess(result: ReviewInfo) {
-                            launchReviewFlow(result).addOnCompleteListener(object: OnCompleteListener<Unit> {
-                                override fun onFailure(throwable: Throwable) {
-                                    // Review flow has finished, continue your app flow.
-                                }
-
-                                override fun onSuccess(result: Unit) {
-                                    BootUpCounter.setMarked(requireContext())
-                                }
-                            })
-                        }
-                    })
+                    }
                 }
             }
         }
@@ -177,7 +174,6 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
 
     override fun onClickStopButton(id: Int) {
         viewModel.stopCounter(id)
-
     }
 
     override fun onTimerTitleChange(id: Int, title: String) {

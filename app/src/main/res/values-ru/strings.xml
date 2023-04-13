@@ -64,4 +64,25 @@
     //Review Flow
     <string name="review_complete">Спасибо за оценку приложения!</string>
 
+    //Content descriptors
+    <string name="navigation_drawer">Панель навигации</string>
+    <string name="toolbar">Панель инструментов</string>
+    <string name="timer_run">Запустить таймер</string>
+    <string name="timer_pause">Приостановить таймер</string>
+    <string name="timer_stop">Остановить таймер</string>
+    <string name="title">Название таймера</string>
+    <string name="timer_set">Установить время таймера</string>
+    <string name="mail_me">Написать автору</string>
+    <string name="copyright">Авторские права</string>
+    <string name="hours_high_set">Задать десятки часов</string>
+    <string name="hours_low_set">Задать единицы часов</string>
+    <string name="minutes_high_set">Задать десятки минут</string>
+    <string name="minutes_low_set">Задать единицы минут</string>
+    <string name="seconds_high_set">Задать десятки секунд</string>
+    <string name="seconds_low_set">Задать единицы секунд</string>
+    <string name="add_timer">Добавить таймер</string>
+    <string name="timers_list">Список с таймерами</string>
+
+    <string name="timer_need_set">Сначала надо установить время…</string>
+
 </resources>

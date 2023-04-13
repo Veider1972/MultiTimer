@@ -3,6 +3,7 @@ package ru.veider.multitimer.viewmodel
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -94,10 +95,16 @@ import java.util.*
     fun startCounter(id: Int) {
         with(counters[counters.getIndexByID(id)]) {
             if (this.state == CounterState.PAUSED || this.state == CounterState.FINISHED) {
-                state = CounterState.RUN
-                startTime = Date().time
-                storeCounter(this)
-                sendToService(this, ON_RUN_CLICK)
+                if (this.currentProgress==0){
+                    context?.run {
+                        Toast.makeText(context, getText(R.string.timer_need_set), Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    state = CounterState.RUN
+                    startTime = Date().time
+                    storeCounter(this)
+                    sendToService(this, ON_RUN_CLICK)
+                }
             }
         }
     }

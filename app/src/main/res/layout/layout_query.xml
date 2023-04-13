@@ -7,7 +7,7 @@
     <EditText
         android:id="@+id/input_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:hint="@string/query_text_hint" />
 
 </LinearLayout>

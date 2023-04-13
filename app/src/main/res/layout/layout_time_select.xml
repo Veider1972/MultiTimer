@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             app:mnp_max="9"
             app:mnp_min="0"
+            android:contentDescription="@string/hours_high_set"
             app:mnp_textSize="@dimen/time_selector_number_size" />
 
         <com.alexzaitsev.meternumberpicker.MeterNumberPicker
@@ -27,6 +28,7 @@
             android:layout_height="wrap_content"
             app:mnp_max="9"
             app:mnp_min="0"
+            android:contentDescription="@string/hours_low_set"
             app:mnp_textSize="@dimen/time_selector_number_size" />
 
         <ImageView
@@ -40,6 +42,7 @@
             android:layout_height="wrap_content"
             app:mnp_max="5"
             app:mnp_min="0"
+            android:contentDescription="@string/minutes_high_set"
             app:mnp_textSize="@dimen/time_selector_number_size" />
 
         <com.alexzaitsev.meternumberpicker.MeterNumberPicker
@@ -48,6 +51,7 @@
             android:layout_height="wrap_content"
             app:mnp_max="9"
             app:mnp_min="0"
+            android:contentDescription="@string/minutes_low_set"
             app:mnp_textSize="@dimen/time_selector_number_size" />
 
         <ImageView
@@ -61,6 +65,7 @@
             android:layout_height="wrap_content"
             app:mnp_max="5"
             app:mnp_min="0"
+            android:contentDescription="@string/seconds_high_set"
             app:mnp_textSize="@dimen/time_selector_number_size" />
 
         <com.alexzaitsev.meternumberpicker.MeterNumberPicker
@@ -69,6 +74,7 @@
             android:layout_height="wrap_content"
             app:mnp_max="9"
             app:mnp_min="0"
+            android:contentDescription="@string/seconds_low_set"
             app:mnp_textSize="@dimen/time_selector_number_size" />
     </LinearLayout>
 

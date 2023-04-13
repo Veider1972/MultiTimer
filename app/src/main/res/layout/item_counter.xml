@@ -10,6 +10,7 @@
 
     <antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
         android:id="@+id/progress_indicator"
+        android:contentDescription="@string/timer_set"
         style="@style/CircularProgressIndicator"/>
 
     <LinearLayout
@@ -22,6 +23,7 @@
         <TextView
             android:id="@+id/title"
             style="@style/TextView.Title"
+            android:contentDescription="@string/title"
             android:hint="@string/title_hint"/>
 
         <LinearLayout
@@ -30,6 +32,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_start"
+                android:contentDescription="@string/timer_run"
                 style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                 android:layout_marginHorizontal="@dimen/button_margin_horizontal"
                 android:paddingHorizontal="@dimen/button_padding_horizontal"
@@ -37,6 +40,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_pause"
+                android:contentDescription="@string/timer_pause"
                 style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                 android:layout_marginHorizontal="@dimen/button_margin_horizontal"
                 android:paddingHorizontal="@dimen/button_padding_horizontal"
@@ -44,6 +48,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_stop"
+                android:contentDescription="@string/timer_stop"
                 style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                 android:layout_marginHorizontal="@dimen/button_margin_horizontal"
                 android:paddingHorizontal="@dimen/button_padding_horizontal"
