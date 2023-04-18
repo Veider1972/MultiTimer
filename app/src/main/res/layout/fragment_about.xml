@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="top"
     android:orientation="vertical"
-    android:padding="@dimen/double_padding"
+    android:padding="@dimen/single_padding"
     tools:context=".ui.about.AboutFragment">
 
 
@@ -26,25 +26,38 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="vertical">
 
             <TextView
                 style="@style/TextView.About.Title"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:contentDescription="@string/app_name"
                 android:text="@string/app_name" />
 
             <TextView
                 android:id="@+id/version"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 style="@style/TextView.About.Version"
                 android:text="@string/about_version" />
 
             <TextView
                 android:id="@+id/date"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 style="@style/TextView.About.Date"
                 android:text="@string/about_date" />
 
             <TextView
                 style="@style/TextView.About.Email"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:contentDescription="@string/mail_me"
                 android:text="@string/my_email" />
         </LinearLayout>
@@ -78,9 +91,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="bottom">
+        android:gravity="bottom|center_horizontal">
         <TextView
             style="@style/TextView.About.Copyrights"
+            android:layout_width="wrap_content"
             android:contentDescription="@string/about_copyrights"
             android:text="@string/about_copyrights" />
     </LinearLayout>

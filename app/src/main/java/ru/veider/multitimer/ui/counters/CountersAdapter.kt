@@ -12,7 +12,6 @@ import com.google.android.material.button.MaterialButton
 import ru.veider.multitimer.R
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.const.CounterState
-import ru.veider.multitimer.const.firstZero
 import ru.veider.multitimer.const.toTime
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.databinding.ItemCounterBinding

@@ -8,6 +8,7 @@
         <item name="android:layout_gravity">center_vertical</item>
         <item name="android:layout_weight">1</item>
         <item name="android:elevation">@dimen/global_elevation</item>
+        <item name="textSize">@dimen/button_text_size</item>
         <item name="singleLine">true</item>
         <item name="backgroundTint">?colorPrimary</item>
     </style>
@@ -79,6 +80,34 @@
     <style name="TextView.About.Description">
         <item name="maxWidth">200dp</item>
         <item name="android:textAlignment">textStart</item>
+        <item name="android:textSize">@dimen/about_description_text_size</item>
+    </style>
+
+    <style name="TextView.Preferences">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TextView.Preferences.Header">
+        <item name="android:layout_marginTop">@dimen/single_padding</item>
+        <item name="android:textSize">@dimen/about_header_text_size</item>
+        <item name="android:textAlignment">textStart</item>
+        <item name="textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextView.Preferences.Description">
+        <item name="android:textSize">@dimen/about_description_text_size</item>
+        <item name="android:textAlignment">textStart</item>
+    </style>
+
+    <style name="TextView.Preferences.Description.Title">
+        <item name="maxWidth">200dp</item>
+        <item name="android:textSize">@dimen/nav_header_description_text_size</item>
+    </style>
+
+    <style name="TextView.Preferences.Description.Body">
+        <item name="maxWidth">200dp</item>
         <item name="android:textSize">@dimen/about_description_text_size</item>
     </style>
 

@@ -8,18 +8,17 @@ import androidx.lifecycle.ViewModelProvider
 import ru.veider.multitimer.R
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.databinding.LayoutTimeSelectBinding
-import ru.veider.multitimer.viewmodel.CountersViewModel
-import ru.veider.multitimer.viewmodel.CountersViewModelFactory
+import ru.veider.multitimer.viewmodel.MainViewModel
+import ru.veider.multitimer.viewmodel.MainViewModelFactory
 
-class TimeSelector :
-    DialogFragment() {
+class TimeSelector : DialogFragment() {
     private var firstHours = 0
     private var secondHours = 0
     private var firstMinutes = 0
     private var secondMinutes = 0
     private var firstSeconds = 0
     private var secondSeconds = 0
-    private lateinit var viewModel: CountersViewModel
+    private lateinit var viewModel: MainViewModel
     private var _binder: LayoutTimeSelectBinding? = null
     private val binder get() = _binder!!
 
@@ -33,7 +32,7 @@ class TimeSelector :
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        viewModel = ViewModelProvider(this, CountersViewModelFactory.getInstance())[CountersViewModel::class.java]
+        viewModel = ViewModelProvider(this, MainViewModelFactory.getInstance())[MainViewModel::class.java]
         var currentProgress = counter.maxProgress
         val hours = (currentProgress / 3600)
         currentProgress %= 3600

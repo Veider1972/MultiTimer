@@ -8,12 +8,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.veider.multitimer.R
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.databinding.LayoutQueryBinding
-import ru.veider.multitimer.viewmodel.CountersViewModel
-import ru.veider.multitimer.viewmodel.CountersViewModelFactory
+import ru.veider.multitimer.viewmodel.MainViewModel
+import ru.veider.multitimer.viewmodel.MainViewModelFactory
 
 class InputDialog : DialogFragment() {
 
-    private lateinit var viewModel: CountersViewModel
+    private lateinit var viewModel: MainViewModel
     private var _binder: LayoutQueryBinding? = null
     private val binder get() = _binder!!
 
@@ -29,7 +29,7 @@ class InputDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        viewModel = ViewModelProvider(this, CountersViewModelFactory.getInstance())[CountersViewModel::class.java]
+        viewModel = ViewModelProvider(this, MainViewModelFactory.getInstance())[MainViewModel::class.java]
         _binder = LayoutQueryBinding.inflate(layoutInflater)
         val dialog = MaterialAlertDialogBuilder(requireContext()).apply {
             setView(binder.root)

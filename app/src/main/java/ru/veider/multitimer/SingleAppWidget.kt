@@ -100,10 +100,10 @@ class SingleAppWidget : AppWidgetProvider() {
 
     private fun getPendingIntent(context: Context): PendingIntent =
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-                PendingIntent.getActivity(context, 0, Intent(context, MultiTimer::class.java),
+                PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java),
                                           PendingIntent.FLAG_UPDATE_CURRENT
                 ) else
-                PendingIntent.getActivity(context, 0, Intent(context, MultiTimer::class.java),
+                PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java),
                                           PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
 

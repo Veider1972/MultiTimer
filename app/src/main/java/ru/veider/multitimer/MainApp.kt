@@ -6,7 +6,7 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import ru.veider.multitimer.service.CountersService
 
-class CountersApp : Application() {
+class MainApp : Application() {
 
     companion object {
         private var application: Application? = null
@@ -23,3 +23,5 @@ class CountersApp : Application() {
         super.onCreate()
     }
 }
+
+val app = MainApp.getInstance()!!

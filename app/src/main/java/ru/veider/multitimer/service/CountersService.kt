@@ -16,13 +16,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
-import ru.veider.multitimer.MultiTimer
+import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.R
 import ru.veider.multitimer.SingleAppWidget
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.viewmodel.CountersViewModel
-import ru.veider.multitimer.viewmodel.CountersViewModelFactory
+import ru.veider.multitimer.viewmodel.MainViewModel
+import ru.veider.multitimer.viewmodel.MainViewModelFactory
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.ceil
@@ -37,7 +37,7 @@ class CountersService : LifecycleService(),
     private lateinit var simpleChannelDescription: String
     private var timers: Hashtable<Int, CountersService.CounterTimer> = Hashtable()
     private var alarmes: Hashtable<Int, CountersService.AlarmTimer> = Hashtable()
-    private lateinit var viewModel: CountersViewModel
+    private lateinit var viewModel: MainViewModel
 
     val mViewModelStore = ViewModelStore()
     private var mFactory: ViewModelProvider.Factory? = null
@@ -56,7 +56,7 @@ class CountersService : LifecycleService(),
                 }
             }
         })
-        viewModel = ViewModelProvider(this.viewModelStore, CountersViewModelFactory.getInstance())[CountersViewModel::class.java]
+        viewModel = ViewModelProvider(this.viewModelStore, MainViewModelFactory.getInstance())[MainViewModel::class.java]
         alarmChannelName = resources.getString(R.string.alarm_channel_name)
         alarmChannelDescription = resources.getString(R.string.alarm_channel_description)
         simpleChannelName = resources.getString(R.string.simple_channel_name)
@@ -266,7 +266,7 @@ class CountersService : LifecycleService(),
                 } else {
                     NotificationCompat.PRIORITY_MIN
                 }
-                val intent = Intent(this@CountersService, MultiTimer::class.java)
+                val intent = Intent(this@CountersService, MainActivity::class.java)
                 val pendingIntent =
                         PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
                 setContentIntent(pendingIntent)
@@ -300,7 +300,7 @@ class CountersService : LifecycleService(),
                 style = notificationStyle
                 setSmallIcon(R.drawable.clock)
                 NotificationCompat.PRIORITY_MIN
-                val intent = Intent(this@CountersService, MultiTimer::class.java)
+                val intent = Intent(this@CountersService, MainActivity::class.java)
                 val pendingIntent =
                         PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 setContentIntent(pendingIntent)
@@ -351,7 +351,7 @@ class CountersService : LifecycleService(),
                 color = Color.RED
                 setSmallIcon(R.drawable.animated_timer)
                 NotificationCompat.PRIORITY_MAX
-                val intent = Intent(this@CountersService, MultiTimer::class.java)
+                val intent = Intent(this@CountersService, MainActivity::class.java)
                 val pendingIntent =
                         PendingIntent.getActivity(this@CountersService, 0, intent,
                                                   PendingIntent.FLAG_UPDATE_CURRENT
@@ -390,7 +390,7 @@ class CountersService : LifecycleService(),
                 setAutoCancel(true)
                 setSmallIcon(R.drawable.animated_timer)
                 NotificationManager.IMPORTANCE_HIGH
-                val intent = Intent(this@CountersService, MultiTimer::class.java)
+                val intent = Intent(this@CountersService, MainActivity::class.java)
                 val pendingIntent =
                         PendingIntent.getActivity(this@CountersService, 0, intent,
                                                   PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

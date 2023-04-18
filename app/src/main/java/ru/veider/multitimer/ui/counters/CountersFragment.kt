@@ -1,3 +1,5 @@
+package ru.veider.multitimer.ui.counters
+
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
@@ -9,17 +11,25 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.play.core.review.ReviewException
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.android.play.core.review.model.ReviewErrorCode
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import ru.rustore.sdk.core.tasks.OnCompleteListener
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.databinding.FragmentCountersBinding
+import ru.veider.multitimer.ui.counters.CountersAdapter
 import ru.veider.multitimer.ui.counters.CountersAdapter.CounterHolder
 import ru.veider.multitimer.utils.BootUpCounter
-import ru.veider.multitimer.viewmodel.CountersViewModel
-import ru.veider.multitimer.viewmodel.CountersViewModelFactory
+import ru.veider.multitimer.viewmodel.MainViewModel
+import ru.veider.multitimer.viewmodel.MainViewModelFactory
+import ru.veider.multitimer.viewmodel.PreferenceViewModel
+import ru.vk.store.sdk.review.RuStoreReviewManagerFactory
+import ru.vk.store.sdk.review.model.ReviewInfo
 
 
 class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
@@ -27,7 +37,8 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
     private var _binder: FragmentCountersBinding? = null
 
     private val binder get() = _binder!!
-    private lateinit var viewModel: CountersViewModel
+    private lateinit var viewModel: MainViewModel
+    private lateinit var preferenceViewModel: PreferenceViewModel
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreateView(
@@ -35,10 +46,17 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel = ViewModelProvider(this, CountersViewModelFactory.getInstance())[CountersViewModel::class.java].apply {
+        viewModel = ViewModelProvider(this, MainViewModelFactory.getInstance())[MainViewModel::class.java].apply {
             counters().observe(this@CountersFragment.viewLifecycleOwner) { counters -> isCountersChanged(counters) }
             counter().observe(this@CountersFragment.viewLifecycleOwner) { counter -> isCounterChanged(counter) }
         }
+        preferenceViewModel = ViewModelProvider(this, MainViewModelFactory.getInstance())[PreferenceViewModel::class.java]
+
+        if (viewModel.getRunCounters() > 0)
+            if (preferenceViewModel.screen.keepScreenOn && preferenceViewModel.screen.isKept)
+                preferenceViewModel.updateScreenSettings()
+            else
+                preferenceViewModel.storeScreenSettings()
 
         _binder = FragmentCountersBinding.inflate(inflater, container, false)
         binder.listView.apply {
@@ -62,7 +80,11 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
                 return makeMovementFlags(dragFlags, movementsFlag)
             }
 
-            override fun onMove(recyclerView: RecyclerView, fromViewHolder: RecyclerView.ViewHolder, toViewHolder: RecyclerView.ViewHolder): Boolean {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                fromViewHolder: RecyclerView.ViewHolder,
+                toViewHolder: RecyclerView.ViewHolder
+            ): Boolean {
                 val fromPosition: Int = fromViewHolder.adapterPosition
                 val toPosition: Int = toViewHolder.adapterPosition
                 (binder.listView.adapter as CountersAdapter).swapItems(fromPosition, toPosition)
@@ -79,7 +101,8 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
                     viewModel.deleteCounter(counterID)
                     (binder.listView.adapter as CountersAdapter).notifyItemRemoved(position)
                 }
-                dialog.setNegativeButton("Нет"
+                dialog.setNegativeButton(
+                    "Нет"
                 ) { _, _ ->
                     (binder.listView.adapter as CountersAdapter).notifyItemChanged(position)
                 }
@@ -123,11 +146,20 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
     }
 
     override fun onPause() {
+        if (preferenceViewModel.screen.keepScreenOn && preferenceViewModel.screen.isKept)
+            preferenceViewModel.restoreScreenSettings()
         viewModel.saveCounters()
         super.onPause()
     }
 
     override fun onResume() {
+
+        if (viewModel.getRunCounters() > 0) {
+            if (preferenceViewModel.screen.keepScreenOn && preferenceViewModel.screen.isKept)
+                preferenceViewModel.updateScreenSettings()
+            else if (preferenceViewModel.screen.keepScreenOn)
+                preferenceViewModel.storeScreenSettings()
+        }
         binder.listView.adapter?.notifyDataSetChanged()
         super.onResume()
     }
@@ -139,14 +171,57 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
     }
 
     override fun onClickStartButton(id: Int) {
+        if (viewModel.getRunCounters() == 0)
+            preferenceViewModel.storeScreenSettings()
         viewModel.startCounter(id)
+        val counter = BootUpCounter.getBootCounts(requireContext())
+        if (counter == 10 || counter % 50 == 0) {
+            GlobalScope.launch {
+                ReviewManagerFactory.create(requireContext()).run {
+                    requestReviewFlow().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            launchReviewFlow(requireActivity(), task.result).addOnCompleteListener {
+                                BootUpCounter.setMarked(requireContext())
+                            }
+                        } else {
+                            @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
+                        }
+                    }
+                }
+            }
+            GlobalScope.launch {
+                RuStoreReviewManagerFactory.create(requireContext()).run {
+                    requestReviewFlow().addOnCompleteListener(object : OnCompleteListener<ReviewInfo> {
+                        override fun onFailure(throwable: Throwable) {
+                            // Handle error
+                        }
+
+                        override fun onSuccess(result: ReviewInfo) {
+                            launchReviewFlow(result).addOnCompleteListener(object : OnCompleteListener<Unit> {
+                                override fun onFailure(throwable: Throwable) {
+                                    // Review flow has finished, continue your app flow.
+                                }
+
+                                override fun onSuccess(result: Unit) {
+                                    BootUpCounter.setMarked(requireContext())
+                                }
+                            })
+                        }
+                    })
+                }
+            }
+        }
     }
 
     override fun onClickPauseButton(id: Int) {
+        if (viewModel.getRunCounters() <= 1 && preferenceViewModel.screen.keepScreenOn && preferenceViewModel.screen.isKept)
+            preferenceViewModel.restoreScreenSettings()
         viewModel.pauseCounter(id)
     }
 
     override fun onClickStopButton(id: Int) {
+        if (viewModel.getRunCounters() <= 1 && preferenceViewModel.screen.keepScreenOn && preferenceViewModel.screen.isKept)
+            preferenceViewModel.restoreScreenSettings()
         viewModel.stopCounter(id)
     }
 

@@ -14,8 +14,8 @@ android {
         minSdk =23
         targetSdk =33
         // Не забыть обновить about_date
-        versionCode = 19
-        versionName = "1.2.1"
+        versionCode = 22
+        versionName = "1.2.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
@@ -43,20 +43,11 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    flavorDimensions += listOf("cost")
 //    buildFeatures {
 //        viewBinding = true
 //    }
-    flavorDimensions += listOf("store", "cost")
     productFlavors {
-        create("common") {
-            dimension = "store"
-        }
-        create("rustore") {
-            dimension = "store"
-        }
-        create("google") {
-            dimension = "store"
-        }
         create("free") {
             dimension = "cost"
         }
@@ -83,6 +74,7 @@ dependencies {
     // Google review
     implementation("com.google.android.play:review:2.0.1")
     implementation("com.google.android.play:review-ktx:2.0.1")
+    implementation("androidx.preference:preference:1.2.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

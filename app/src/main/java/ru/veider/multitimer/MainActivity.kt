@@ -1,7 +1,10 @@
 package ru.veider.multitimer
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -15,7 +18,7 @@ import com.google.android.material.navigation.NavigationView
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.databinding.ActivityMultiTimerBinding
 
-class MultiTimer : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMultiTimerBinding
@@ -33,7 +36,7 @@ class MultiTimer : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_multi_timer)
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_counters, R.id.nav_about
+                R.id.nav_counters, R.id.nav_about, R.id.nav_preferences
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -44,13 +47,19 @@ class MultiTimer : AppCompatActivity() {
                 bundle.putInt(COUNTER_ID, counterId)
                 navController.navigate(R.id.nav_counters, bundle)
             }
-
         }
         navView.setupWithNavController(navController)
+        
+//        val configuration = resources.configuration
+//        configuration.fontScale = 1f
+//        val metrics = DisplayMetrics()
+//        windowManager.defaultDisplay.getMetrics(metrics)
+//        metrics.scaledDensity = configuration.fontScale*metrics.density
+//        baseContext.resources.updateConfiguration(configuration,metrics)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId==android.R.id.home){
+        if (item.itemId == android.R.id.home) {
             val drawerLayout = binding.drawerLayout
             if (drawerLayout.isDrawerOpen(GravityCompat.START))
                 drawerLayout.closeDrawer(GravityCompat.START)

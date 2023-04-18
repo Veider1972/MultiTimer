@@ -6,6 +6,7 @@
     // menu -> activity_main_drawer.xml
     <string name="menu_counters">Таймеры</string>
     <string name="menu_about">О программе</string>
+    <string name="menu_settings">Настройки</string>
 
     // layout -> navigation_header.xml
     <string name="app_name">Мультитаймер</string>
@@ -84,5 +85,28 @@
     <string name="timers_list">Список с таймерами</string>
 
     <string name="timer_need_set">Сначала надо установить время…</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <string name="preferences_title">Общие настройки</string>
+    <string name="permission_write_settings_description">Для включения этой опции вы должны предоставить программе право на управление настройками телефона</string>
+    <string name="preferences_keep_screen_on">Не выключать экран при работающем таймере</string>
+
+    // ключи настроек
+    <string name="keepScreenOn">keepScreenOn</string>
+    <string name="keptTime">keptTime</string>
+    <string name="isKept">isKept</string>
 
 </resources>

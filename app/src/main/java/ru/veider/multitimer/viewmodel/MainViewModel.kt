@@ -9,7 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import ru.veider.multitimer.CountersApp
+import ru.veider.multitimer.MainApp
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
@@ -18,11 +18,11 @@ import ru.veider.multitimer.repository.CountersDataSource
 import ru.veider.multitimer.service.CountersService
 import java.util.*
 
-@OptIn(DelicateCoroutinesApi::class) class CountersViewModel : ViewModel() {
+@OptIn(DelicateCoroutinesApi::class) class MainViewModel : ViewModel() {
 
     private var counters: Counters
     val getCounters get() = counters
-    private val context get() = CountersApp.getInstance()?.applicationContext
+    private val context get() = MainApp.getInstance()?.applicationContext
 
     private val db = CountersDataSource.getInstance()
 
@@ -33,8 +33,8 @@ import java.util.*
     fun counter() = counterLiveData
 
     companion object {
-        private var instance: CountersViewModel? = null
-        fun getInstance() = instance?.apply {} ?: CountersViewModel().also { instance = it }
+        private var instance: MainViewModel? = null
+        fun getInstance() = instance?.apply {} ?: MainViewModel().also { instance = it }
     }
 
 
@@ -188,11 +188,16 @@ import java.util.*
     }
 
     private fun startService(intent: Intent) {
-        CountersApp.getInstance()?.applicationContext?.apply {
+        MainApp.getInstance()?.applicationContext?.apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 ContextCompat.startForegroundService(this, intent)
             else
                 this.startService(intent)
         }
     }
+
+    fun getRunCounters():Int =
+        counters.filter {
+            it.state == CounterState.RUN
+        }.count()
 }
