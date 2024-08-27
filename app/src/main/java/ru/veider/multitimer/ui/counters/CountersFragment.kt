@@ -175,7 +175,7 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
             preferenceViewModel.storeScreenSettings()
         viewModel.startCounter(id)
         val counter = BootUpCounter.getBootCounts(requireContext())
-        if (counter == 10 || counter % 50 == 0) {
+        if (counter == 30 || counter % 50 == 0) {
             GlobalScope.launch {
                 ReviewManagerFactory.create(requireContext()).run {
                     requestReviewFlow().addOnCompleteListener { task ->

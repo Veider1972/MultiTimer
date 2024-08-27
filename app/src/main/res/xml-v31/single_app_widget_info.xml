@@ -7,7 +7,7 @@
     android:maxResizeHeight="120dp"
     android:minResizeHeight="30dp"
     android:previewImage="@drawable/timer_widget"
-    android:resizeMode="none"
+    android:resizeMode="vertical|horizontal"
 
     android:targetCellWidth="1"
     android:targetCellHeight="1"

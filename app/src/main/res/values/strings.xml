@@ -100,13 +100,38 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
     <string name="preferences_title">General settings</string>
-    <string name="preferences_keep_screen_on">Do not turn off the screen when the timer is running</string>
     <string name="permission_write_settings_description">To enable this option, you must grant the program the right to manage the phone settings</string>
-
+    <string name="preferences_keep_screen_on">Do not turn off the screen when the timer is running</string>
+    <string name="preferences_repeat_counters">Unlimited number of notification repeats</string>
+    <string name="preferences_repeat_nums">Number of repeats</string>
+    <string-array name="repeatsList">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+    </string-array>
 
     // ключи настроек
     <string name="keepScreenOn">keepScreenOn</string>
     <string name="keptTime">keptTime</string>
     <string name="isKept">isKept</string>
+    <string name="unlimitedCounter">unlimitedCounter</string>
+    <string name="counterLimits">counterLimits</string>
 
 </resources>

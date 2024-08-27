@@ -103,10 +103,36 @@
     <string name="preferences_title">Общие настройки</string>
     <string name="permission_write_settings_description">Для включения этой опции вы должны предоставить программе право на управление настройками телефона</string>
     <string name="preferences_keep_screen_on">Не выключать экран при работающем таймере</string>
+    <string name="preferences_repeat_counters">Неограниченное количество повторов уведомлений</string>
+    <string name="preferences_repeat_nums">Количество повторов</string>
+    <string-array name="repeatsList">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+    </string-array>
 
     // ключи настроек
     <string name="keepScreenOn">keepScreenOn</string>
     <string name="keptTime">keptTime</string>
     <string name="isKept">isKept</string>
+    <string name="unlimitedCounter">unlimitedCounter</string>
+    <string name="counterLimits">counterLimits</string>
 
 </resources>

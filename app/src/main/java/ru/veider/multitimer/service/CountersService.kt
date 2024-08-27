@@ -1,5 +1,6 @@
 package ru.veider.multitimer.service
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,11 +8,14 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.AudioAttributes.*
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.CountDownTimer
+import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -23,6 +27,7 @@ import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.viewmodel.MainViewModel
 import ru.veider.multitimer.viewmodel.MainViewModelFactory
+import ru.veider.multitimer.viewmodel.PreferenceViewModel
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.ceil
@@ -38,6 +43,7 @@ class CountersService : LifecycleService(),
     private var timers: Hashtable<Int, CountersService.CounterTimer> = Hashtable()
     private var alarmes: Hashtable<Int, CountersService.AlarmTimer> = Hashtable()
     private lateinit var viewModel: MainViewModel
+    private lateinit var preferencesViewModel: PreferenceViewModel
 
     val mViewModelStore = ViewModelStore()
     private var mFactory: ViewModelProvider.Factory? = null
@@ -57,6 +63,7 @@ class CountersService : LifecycleService(),
             }
         })
         viewModel = ViewModelProvider(this.viewModelStore, MainViewModelFactory.getInstance())[MainViewModel::class.java]
+        preferencesViewModel = ViewModelProvider(this.viewModelStore, MainViewModelFactory.getInstance())[PreferenceViewModel::class.java]
         alarmChannelName = resources.getString(R.string.alarm_channel_name)
         alarmChannelDescription = resources.getString(R.string.alarm_channel_description)
         simpleChannelName = resources.getString(R.string.simple_channel_name)
@@ -68,9 +75,10 @@ class CountersService : LifecycleService(),
     }
 
     private fun setIdleMessage() {
-        startForeground(-1, NotificationCompat.Builder(this, SIMPLE_CHANNEL_ID)
-            .setContentText(resources.getString(R.string.notification_title))
-            .build()
+        startForeground(
+            -1, NotificationCompat.Builder(this, SIMPLE_CHANNEL_ID)
+                .setContentText(resources.getString(R.string.notification_title))
+                .build()
         )
     }
 
@@ -87,13 +95,14 @@ class CountersService : LifecycleService(),
         super.onStartCommand(intent, flags, startId)
         intent?.getStringExtra(EVENT)?.apply {
             when (this) {
-                ON_RUN_CLICK     -> {
+                ON_RUN_CLICK -> {
                     getCounterFromBundle(intent)?.apply {
                         addTimer(this)
                         removeIdleMessage()
                     }
                 }
-                ON_PAUSE_CLICK   -> {
+
+                ON_PAUSE_CLICK -> {
                     getCounterFromBundle(intent)?.apply {
                         removeTimer(this)
                         if (timers.size == 0)
@@ -102,7 +111,8 @@ class CountersService : LifecycleService(),
                         if (timers.size == 0 && alarmes.size == 0) stopSelf()
                     }
                 }
-                ON_STOP_CLICK    -> {
+
+                ON_STOP_CLICK -> {
                     getCounterFromBundle(intent)?.apply {
                         removeTimer(this)
                         removeAlarmed(this)
@@ -118,7 +128,7 @@ class CountersService : LifecycleService(),
                     }
                 }
 
-                ON_ALARM_TIMER   -> {
+                ON_ALARM_TIMER -> {
                     getCounterFromBundle(intent)?.apply {
                         removeTimer(this)
                         addAlarmed(this)
@@ -128,12 +138,13 @@ class CountersService : LifecycleService(),
                         viewModel.timerAlarmed(id)
                     }
                 }
+
                 ON_START_SERVICE -> {
                     getCountersFromBundle(intent)?.apply {
                         var hasRunCounters = false
                         for (counter in this) {
                             when (counter.state) {
-                                CounterState.RUN     -> {
+                                CounterState.RUN -> {
                                     hasRunCounters = true
                                     if (timers.containsKey(counter.id)) continue
                                     val currentTime = Date().time
@@ -147,12 +158,14 @@ class CountersService : LifecycleService(),
                                     } else
                                         onAlarmed(counter)
                                 }
+
                                 CounterState.ALARMED -> {
                                     hasRunCounters = true
                                     if (alarmes.containsKey(counter.id)) continue
                                     onAlarmed(counter)
                                 }
-                                else                 -> {}
+
+                                else -> {}
                             }
                         }
                         if (!hasRunCounters) {
@@ -160,7 +173,8 @@ class CountersService : LifecycleService(),
                         }
                     }
                 }
-                ON_STOP_SERVICE  -> {
+
+                ON_STOP_SERVICE -> {
                     stopSelf()
                 }
             }
@@ -179,16 +193,16 @@ class CountersService : LifecycleService(),
     }
 
     private fun getCounterFromBundle(intent: Intent?) =
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
-                intent?.getSerializableExtra(COUNTER) as Counter?
-            else
-                intent?.getSerializableExtra(COUNTER, Counter::class.java)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+            intent?.getSerializableExtra(COUNTER) as Counter?
+        else
+            intent?.getSerializableExtra(COUNTER, Counter::class.java)
 
     private fun getCountersFromBundle(intent: Intent?): ArrayList<Counter>? =
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
-                intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE) as ArrayList<Counter>?
-            else
-                intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE, arrayListOf<Counter>()::class.java)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+            intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE) as ArrayList<Counter>?
+        else
+            intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE, arrayListOf<Counter>()::class.java)
 
 
     private fun addAlarmed(counter: Counter) {
@@ -268,10 +282,17 @@ class CountersService : LifecycleService(),
                 }
                 val intent = Intent(this@CountersService, MainActivity::class.java)
                 val pendingIntent =
-                        PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
                 setContentIntent(pendingIntent)
             }
-            NotificationManagerCompat.from(this).notify(SIMPLE_CHANNEL_NUM, notificationBuilder.build())
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                NotificationManagerCompat.from(this).notify(SIMPLE_CHANNEL_NUM, notificationBuilder.build())
+            }
+
         } else {
             val notificationBuilder = Notification.Builder(this, SIMPLE_CHANNEL_ID).apply {
                 setCategory(Notification.CATEGORY_ALARM)
@@ -302,10 +323,22 @@ class CountersService : LifecycleService(),
                 NotificationCompat.PRIORITY_MIN
                 val intent = Intent(this@CountersService, MainActivity::class.java)
                 val pendingIntent =
-                        PendingIntent.getActivity(this@CountersService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                    PendingIntent.getActivity(
+                        this@CountersService,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
                 setContentIntent(pendingIntent)
             }
-            NotificationManagerCompat.from(this).notify(SIMPLE_CHANNEL_NUM, notificationBuilder.build())
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                NotificationManagerCompat.from(this).notify(SIMPLE_CHANNEL_NUM, notificationBuilder.build())
+            }
+
         }
     }
 
@@ -353,12 +386,20 @@ class CountersService : LifecycleService(),
                 NotificationCompat.PRIORITY_MAX
                 val intent = Intent(this@CountersService, MainActivity::class.java)
                 val pendingIntent =
-                        PendingIntent.getActivity(this@CountersService, 0, intent,
-                                                  PendingIntent.FLAG_UPDATE_CURRENT
-                        )
+                    PendingIntent.getActivity(
+                        this@CountersService, 0, intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    )
                 setContentIntent(pendingIntent)
             }
-            NotificationManagerCompat.from(this).notify(ALARM_CHANNEL_NUM, notificationBuilder.build())
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                NotificationManagerCompat.from(this).notify(ALARM_CHANNEL_NUM, notificationBuilder.build())
+            }
+
         } else {
             val notificationBuilder = Notification.Builder(this, ALARM_CHANNEL_ID).apply {
                 setCategory(Notification.CATEGORY_ALARM)
@@ -392,9 +433,10 @@ class CountersService : LifecycleService(),
                 NotificationManager.IMPORTANCE_HIGH
                 val intent = Intent(this@CountersService, MainActivity::class.java)
                 val pendingIntent =
-                        PendingIntent.getActivity(this@CountersService, 0, intent,
-                                                  PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
+                    PendingIntent.getActivity(
+                        this@CountersService, 0, intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
                 setContentIntent(pendingIntent)
             }
             NotificationManagerCompat.from(this).notify(ALARM_CHANNEL_NUM, notificationBuilder.build())
@@ -403,10 +445,10 @@ class CountersService : LifecycleService(),
     }
 
     private fun getAlarmTitle(count: Int) =
-            if (count == 1)
-                resources.getText(R.string.notification_alarm_finished)
-            else
-                resources.getText(R.string.notification_alarm_multi_finished)
+        if (count == 1)
+            resources.getText(R.string.notification_alarm_finished)
+        else
+            resources.getText(R.string.notification_alarm_multi_finished)
 
     private fun createAlarmNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -447,8 +489,9 @@ class CountersService : LifecycleService(),
                     vibrationPattern = vibroPattern
                     enableLights(true)
                     lightColor = Color.WHITE
-                    setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM),
-                             Builder().setContentType(CONTENT_TYPE_SONIFICATION).setUsage(USAGE_ALARM).build()
+                    setSound(
+                        RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM),
+                        Builder().setContentType(CONTENT_TYPE_SONIFICATION).setUsage(USAGE_ALARM).build()
                     )
                 } else {
                     enableVibration(false)
@@ -462,19 +505,29 @@ class CountersService : LifecycleService(),
     abstract inner class Timer(msec: Long, interval: Long) : CountDownTimer(msec, interval),
         Comparator<Counter> {
         override fun compare(counter0: Counter?, counter1: Counter?): Int =
-                if (counter0 != null || counter1 != null)
-                    counter0!!.currentProgress - counter1!!.currentProgress
-                else 0
+            if (counter0 != null || counter1 != null)
+                counter0!!.currentProgress - counter1!!.currentProgress
+            else 0
     }
 
 
     inner class AlarmTimer(val counter: Counter) : Timer(600 * 1000L, 10 * 1000L) {
+        val unlimited = preferencesViewModel.preferencesData.value?.unlimitedCounter ?: true
+        var repeats = preferencesViewModel.preferencesData.value?.counterLimits ?: 20
         override fun onTick(millisUntilFinished: Long) {
-            sendAlarmNotification()
+            Log.d("AlarmTimer", repeats.toString())
+            if (!unlimited && repeats > 0)
+                sendAlarmNotification()
+            else
+                onFinish()
+            repeats = if (repeats > 0) repeats - 1 else 0
         }
 
         override fun onFinish() {
-            onAlarmed(counter)
+            if (unlimited)
+                onAlarmed(counter)
+            else
+                removeAlarmed(counter)
         }
 
     }

@@ -14,8 +14,8 @@ android {
         minSdk =23
         targetSdk =33
         // Не забыть обновить about_date
-        versionCode = 22
-        versionName = "1.2.3"
+        versionCode = 24
+        versionName = "1.2.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
@@ -30,7 +30,7 @@ android {
             outputs
                 .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
                 .forEach { output ->
-                    val outputFileName = "multitimer-${baseName}-${versionName} ${versionCode}.apk"
+                    val outputFileName = "multitimer-${baseName}-${versionName}-${versionCode}.apk"
                     println("OutputFileName: $outputFileName")
                     output.outputFileName = outputFileName
                 }

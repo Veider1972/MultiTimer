@@ -90,7 +90,7 @@
 
     <style name="TextView.Preferences.Header">
         <item name="android:layout_marginTop">@dimen/single_padding</item>
-        <item name="android:textSize">@dimen/about_header_text_size</item>
+        <item name="android:textSize">@dimen/nav_header_title_text_size</item>
         <item name="android:textAlignment">textStart</item>
         <item name="textAllCaps">true</item>
         <item name="android:textStyle">bold</item>
