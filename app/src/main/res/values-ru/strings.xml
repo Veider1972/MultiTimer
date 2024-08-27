@@ -24,13 +24,13 @@
     // layout -> fragment_about.xml
     // app_name
     <string name="about_version">Версия</string>
-    <string name="about_date">Апрель, 2023</string>
+    <string name="about_date">Август, 2024</string>
     // my_email
     <string name="about_description_title">Описание</string>
     <string name="about_description">Программа разработана для тех, кто не хочет пропустить важные события. Количество таймеров не ограничено.\nДля каждого таймера можно задать своё название.\nВиджет программы ведёт отсчёт оставшегося времени до ближайшего работающего таймера.</string>
     <string name="about_guide_title">Краткое руководство</string>
     <string name="about_guide">Сортировка таймеров - перетаскиванием\nУдаление таймеров - смахиванием\nОстальные действия - нажатием</string>
-    <string name="about_copyrights">Copyright © by Vadim Korkhovoy, 2023</string>
+    <string name="about_copyrights">Copyright © by Vadim Korkhovoy, 2024</string>
 
     // CountersService.kt
     <string name="alarm_channel_name">Уведомление сработавшего таймера</string>
