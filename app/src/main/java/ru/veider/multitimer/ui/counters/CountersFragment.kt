@@ -2,7 +2,12 @@ package ru.veider.multitimer.ui.counters
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,20 +21,17 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import ru.rustore.sdk.core.tasks.OnCompleteListener
+import ru.rustore.sdk.review.RuStoreReviewManagerFactory
 import ru.veider.multitimer.R
-import ru.veider.multitimer.const.*
+import ru.veider.multitimer.const.COUNTER_ID
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.data.Counters
 import ru.veider.multitimer.databinding.FragmentCountersBinding
-import ru.veider.multitimer.ui.counters.CountersAdapter
 import ru.veider.multitimer.ui.counters.CountersAdapter.CounterHolder
 import ru.veider.multitimer.utils.BootUpCounter
 import ru.veider.multitimer.viewmodel.MainViewModel
 import ru.veider.multitimer.viewmodel.MainViewModelFactory
 import ru.veider.multitimer.viewmodel.PreferenceViewModel
-import ru.vk.store.sdk.review.RuStoreReviewManagerFactory
-import ru.vk.store.sdk.review.model.ReviewInfo
 
 
 class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
@@ -191,23 +193,13 @@ class CountersFragment : Fragment(), CountersAdapter.CountersAdapterEvents {
             }
             GlobalScope.launch {
                 RuStoreReviewManagerFactory.create(requireContext()).run {
-                    requestReviewFlow().addOnCompleteListener(object : OnCompleteListener<ReviewInfo> {
-                        override fun onFailure(throwable: Throwable) {
-                            // Handle error
-                        }
-
-                        override fun onSuccess(result: ReviewInfo) {
-                            launchReviewFlow(result).addOnCompleteListener(object : OnCompleteListener<Unit> {
-                                override fun onFailure(throwable: Throwable) {
-                                    // Review flow has finished, continue your app flow.
-                                }
-
-                                override fun onSuccess(result: Unit) {
+                    requestReviewFlow()
+                        .addOnSuccessListener{
+                            launchReviewFlow(it)
+                                .addOnSuccessListener{
                                     BootUpCounter.setMarked(requireContext())
                                 }
-                            })
                         }
-                    })
                 }
             }
         }

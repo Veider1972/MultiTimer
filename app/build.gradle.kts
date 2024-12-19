@@ -14,11 +14,11 @@ android {
         minSdk =23
         targetSdk =33
         // Не забыть обновить about_date
-        versionCode = 24
-        versionName = "1.2.5"
+        versionCode = 25
+        versionName = "1.2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        signingConfig = signingConfigs.getByName("debug")
+//        signingConfig = signingConfigs.getByName("debug")
     }
 
     buildTypes {
@@ -43,18 +43,18 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    flavorDimensions += listOf("cost")
-//    buildFeatures {
-//        viewBinding = true
+//    flavorDimensions += listOf("cost")
+////    buildFeatures {
+////        viewBinding = true
+////    }
+//    productFlavors {
+//        create("free") {
+//            dimension = "cost"
+//        }
+//        create("paid") {
+//            dimension = "cost"
+//        }
 //    }
-    productFlavors {
-        create("free") {
-            dimension = "cost"
-        }
-        create("paid") {
-            dimension = "cost"
-        }
-    }
 }
 
 dependencies {
@@ -63,14 +63,13 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.lifecycle:lifecycle-service:2.5.1")
     // Rustore review
-    implementation("ru.rustore.sdk:review:0.1.5")
+    implementation("ru.rustore.sdk:review:7.0.0")
     // Google review
     implementation("com.google.android.play:review:2.0.1")
     implementation("com.google.android.play:review-ktx:2.0.1")
