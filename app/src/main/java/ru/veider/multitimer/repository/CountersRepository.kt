@@ -1,17 +1,16 @@
 package ru.veider.multitimer.repository
 
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.data.Counters
 
 interface CountersRepository {
 
-    fun getAll(): Counters
+    suspend fun getAll(): List<Counter>
 
-    fun updateCounter(counter: Counter)
+    suspend fun upsert(counter: Counter)
 
-    fun addCounter(counter: Counter)
+    suspend fun upsert(counters: List<Counter>)
 
-    fun deleteCounter(id: Int)
+    suspend fun delete(id: Int)
 
-    fun deleteAllCounter()
+    suspend fun deleteAll()
 }

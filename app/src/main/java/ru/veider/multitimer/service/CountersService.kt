@@ -20,21 +20,21 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import org.koin.android.ext.android.inject
 import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.R
 import ru.veider.multitimer.SingleAppWidget
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.viewmodel.MainViewModel
-import ru.veider.multitimer.viewmodel.MainViewModelFactory
 import ru.veider.multitimer.viewmodel.PreferenceViewModel
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.ceil
 
 
-class CountersService : LifecycleService(),
-    ViewModelStoreOwner, HasDefaultViewModelProviderFactory {
+class CountersService() : LifecycleService() {
 
     private lateinit var alarmChannelName: String
     private lateinit var alarmChannelDescription: String
@@ -42,28 +42,13 @@ class CountersService : LifecycleService(),
     private lateinit var simpleChannelDescription: String
     private var timers: Hashtable<Int, CountersService.CounterTimer> = Hashtable()
     private var alarmes: Hashtable<Int, CountersService.AlarmTimer> = Hashtable()
-    private lateinit var viewModel: MainViewModel
-    private lateinit var preferencesViewModel: PreferenceViewModel
-
-    val mViewModelStore = ViewModelStore()
-    private var mFactory: ViewModelProvider.Factory? = null
-    override fun getViewModelStore(): ViewModelStore {
-        return mViewModelStore
-    }
+    private val viewModel: MainViewModel by inject()
+    private val preferencesViewModel: PreferenceViewModel by inject()
+    private val gson: Gson by inject()
 
     override fun onCreate() {
         super.onCreate()
         setWidget(100, 100, SingleAppWidget.Companion.WidgetStatus.STOP.toString())
-        lifecycle.addObserver(object : LifecycleEventObserver {
-            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                if (source.lifecycle.currentState == Lifecycle.State.DESTROYED) {
-                    mViewModelStore.clear()
-                    source.lifecycle.removeObserver(this)
-                }
-            }
-        })
-        viewModel = ViewModelProvider(this.viewModelStore, MainViewModelFactory.getInstance())[MainViewModel::class.java]
-        preferencesViewModel = ViewModelProvider(this.viewModelStore, MainViewModelFactory.getInstance())[PreferenceViewModel::class.java]
         alarmChannelName = resources.getString(R.string.alarm_channel_name)
         alarmChannelDescription = resources.getString(R.string.alarm_channel_description)
         simpleChannelName = resources.getString(R.string.simple_channel_name)
@@ -179,6 +164,7 @@ class CountersService : LifecycleService(),
                 }
             }
         }
+        Log.d("Counter", "CountersService viewModel=$viewModel timerTick: ${viewModel.counters}")
         return START_NOT_STICKY
     }
 
@@ -198,11 +184,8 @@ class CountersService : LifecycleService(),
         else
             intent?.getSerializableExtra(COUNTER, Counter::class.java)
 
-    private fun getCountersFromBundle(intent: Intent?): ArrayList<Counter>? =
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
-            intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE) as ArrayList<Counter>?
-        else
-            intent?.getBundleExtra(COUNTERS)?.getSerializable(COUNTERS_BUNDLE, arrayListOf<Counter>()::class.java)
+    private fun getCountersFromBundle(intent: Intent?): List<Counter>? =
+        intent?.getBundleExtra(COUNTERS)?.getString(COUNTERS_BUNDLE)?.let { gson.fromJson(it, object : TypeToken<List<Counter>>() {}.type) }
 
 
     private fun addAlarmed(counter: Counter) {
@@ -563,12 +546,6 @@ class CountersService : LifecycleService(),
             String.format(resources.getString(R.string.time_min_sec_pattern), minutes, seconds)
         else
             String.format(resources.getString(R.string.time_hours_min_sec_pattern), hours, minutes, seconds)
-    }
-
-    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
-        return mFactory ?: ViewModelProvider.AndroidViewModelFactory(application).also {
-            mFactory = it
-        }
     }
 
 }

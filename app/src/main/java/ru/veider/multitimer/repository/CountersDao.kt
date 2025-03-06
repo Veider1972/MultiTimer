@@ -4,21 +4,38 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
+import androidx.room.Upsert
+import ru.veider.multitimer.data.Counter
 
 @Dao
 interface CountersDao {
     @Query("SELECT * FROM CounterEntity")
-    fun getAll(): List<CounterEntity>
+    suspend fun getAll(): List<CounterEntity>
 
-    @Query( "UPDATE CounterEntity SET currentProgress=:currentProgress, maxProgress=:maxProgress, startTime=:startTime, state=:state, title=:title  WHERE id=:id")
-    fun updateCounter(id: Int, currentProgress:Int, maxProgress:Int, startTime:Long, state:Int, title:String)
+    @Query("SELECT * FROM CounterEntity WHERE id=:id")
+    suspend fun getById(id: Int): List<CounterEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addCounter(entity: CounterEntity)
+    @Insert
+    suspend fun insert(counter: CounterEntity)
+
+    @Query("UPDATE CounterEntity SET currentProgress=:currentProgress, maxProgress=:maxProgress, startTime=:startTime, state=:state, title=:title WHERE id=:id ")
+    suspend fun update(id: Int, currentProgress: Int, maxProgress: Int, startTime: Long, state: Int, title: String)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(counter: CounterEntity){
+        if (getById(counter.id).isEmpty())
+            insert(counter)
+        else
+            update(counter.id, counter.currentProgress, counter.maxProgress, counter.startTime, counter.state, counter.title)
+    }
+
+    @Upsert
+    suspend fun upsert(counters: List<CounterEntity>)
 
     @Query("DELETE FROM CounterEntity WHERE id = :id")
-    fun deleteCounter(id: Int)
+    suspend fun delete(id: Int)
 
     @Query("DELETE FROM CounterEntity")
-    fun deleteAllCounter()
+    suspend fun deleteAll()
 }

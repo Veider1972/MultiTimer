@@ -127,11 +127,15 @@
         <item>20</item>
     </string-array>
 
+    // CounterWidget
+    <string name="setTime">Set time</string>
+
     // ключи настроек
     <string name="keepScreenOn">keepScreenOn</string>
     <string name="keptTime">keptTime</string>
     <string name="isKept">isKept</string>
     <string name="unlimitedCounter">unlimitedCounter</string>
     <string name="counterLimits">counterLimits</string>
+    <string name="title_activity_cmain">CMainActivity</string>
 
 </resources>

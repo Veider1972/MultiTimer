@@ -1,178 +1,252 @@
 package ru.veider.multitimer.viewmodel
 
+import android.app.Application
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import ru.veider.multitimer.MainApp
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import ru.veider.multitimer.R
-import ru.veider.multitimer.const.*
+import ru.veider.multitimer.const.COUNTER
+import ru.veider.multitimer.const.COUNTERS
+import ru.veider.multitimer.const.COUNTERS_BUNDLE
+import ru.veider.multitimer.const.CounterState
+import ru.veider.multitimer.const.EVENT
+import ru.veider.multitimer.const.ON_ALARM_TIMER
+import ru.veider.multitimer.const.ON_PAUSE_CLICK
+import ru.veider.multitimer.const.ON_RUN_CLICK
+import ru.veider.multitimer.const.ON_START_SERVICE
+import ru.veider.multitimer.const.ON_STOP_CLICK
+import ru.veider.multitimer.const.TAG
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.data.Counters
-import ru.veider.multitimer.repository.CountersDataSource
+import ru.veider.multitimer.data.addNew
+import ru.veider.multitimer.data.deleteById
+import ru.veider.multitimer.repository.CountersRepository
 import ru.veider.multitimer.service.CountersService
-import java.util.*
+import java.util.Date
 
-@OptIn(DelicateCoroutinesApi::class) class MainViewModel : ViewModel() {
+class MainViewModel(
+    val app: Application,
+    private val repo: CountersRepository,
+    private val gson: Gson
+) : AndroidViewModel(app) {
 
-    private var counters: Counters
-    val getCounters get() = counters
-    private val context get() = MainApp.getInstance()?.applicationContext
-
-    private val db = CountersDataSource.getInstance()
-
-    private val countersLiveData: MutableLiveData<Counters> = MutableLiveData<Counters>()
-    private val counterLiveData: MutableLiveData<Counter> = MutableLiveData<Counter>()
-
-    fun counters() = countersLiveData
-    fun counter() = counterLiveData
-
-    companion object {
-        private var instance: MainViewModel? = null
-        fun getInstance() = instance?.apply {} ?: MainViewModel().also { instance = it }
-    }
-
+    private val _counters: MutableStateFlow<List<Counter>> = MutableStateFlow(emptyList())
+    val counters get()= _counters.asStateFlow()
 
     init {
-        counters = db.getAll()
-
-        if (counters.size == 0) {
-            addCounter()
-            saveCounters()
+        viewModelScope.launch {
+            _counters.tryEmit(repo.getAll())
+            Log.d(TAG, "Таймеры загружены: ${counters.value}")
+            if (counters.value.isEmpty())
+                _counters.value = _counters.value.addNew().also { saveCounters(it) }
+            startService(_counters.value)
         }
-        countersLiveData.postValue(counters)
-        onStartProgram()
     }
 
-    fun saveCounters() {
-        GlobalScope.run {
-            db.deleteAllCounter()
-            for (counter in counters) {
-                db.addCounter(counter)
+    fun saveCounters() = saveCounters(counters.value)
+
+    fun saveCounters(counters: List<Counter>) {
+        viewModelScope.launch {
+            repo.deleteAll()
+            Log.d(TAG, "Таймеры в репо удалены")
+            repo.upsert(counters)
+            Log.d(TAG, "Таймеры $counters сохранены")
+        }
+    }
+
+    private fun updateCounters(counters: List<Counter>) {
+        viewModelScope.launch {
+            _counters.value = counters
+            saveCounters(counters)
+            Log.d(TAG, "Таймеры обновлены $counters")
+        }
+    }
+
+    fun addCounter() {
+        viewModelScope.launch {
+            _counters.value = counters.value.addNew().also {
+                updateCounters(it)
+                Log.d(TAG, "Таймер добавлен ${it.last()}")
             }
         }
     }
 
-    private fun updateCounters() {
-        countersLiveData.postValue(counters)
-        saveCounters()
-    }
-
-    fun addCounter() {
-        counters.new().apply {
-            updateCounters()
+    fun deleteCounter(id: Int) {
+        viewModelScope.launch {
+            _counters.value = counters.value.deleteById(id).also {
+                repo.delete(id)
+                Log.d(TAG, "Таймер удалён: ${counters.value}")
+            }
         }
     }
 
-    fun deleteCounter(id: Int) {
-        counters.delByID(id)
-        countersLiveData.postValue(counters)
-        removeCounter(id)
-    }
-
     fun updateTitle(id: Int, title: String) {
-        counters[counters.getIndexByID(id)].apply {
-            this.title = title
-            counterLiveData.postValue(this)
-            storeCounter(this)
+        viewModelScope.launch {
+            _counters.value = counters.value.map { counter ->
+                if (counter.id == id)
+                    counter.copy(title = title).also {
+                        viewModelScope.launch(Dispatchers.IO) {
+                            repo.upsert(it)
+                            Log.d(TAG, "Таймер обновлен $it")
+                        }
+
+                    }
+                else
+                    counter
+            }
         }
     }
 
     fun updateMaxProgress(id: Int, time: Int) {
-        counters[counters.getIndexByID(id)].apply {
-            maxProgress = time
-            currentProgress = time
-            counterLiveData.postValue(this)
-            storeCounter(this)
+        viewModelScope.launch {
+            _counters.value = counters.value.map { counter ->
+                if (counter.id == id)
+                    counter.copy(maxProgress = time, currentProgress = time).also {
+                        viewModelScope.launch(Dispatchers.IO) {
+                            repo.upsert(it)
+                            Log.d(TAG, "Таймер обновлен $it")
+                        }
+
+                    }
+                else
+                    counter
+            }
         }
     }
 
     fun startCounter(id: Int) {
-        with(counters[counters.getIndexByID(id)]) {
-            if (this.state == CounterState.PAUSED || this.state == CounterState.FINISHED) {
-                if (this.currentProgress==0){
-                    context?.run {
-                        Toast.makeText(context, getText(R.string.timer_need_set), Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    state = CounterState.RUN
-                    startTime = Date().time
-                    storeCounter(this)
-                    sendToService(this, ON_RUN_CLICK)
-                }
+        viewModelScope.launch {
+            _counters.value = counters.value.map { counter ->
+                if (counter.id == id) {
+                    if (counter.state == CounterState.PAUSED || counter.state == CounterState.FINISHED) {
+                        if (counter.currentProgress == 0) {
+                            counter.also {
+                                viewModelScope.launch {
+                                    Toast.makeText(app, app.getText(R.string.timer_need_set), Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        } else {
+                            counter.copy(state = CounterState.RUN, startTime = Date().time).also {
+                                viewModelScope.launch {
+                                    repo.upsert(it)
+                                    sendToService(it, ON_RUN_CLICK)
+                                }
+                            }
+                        }
+                    } else
+                        counter
+                } else
+                    counter
             }
         }
     }
 
     fun pauseCounter(id: Int) {
-        with(counters[counters.getIndexByID(id)]) {
-            if (this.state == CounterState.RUN) {
-                state = CounterState.PAUSED
-                storeCounter(this)
-                sendToService(this, ON_PAUSE_CLICK)
+        viewModelScope.launch {
+            _counters.value = counters.value.map { counter ->
+                if (counter.id == id && counter.state == CounterState.RUN)
+                    counter.copy(state = CounterState.PAUSED).also {
+                        viewModelScope.launch {
+                            repo.upsert(it)
+                            sendToService(it, ON_PAUSE_CLICK)
+                        }
+                    }
+                else
+                    counter
             }
         }
     }
 
     fun stopCounter(id: Int) {
-        with(counters[counters.getIndexByID(id)]) {
-            if (this.state != CounterState.FINISHED) {
-                state = CounterState.FINISHED
-                currentProgress = maxProgress
-                storeCounter(this)
-                sendToService(this, ON_STOP_CLICK)
+        viewModelScope.launch {
+            _counters.value = counters.value.map { counter ->
+                if (counter.id == id && counter.state != CounterState.FINISHED)
+                    counter.copy(state = CounterState.FINISHED, currentProgress = counter.maxProgress).also {
+                        viewModelScope.launch {
+                            repo.upsert(it)
+                            sendToService(it, ON_STOP_CLICK)
+                        }
+                    }
+                else
+                    counter
             }
         }
     }
 
     fun timerTick(id: Int, progress: Int) {
-        counters[counters.getIndexByID(id)].apply {
-            currentProgress = progress
-            counterLiveData.postValue(this)
+        viewModelScope.launch {
+            _counters.value = counters.value.map { counter ->
+                if (counter.id == id)
+                    counter.copy(currentProgress = progress)
+                else
+                    counter
+            }
+            Log.d("Counter", "viewModel viewModel=${this@MainViewModel} timerTick: ${counters.value}")
         }
     }
 
     fun timerFinish(id: Int) {
-        counters[counters.getIndexByID(id)].apply {
-            state = CounterState.FINISHED
-            currentProgress = maxProgress
-            startTime = 0
-            counterLiveData.postValue(this)
+        viewModelScope.launch {
+            _counters.value = counters.value.map { counter ->
+                if (counter.id == id)
+                    counter.copy(
+                        state = CounterState.FINISHED,
+                        currentProgress = counter.maxProgress,
+                        startTime = 0,
+                    )
+                else
+                    counter
+            }
         }
     }
 
     fun timerAlarmed(id: Int) {
-        counters[counters.getIndexByID(id)].apply {
-            state = CounterState.ALARMED
-            currentProgress = 0
-            startTime = 0
-            storeCounter(this)
-            counterLiveData.postValue(this)
+        viewModelScope.launch {
+            _counters.value = counters.value.map { counter ->
+                if (counter.id == id)
+                    counter.copy(
+                        state = CounterState.ALARMED,
+                        currentProgress = 0,
+                        startTime = 0,
+                    ).also {
+                        viewModelScope.launch {
+                            repo.upsert(it)
+                        }
+                    }
+                else
+                    counter
+            }
         }
     }
 
-    private fun removeCounter(id: Int) {
-        GlobalScope.run {
-            db.deleteCounter(id)
-        }
-    }
+//    private fun deleteCounter(id: Int) {
+//        viewModelScope.launch {
+//            repo.delete(id)
+//        }
+//    }
+//
+//    private fun storeCounter(counter: Counter) {
+//        viewModelScope.launch {
+//            repo.upsert(counter)
+//
+//        }
+//    }
 
-    private fun storeCounter(counter: Counter) {
-        GlobalScope.run {
-            db.updateCounter(counter)
-        }
-    }
-
-    private fun onStartProgram() {
-        val intent = Intent(context, CountersService::class.java).apply {
+    private fun startService(counters: List<Counter>) {
+        val intent = Intent(app, CountersService::class.java).apply {
             putExtra(EVENT, ON_START_SERVICE)
             putExtra(COUNTERS, Bundle().apply {
-                putSerializable(COUNTERS_BUNDLE, counters)
+                putString(COUNTERS_BUNDLE, gson.toJson(counters))
             })
         }
         startService(intent)
@@ -180,24 +254,34 @@ import java.util.*
 
     private fun sendToService(counter: Counter, event: String) {
         if (event != ON_RUN_CLICK && event != ON_PAUSE_CLICK && event != ON_STOP_CLICK && event != ON_ALARM_TIMER)
-            throw Exception(context?.resources?.getString(R.string.error_service_event))
-        startService(Intent(context, CountersService::class.java).apply {
+            throw Exception(app.resources?.getString(R.string.error_service_event))
+        startService(Intent(app, CountersService::class.java).apply {
             putExtra(EVENT, event)
             putExtra(COUNTER, counter)
         })
     }
 
     private fun startService(intent: Intent) {
-        MainApp.getInstance()?.applicationContext?.apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                ContextCompat.startForegroundService(this, intent)
-            else
-                this.startService(intent)
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            ContextCompat.startForegroundService(app, intent)
+        else
+            this.startService(intent)
     }
 
-    fun getRunCounters():Int =
-        counters.filter {
+    fun getRunCounters(): Int =
+        counters.value.count {
             it.state == CounterState.RUN
-        }.count()
+        }
+
+    fun swapCounters(from: Int, to: Int){
+        val fromCounter = counters.value.first { it.id == from }
+        val toCounter = counters.value.first { it.id == to }
+        _counters.value = counters.value.map{
+            when (it.id){
+                from -> toCounter
+                to -> fromCounter
+                else -> it
+            }
+        }
+    }
 }

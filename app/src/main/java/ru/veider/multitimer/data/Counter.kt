@@ -17,8 +17,8 @@ data class Counter(
 
     constructor(id:Int) : this(id, 0,  0, 0, CounterState.FINISHED, "")
 
-    override fun toString(): String {
-        return String.format("id=%d, time=%d, state=%s", id, currentProgress, state)
-    }
+//    override fun toString(): String {
+//        return String.format("id=%d, time=%d, state=%s", id, currentProgress, state)
+//    }
 
 }

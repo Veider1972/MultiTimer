@@ -2,6 +2,7 @@
 <resources>
     // Button
     <color name="color_on_surface">#000000</color>
+    <color name="color_surface">#FFFFFF</color>
     <color name="color_primary">#7CAA46</color>
     <color name="color_primary_dark">#33691E</color>
     <color name="color_on_primary">#FFFFFF</color>
@@ -27,4 +28,5 @@
     <color name="light_blue_900">#01579B</color>
     <color name="widget_background_color_start">#BFBFBF</color>
     <color name="widget_background_color_end">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
 </resources>

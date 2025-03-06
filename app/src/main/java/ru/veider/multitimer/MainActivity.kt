@@ -1,76 +1,32 @@
 package ru.veider.multitimer
 
-import android.content.SharedPreferences
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.view.MenuItem
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.navigation.NavigationView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import ru.veider.multitimer.ui.compose.MainState
+import ru.veider.multitimer.ui.compose.assets.SetSystemBarsContrast
+import ru.veider.multitimer.ui.theme.MultiTimerTheme
 
-import ru.veider.multitimer.const.*
-import ru.veider.multitimer.databinding.ActivityMultiTimerBinding
-
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivityMultiTimerBinding
-
+class MainActivity : ComponentActivity() {
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityMultiTimerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setSupportActionBar(binding.appBarMultiTimer.toolbar)
-
-        val drawerLayout: DrawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_multi_timer)
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_counters, R.id.nav_about, R.id.nav_preferences
-            ), drawerLayout
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        intent.extras?.apply {
-            val counterId: Int = intent.extras?.getInt(COUNTER_ID, -1) as Int
-            if (counterId >= 0) {
-                val bundle = Bundle()
-                bundle.putInt(COUNTER_ID, counterId)
-                navController.navigate(R.id.nav_counters, bundle)
+        enableEdgeToEdge()
+        setContent {
+            MultiTimerTheme {
+                SetSystemBarsContrast()
+                Scaffold(modifier = Modifier.fillMaxSize()) {
+                    MainState()
+                }
             }
         }
-        navView.setupWithNavController(navController)
-        
-//        val configuration = resources.configuration
-//        configuration.fontScale = 1f
-//        val metrics = DisplayMetrics()
-//        windowManager.defaultDisplay.getMetrics(metrics)
-//        metrics.scaledDensity = configuration.fontScale*metrics.density
-//        baseContext.resources.updateConfiguration(configuration,metrics)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            val drawerLayout = binding.drawerLayout
-            if (drawerLayout.isDrawerOpen(GravityCompat.START))
-                drawerLayout.closeDrawer(GravityCompat.START)
-            else
-                drawerLayout.openDrawer(GravityCompat.START)
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_multi_timer)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

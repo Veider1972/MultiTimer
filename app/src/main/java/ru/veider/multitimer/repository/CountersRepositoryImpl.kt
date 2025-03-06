@@ -1,24 +1,22 @@
 package ru.veider.multitimer.repository
 
+import android.util.Log
+import ru.veider.multitimer.const.TAG
 import ru.veider.multitimer.data.Counter
+import ru.veider.multitimer.domain.usecases.toCounter
+import ru.veider.multitimer.domain.usecases.toCounterEntity
 
-class CountersRepositoryImpl : CountersRepository {
+class CountersRepositoryImpl(
+    private val db: CountersDB
+) : CountersRepository {
 
-    override fun getAll() = CountersDataSource.getInstance().getAll()
+    override suspend fun getAll() = db.dao().getAll().map { it.toCounter() }
 
-    override fun updateCounter(counter: Counter) {
-        CountersDataSource.getInstance().updateCounter(counter)
-    }
+    override suspend fun upsert(counter: Counter) = db.dao().upsert(counter.toCounterEntity()).also {  Log.d(TAG, "Счётчик сохранён : $counter") }
 
-    override fun addCounter(counter: Counter) {
-        CountersDataSource.getInstance().addCounter(counter)
-    }
+    override suspend fun upsert(counters: List<Counter>) = db.dao().upsert(counters.map { it.toCounterEntity() }).also {  Log.d(TAG, "Счётчики сохранены: $counters") }
 
-    override fun deleteCounter(id: Int) {
-        CountersDataSource.getInstance().deleteCounter(id)
-    }
+    override suspend fun delete(id: Int) = db.dao().delete(id)
 
-    override fun deleteAllCounter(){
-        CountersDataSource.getInstance().deleteAllCounter()
-    }
+    override suspend fun deleteAll() = db.dao().deleteAll()
 }

@@ -128,6 +128,9 @@
         <item>20</item>
     </string-array>
 
+    // CounterWidget
+    <string name="setTime">Настройте</string>
+
     // ключи настроек
     <string name="keepScreenOn">keepScreenOn</string>
     <string name="keptTime">keptTime</string>
