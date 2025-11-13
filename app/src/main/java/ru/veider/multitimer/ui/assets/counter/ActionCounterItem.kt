@@ -1,4 +1,4 @@
-package ru.veider.multitimer.ui.compose.counter
+package ru.veider.multitimer.ui.assets.counter
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
@@ -13,7 +13,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -102,7 +101,7 @@ data class HorizontalSwipeState(
     val isSwiped: Boolean = false // Флаг, указывающий, был ли элемент сдвинут
 )
 
-@Preview(widthDp = 300, heightDp = 50, apiLevel = 34)
+@Preview(widthDp = 300, heightDp = 50, apiLevel = 35)
 @Composable
 private fun ActionCounterItemPreview() {
     ActionCounterItem(

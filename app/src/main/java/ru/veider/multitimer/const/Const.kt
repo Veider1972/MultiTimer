@@ -25,6 +25,7 @@ const val DB_NAME = "Counters.db"
 
 const val PREFERENCES = "Multitimer"
 const val PREFERENCE_KEEP_SCREEN_ON = "keepScreenOn"
+const val alphaTransition = 200
 
 
 fun firstZero(n: Int) = if (n in 0..9) "0$n" else "$n"

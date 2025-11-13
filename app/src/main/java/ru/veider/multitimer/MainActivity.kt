@@ -7,12 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import ru.veider.multitimer.ui.compose.MainState
-import ru.veider.multitimer.ui.compose.assets.SetSystemBarsContrast
+import ru.veider.multitimer.ui.screens.MainState
+import ru.veider.multitimer.ui.assets.SetSystemBarsContrast
 import ru.veider.multitimer.ui.theme.MultiTimerTheme
 
 class MainActivity : ComponentActivity() {

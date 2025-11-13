@@ -1,4 +1,4 @@
-package ru.veider.multitimer.ui.compose.assets.dialogs
+package ru.veider.multitimer.ui.assets.dialogs
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import ru.veider.multitimer.ui.compose.assets.dialogs.wrappers.TitledTwoButtonsDialogWrapper
+import ru.veider.multitimer.ui.assets.dialogs.wrappers.TitledTwoButtonsDialogWrapper
 import ru.veider.multitimer.ui.theme.colorTimerSimple
 import ru.veider.multitimer.ui.theme.paddingsDouble
 import ru.veider.multitimer.ui.theme.textStyle_18_400
@@ -29,23 +29,23 @@ fun TitleEditor(
         title = "Название таймера",
         acceptButtonText = "Принять",
         cancelButtonText = "Отменить",
-        onAccept = {onTitleChange(text)},
+        onAccept = { onTitleChange(text) },
         onCancel = onDismiss,
         content = {
             BasicTextField(
                 modifier = Modifier.fillMaxWidth().padding(vertical = paddingsDouble),
                 value = text,
-                onValueChange = {text = it},
+                onValueChange = { text = it },
                 textStyle = textStyle_18_400,
                 decorationBox = { innerTextField ->
-                        if (text.isEmpty()) {
-                            Text(
-                                text = "Введите название",
-                                style = textStyle_18_400,
-                                color = colorTimerSimple
-                            )
-                        }
-                        innerTextField()
+                    if (text.isEmpty()) {
+                        Text(
+                            text = "Введите название",
+                            style = textStyle_18_400,
+                            color = colorTimerSimple
+                        )
+                    }
+                    innerTextField()
                 }
             )
         }

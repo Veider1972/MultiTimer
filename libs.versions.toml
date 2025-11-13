@@ -1,0 +1,56 @@
+[versions]
+core = "1.16.0"
+appCompat = "1.7.0"
+material = "1.12.0"
+constraintlayout = "2.2.0"
+lifecycle = "2.8.7"
+work-runtime-ktx = "2.10.0"
+rustore-sdk = "7.0.0"
+compose-activity = "1.10.0"
+compose-foundation = "1.7.7"
+compose-bom = "2025.01.01"
+preference-ktx = "1.2.1"
+koin-compose = "4.0.2"
+gson = "2.10.1"
+room = "2.6.1"
+room-ksp = "1.1.1"
+accompanist = "0.30.1"
+composereorderable = "0.9.6"
+
+test-junit = "4.13.2"
+test-junit-ext = "1.2.1"
+test-espresso = "3.6.1"
+
+[libraries]
+core = {module = "androidx.core:core", version.ref="core"}
+core-ktx = {module = "androidx.core:core-ktx", version.ref="core"}
+appCompat = {module = "androidx.appcompat:appcompat", version.ref="appCompat"}
+material = {module = "com.google.android.material:material", version.ref="material"}
+constraintlayout = {module = "androidx.constraintlayout:constraintlayout", version.ref="constraintlayout"}
+lifecycle-viewmodel-ktx = {module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref="lifecycle"}
+lifecycle-service = {module = "androidx.lifecycle:lifecycle-service", version.ref="lifecycle"}
+work-runtime-ktx = {module = "androidx.work:work-runtime-ktx", version.ref="work-runtime-ktx"}
+rustore-sdk = {module = "ru.rustore.sdk:review", version.ref="rustore-sdk"}
+compose-activity = {module = "androidx.activity:activity-compose", version.ref="compose-activity"}
+compose-foundation = {module = "androidx.compose.foundation:foundation", version.ref="compose-foundation"}
+compose-bom = {module = "androidx.compose:compose-bom", version.ref="compose-bom"}
+compose-ui = {module = "androidx.compose.ui:ui"}
+compose-ui-graphics = {module = "androidx.compose.ui:ui-graphics"}
+compose-ui-tooling = {module = "androidx.compose.ui:ui-tooling"}
+compose-ui-tooling-preview = {module = "androidx.compose.ui:ui-tooling-preview"}
+compose-material3 = {module = "androidx.compose.material3:material3"}
+preference-ktx = {module = "androidx.preference:preference-ktx", version.ref="preference-ktx"}
+koin-compose-ktx = {module = "io.insert-koin:koin-androidx-compose", version.ref="koin-compose"}
+gson = {module = "com.google.code.gson:gson", version.ref="gson"}
+room-compiler = {module = "androidx.room:room-compiler", version.ref="room"}
+room-ktx = {module = "androidx.room:room-ktx", version.ref="room"}
+arch-room-compiler = {module = "android.arch.persistence.room:compiler", version.ref="room-ksp"}
+accompanist = {module = "com.google.accompanist:accompanist-systemuicontroller", version.ref="accompanist"}
+composereorderable = {module = "org.burnoutcrew.composereorderable:reorderable", version.ref="composereorderable"}
+
+test-junit = {module = "junit:junit", version.ref="test-junit"}
+test-junit-ext = {module = "androidx.test.ext:junit", version.ref="test-junit-ext"}
+test-manifest = {module = "androidx.compose.ui:ui-test-manifest"}
+test-espresso = {module = "androidx.test.espresso:espresso-core", version.ref="test-espresso"}
+androidTest-junit = {module = "androidx.compose.ui:ui-test-junit4"}
+[plugins]

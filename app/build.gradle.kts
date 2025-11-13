@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.ir.backend.js.compile
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -51,55 +49,47 @@ android {
 }
 
 dependencies {
-
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-//    implementation("androidx.navigation:navigation-fragment-ktx:2.8.6")
-//    implementation("androidx.navigation:navigation-ui-ktx:2.8.6")
-    implementation("androidx.work:work-runtime-ktx:2.10.0")
-    implementation("androidx.lifecycle:lifecycle-service:2.8.7")
+    implementation(libs.core)
+    implementation(libs.core.ktx)
+    implementation(libs.appCompat)
+    implementation(libs.material)
+    implementation(libs.constraintlayout)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.lifecycle.service)
     // Rustore review
-    implementation("ru.rustore.sdk:review:7.0.0")
+    implementation(libs.rustore.sdk)
     // Google review
-    implementation("androidx.preference:preference-ktx:1.2.1")
-//    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-    implementation("androidx.activity:activity-compose:1.10.0")
-    implementation(platform("androidx.compose:compose-bom:2025.01.01"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.foundation:foundation:1.7.7")
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
-
-//    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.20")
+    implementation(libs.preference.ktx)
+    implementation(libs.compose.activity)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.foundation)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.composereorderable)
 
     // Koin
-    implementation("io.insert-koin:koin-androidx-compose:4.0.2")
+    implementation(libs.koin.compose.ktx)
 
     // Gson
-    implementation("com.google.code.gson:gson:2.10.1")
-
-//    implementation("com.github.antonKozyriatskyi:CircularProgressIndicator:1.3.0")
-//    implementation("com.alex-zaitsev:meternumberpicker:1.0.5")
+    implementation(libs.gson)
 
     // Room
-    ksp("androidx.room:room-compiler:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("android.arch.persistence.room:compiler:1.1.1")
+    ksp(libs.room.compiler)
+    implementation(libs.room.ktx)
+    ksp(libs.arch.room.compiler)
 
     // Accompanist
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
+    implementation(libs.accompanist)
 
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2025.01.01"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation(libs.test.junit)
+    testImplementation(libs.test.junit.ext)
+    androidTestImplementation(libs.test.espresso)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.androidTest.junit)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.test.manifest)
 
 }

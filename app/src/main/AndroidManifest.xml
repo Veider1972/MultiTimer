@@ -25,7 +25,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/title_activity_cmain"
             android:theme="@style/Theme.MaterialComponents.DayNight" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

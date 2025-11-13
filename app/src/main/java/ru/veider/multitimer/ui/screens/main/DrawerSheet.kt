@@ -1,4 +1,4 @@
-package ru.veider.multitimer.ui.compose.assets.drawer
+package ru.veider.multitimer.ui.screens.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -24,10 +24,12 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.veider.multitimer.R
 import ru.veider.multitimer.domain.entity.CurrentState
+import ru.veider.multitimer.ui.screens.main.elements.DrawerItem
 import ru.veider.multitimer.ui.theme.colorPrimary
 import ru.veider.multitimer.ui.theme.colorPrimaryDark
 
@@ -68,7 +70,10 @@ fun DrawerSheet(
                     painter = painterResource(R.drawable.big_timer),
                     contentDescription = null,
                     modifier = Modifier
-                        .padding(start = 16.dp, top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+                        .padding(
+                            start = 16.dp,
+                            top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+                        )
                         .size(100.dp)
                 )
                 Text(
@@ -108,4 +113,13 @@ fun DrawerSheet(
         )
 
     }
+}
+
+@Preview
+@Composable
+private fun DrawerSheetPreview() {
+    DrawerSheet(
+        state = CurrentState.About,
+        onStateChange = {}
+    )
 }

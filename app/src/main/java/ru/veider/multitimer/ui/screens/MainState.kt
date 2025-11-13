@@ -1,4 +1,4 @@
-package ru.veider.multitimer.ui.compose
+package ru.veider.multitimer.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.padding
@@ -24,9 +24,9 @@ import org.koin.compose.koinInject
 import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.domain.entity.CurrentState
-import ru.veider.multitimer.ui.compose.assets.drawer.DrawerSheet
-import ru.veider.multitimer.ui.compose.assets.topBar.TopBar
-import ru.veider.multitimer.ui.compose.counter.MyLazyColumn
+import ru.veider.multitimer.ui.screens.main.DrawerSheet
+import ru.veider.multitimer.ui.screens.main.TopBar
+import ru.veider.multitimer.ui.screens.timers.MyLazyColumn
 import ru.veider.multitimer.viewmodel.MainViewModel
 
 @Composable

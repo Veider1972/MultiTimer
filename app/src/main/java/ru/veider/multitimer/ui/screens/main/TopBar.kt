@@ -1,4 +1,4 @@
-package ru.veider.multitimer.ui.compose.assets.topBar
+package ru.veider.multitimer.ui.screens.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import ru.veider.multitimer.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,5 +53,14 @@ fun TopBar(
                     .clickable { onAddCounter() }
             )
         }
+    )
+}
+
+@Preview
+@Composable
+private fun TopBarPreview() {
+    TopBar(
+        {},
+        {}
     )
 }

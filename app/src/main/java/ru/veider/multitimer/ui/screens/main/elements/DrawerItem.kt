@@ -1,4 +1,4 @@
-package ru.veider.multitimer.ui.compose.assets.drawer
+package ru.veider.multitimer.ui.screens.main.elements
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -13,7 +13,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ru.veider.multitimer.R
 
 @Composable
 fun DrawerItem(

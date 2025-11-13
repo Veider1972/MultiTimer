@@ -1,4 +1,4 @@
-package ru.veider.multitimer.ui.compose.assets.dialogs.wrappers
+package ru.veider.multitimer.ui.assets.dialogs.wrappers
 
 import androidx.compose.foundation.*
 import androidx.compose.material3.*
@@ -10,25 +10,29 @@ import androidx.compose.ui.unit.*
 import ru.veider.multitimer.ui.theme.colorPrimary
 
 @Composable
-fun OneButtonDialog(
+fun TwoButtonDialog(
 	title: String,
 	message: String,
 	modifier: Modifier = Modifier,
 	cornerRadius: Dp = 24.dp,
 	color: Color = MaterialTheme.colorScheme.surface,
 	border: BorderStroke = BorderStroke(width = 1.dp, color = colorPrimary),
-	buttonText: String,
-	onClick: () -> Unit,
+	acceptButtonText: String,
+	onAccept: () -> Unit,
+	cancelButtonText: String,
+	onCancel: () -> Unit,
 	usePlatformDefaultWidth: Boolean = true
 ) {
-	TitledOneButtonDialogWrapper(
+	TitledTwoButtonsDialogWrapper(
 		title = title,
 		modifier = modifier,
 		cornerRadius = cornerRadius,
 		color = color,
 		border = border,
-		buttonText = buttonText,
-		onClick = onClick,
+		acceptButtonText = acceptButtonText,
+		onAccept = onAccept,
+		cancelButtonText = cancelButtonText,
+		onCancel = onCancel,
 		usePlatformDefaultWidth = usePlatformDefaultWidth
 	) {
 		Text(
@@ -39,10 +43,12 @@ fun OneButtonDialog(
 
 @Preview
 @Composable
-private fun OneButtonDialogShow() {
-	OneButtonDialog(
+private fun TwoButtonDialogShow() {
+	TwoButtonDialog(
 		title = "Ошибка!",
 		message = "Название события не должно быть пустым",
-		buttonText = "Закрыть",
-		onClick = {})
+		acceptButtonText = "Принять",
+		onAccept = {},
+		cancelButtonText = "Отменить",
+		onCancel = {})
 }

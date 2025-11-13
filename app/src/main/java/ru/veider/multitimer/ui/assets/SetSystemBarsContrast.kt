@@ -1,14 +1,10 @@
-package ru.veider.multitimer.ui.compose.assets
+package ru.veider.multitimer.ui.assets
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
-import ru.veider.multitimer.R
 import ru.veider.multitimer.ui.theme.colorPrimary
-import ru.veider.multitimer.ui.theme.colorPrimaryDark
 
 @Composable
 fun SetSystemBarsContrast() {
