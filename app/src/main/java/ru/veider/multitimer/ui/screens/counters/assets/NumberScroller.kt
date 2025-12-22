@@ -1,4 +1,4 @@
-package ru.veider.multitimer.ui.screens.timers.assets
+package ru.veider.multitimer.ui.screens.counters.assets
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -43,6 +44,7 @@ fun NumberScroller(
         .height(60.dp * 5)
         .fillMaxWidth(),
     textAlign: TextAlign,
+    firstZero: Boolean = true,
     onItemHeight: (Dp) -> Unit,
     readyToShow: (Boolean) -> Unit
 ) {
@@ -50,6 +52,8 @@ fun NumberScroller(
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
     val numbers = remember { mutableStateListOf<Int>() }
+    val min by rememberUpdatedState( range.first)
+    val max by rememberUpdatedState( range.last)
     val listState = rememberLazyListState()
     var currentNumber by remember(initialNumber) { mutableIntStateOf(initialNumber) }
     var itemHeight by remember {
@@ -76,11 +80,11 @@ fun NumberScroller(
     // Инициализация
     LaunchedEffect(Unit) {
         // Создаем большой циклический буфер
-        val bufferSize = 100 * (range.last - range.first + 1)
+        val bufferSize = 100 * (max - min + 1)
         for (i in -bufferSize / 2 until bufferSize / 2) {
             var num = initialNumber + i
-            while (num < range.first) num += range.last + 1
-            while (num > range.last) num -= range.last + 1
+            while (num < min) num += (max - min + 1)
+            while (num > max) num -= (max - min + 1)
             numbers.add(num)
         }
 
@@ -115,7 +119,7 @@ fun NumberScroller(
             }
 
             Text(
-                text = number.toZeroStr(),
+                text = if (firstZero) number.toZeroStr() else number.toString(),
                 color = if (number == currentNumber) colorOnPrimaryContainer else colorPrimary,
                 textAlign = textAlign,
                 style = textStyle_50_500,
@@ -130,16 +134,16 @@ fun NumberScroller(
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun GuaranteedInitialPositionListPreview() {
     Row {
         NumberScroller(
-            initialNumber = 5,
-            range = 0..23,
+            initialNumber = 3,
+            range = 2..10,
             onNumberChange = {},
             textAlign = TextAlign.Center,
+            firstZero = false,
             onItemHeight = {},
             readyToShow = {}
         )

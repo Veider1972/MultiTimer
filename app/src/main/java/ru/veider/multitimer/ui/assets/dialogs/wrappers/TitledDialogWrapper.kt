@@ -28,7 +28,7 @@ fun TitledDialogWrapper(
     border: BorderStroke = BorderStroke(width = 0.dp, color = Color.Transparent),
     usePlatformDefaultWidth: Boolean = true,
     show: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable (ColumnScope) -> Unit
 ) {
 
     val density = LocalDensity.current
@@ -40,12 +40,12 @@ fun TitledDialogWrapper(
         color = color,
         border = border,
         usePlatformDefaultWidth = usePlatformDefaultWidth,
-        show = show && width > 0.dp
+        show = show && width > 0.dp,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.onSizeChanged{ (w,_) ->
-                width = density.run { w.toDp() }
+            modifier = Modifier.onSizeChanged{
+                width = density.run { it.width.toDp() }
             }
         ) {
             Row(modifier = Modifier
@@ -67,11 +67,9 @@ fun TitledDialogWrapper(
             }
 
             Column(
-                modifier = Modifier
-                    .padding(start = paddingsDouble, top = paddingsDouble, end = paddingsDouble),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                content()
+                content(this)
             }
         }
     }
@@ -80,7 +78,6 @@ fun TitledDialogWrapper(
 @Preview
 @Composable
 fun TitledDialogShow() {
-    TitledDialogWrapper(title = "Заголовок") {
-
-    }
+    TitledDialogWrapper(
+        title = "Заголовок"){}
 }

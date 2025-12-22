@@ -1,22 +1,28 @@
+import org.gradle.cache.internal.ProducerGuard.adaptive
+import org.gradle.internal.impldep.org.joda.time.format.DateTimeFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
     namespace = "ru.veider.multitimer"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ru.veider.multitimer"
-        minSdk =26
+        minSdk =29
         targetSdk =34
         // Не забыть обновить about_date
-        versionCode = 26
-        versionName = "1.3.0"
+        versionCode = 27
+        versionName = "1.4.0"
 
 //        setProperty("archivesName", "multitimer-${versionName}-${versionCode}")
 
@@ -27,7 +33,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BUILD_DATE", "\"${DateTimeFormatter.ofPattern("LLLL, yyyy").format(LocalDateTime.now())}\"")
+            buildConfigField("String", "BUILD_YEAR", "\"${LocalDateTime.now().year}\"")
+        }
         release {
+            buildConfigField("String", "BUILD_DATE", "\"${DateTimeFormatter.ofPattern("LLLL, yyyy").format(LocalDateTime.now())}\"")
+            buildConfigField("String", "BUILD_YEAR", "\"${LocalDateTime.now().year}\"")
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -49,26 +61,36 @@ android {
 }
 
 dependencies {
-    implementation(libs.core)
     implementation(libs.core.ktx)
+    implementation(libs.core)
     implementation(libs.appCompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.work.runtime.ktx)
     implementation(libs.lifecycle.service)
-    // Rustore review
+    // RuStore review
     implementation(libs.rustore.sdk)
     // Google review
     implementation(libs.preference.ktx)
     implementation(libs.compose.activity)
     implementation(libs.compose.ui)
+    implementation(libs.compose.ui.animation)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.foundation)
     implementation(platform(libs.compose.bom))
     implementation(libs.composereorderable)
+
+    // Navigation
+    implementation(libs.navigation.runtime)
+    implementation(libs.navigation.ui)
+    implementation(libs.navigation.router)
+    implementation(libs.navigation.material3.adaptive)
+
+    // Serialization
+    implementation(libs.serialization.core)
 
     // Koin
     implementation(libs.koin.compose.ktx)
@@ -79,6 +101,7 @@ dependencies {
     // Room
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+    implementation(libs.room.gradle.plugin)
     ksp(libs.arch.room.compiler)
 
     // Accompanist

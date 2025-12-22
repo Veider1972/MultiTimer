@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -89,7 +90,7 @@ fun CounterItem(
         counter = currentCounter,
         onTitleClick = { titleEditorView = true },
         onCounterClick = { timerEditorView = true },
-        onConterStart = { viewModel.startCounter(counter.id) },
+        onCounterStart = { viewModel.startCounter(counter.id) },
         onCounterPause = { viewModel.pauseCounter(counter.id) },
         onCounterStop = { viewModel.stopCounter(counter.id) }
     )
@@ -101,7 +102,7 @@ private fun CounterItemBody(
     counter: Counter,
     onTitleClick: () -> Unit,
     onCounterClick: () -> Unit,
-    onConterStart: () -> Unit,
+    onCounterStart: () -> Unit,
     onCounterPause: () -> Unit,
     onCounterStop: () -> Unit,
 ) {
@@ -114,6 +115,7 @@ private fun CounterItemBody(
     ) {
         CounterWidget(
             counter = rememberUpdatedState(counter).value,
+            alarmed = counter.state == CounterState.ALARMED,
             modifier = Modifier
                 .padding(start = 6.dp)
                 .size(80.dp),
@@ -141,7 +143,7 @@ private fun CounterItemBody(
                     text = "СТАРТ",
                     enabled = counter.state == CounterState.FINISHED || counter.state == CounterState.PAUSED,
                     modifier = Modifier.weight(1f),
-                    onClick = onConterStart
+                    onClick = onCounterStart
                 )
                 Button(
                     text = "ПАУЗА",
@@ -166,6 +168,7 @@ fun Button(text: String, enabled: Boolean, onClick: () -> Unit, modifier: Modifi
     Button(
         onClick = onClick,
         enabled = enabled,
+        contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = colorPrimary,
 

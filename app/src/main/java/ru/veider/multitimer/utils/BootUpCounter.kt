@@ -1,6 +1,7 @@
 package ru.veider.multitimer.utils
 
 import android.content.Context
+import androidx.core.content.edit
 
 class BootUpCounter {
     companion object{
@@ -19,9 +20,9 @@ class BootUpCounter {
         }
         fun setMarked(context: Context){
             context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-                .edit()
-                .putBoolean(HAS_SET,true)
-                .apply()
+                .edit {
+                    putBoolean(HAS_SET, true)
+                }
         }
     }
 }

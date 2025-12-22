@@ -27,16 +27,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation3.runtime.NavKey
 import ru.veider.multitimer.R
 import ru.veider.multitimer.domain.entity.CurrentState
+import ru.veider.multitimer.navigation.Screen
 import ru.veider.multitimer.ui.screens.main.elements.DrawerItem
 import ru.veider.multitimer.ui.theme.colorPrimary
 import ru.veider.multitimer.ui.theme.colorPrimaryDark
 
 @Composable
 fun DrawerSheet(
-    state: CurrentState,
-    onStateChange: (CurrentState) -> Unit,
+    state: Screen,
+    onStateChange: (Screen) -> Unit,
 ) {
 
     val gradient = listOf(colorPrimary, colorPrimaryDark)
@@ -93,22 +95,22 @@ fun DrawerSheet(
         DrawerItem(
             icon = R.drawable.icon_timer,
             label = R.string.menu_counters,
-            selected = state == CurrentState.Counters,
-            onClick = { onStateChange(CurrentState.Counters) }
+            selected = state == Screen.Counters,
+            onClick = { onStateChange(Screen.Counters) }
 
         )
         DrawerItem(
             icon = R.drawable.icon_settings,
             label = R.string.menu_settings,
-            selected = state == CurrentState.Settings,
-            onClick = { onStateChange(CurrentState.Settings) }
+            selected = state == Screen.Settings,
+            onClick = { onStateChange(Screen.Settings) }
 
         )
         DrawerItem(
             icon = R.drawable.icon_about,
             label = R.string.menu_about,
-            selected = state == CurrentState.About,
-            onClick = { onStateChange(CurrentState.About) }
+            selected = state == Screen.About,
+            onClick = { onStateChange(Screen.About) }
 
         )
 
@@ -119,7 +121,7 @@ fun DrawerSheet(
 @Composable
 private fun DrawerSheetPreview() {
     DrawerSheet(
-        state = CurrentState.About,
+        state = Screen.About,
         onStateChange = {}
     )
 }

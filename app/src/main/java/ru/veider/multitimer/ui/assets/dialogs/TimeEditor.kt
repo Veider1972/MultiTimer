@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
@@ -31,14 +32,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import kotlinx.coroutines.launch
-import ru.rustore.sdk.review.f
 import ru.veider.multitimer.core.utils.fadingEdge
 import ru.veider.multitimer.core.utils.getTime
 import ru.veider.multitimer.core.utils.hours
 import ru.veider.multitimer.core.utils.minutes
 import ru.veider.multitimer.core.utils.seconds
 import ru.veider.multitimer.ui.assets.dialogs.wrappers.TitledTwoButtonsDialogWrapper
-import ru.veider.multitimer.ui.screens.timers.assets.NumberScroller
+import ru.veider.multitimer.ui.screens.counters.assets.NumberScroller
 import ru.veider.multitimer.ui.theme.colorOnSurface
 import ru.veider.multitimer.ui.theme.colorPrimary
 import ru.veider.multitimer.ui.theme.colorPrimaryDark
@@ -56,13 +56,19 @@ fun TimeEditor(
 ) {
 
     val scope = rememberCoroutineScope()
-    var currentHours by remember { mutableIntStateOf(time.hours) }
-    var currentMinutes by remember { mutableIntStateOf(time.minutes) }
-    var currentSeconds by remember { mutableIntStateOf(time.seconds) }
+    var currentHoursTens by remember { mutableIntStateOf(time.hours / 10) }
+    var currentHours by remember { mutableIntStateOf(time.hours % 10) }
+    var currentMinutesTens by remember { mutableIntStateOf(time.minutes / 10) }
+    var currentMinutes by remember { mutableIntStateOf(time.minutes % 10) }
+    var currentSecondsTens by remember { mutableIntStateOf(time.seconds / 10) }
+    var currentSeconds by remember { mutableIntStateOf(time.seconds % 10) }
 
     val density = LocalDensity.current
+    val hoursTensState = rememberLazyListState()
     val hoursState = rememberLazyListState()
+    val minutesTensState = rememberLazyListState()
     val minutesState = rememberLazyListState()
+    val secondsTensState = rememberLazyListState()
     val secondsState = rememberLazyListState()
     val textStyle = textStyle_50_500
     var height by remember { mutableStateOf(0.dp) }
@@ -71,13 +77,22 @@ fun TimeEditor(
     val borderColor = colorPrimaryDark
 
     LaunchedEffect(Unit) {
-        hoursState.animateScrollToItem(time.hours, 0)
+        hoursTensState.animateScrollToItem(currentHoursTens, 0)
     }
     LaunchedEffect(Unit) {
-        minutesState.animateScrollToItem(time.minutes, 0)
+        hoursState.animateScrollToItem(currentHours, 0)
     }
     LaunchedEffect(Unit) {
-        secondsState.animateScrollToItem(time.seconds, 0)
+        minutesTensState.animateScrollToItem(currentMinutesTens, 0)
+    }
+    LaunchedEffect(Unit) {
+        minutesState.animateScrollToItem(currentMinutes, 0)
+    }
+    LaunchedEffect(Unit) {
+        secondsTensState.animateScrollToItem(currentSecondsTens, 0)
+    }
+    LaunchedEffect(Unit) {
+        secondsState.animateScrollToItem(currentSecondsTens, 0)
     }
 
     LaunchedEffect(hoursState.isScrollInProgress) {
@@ -117,10 +132,19 @@ fun TimeEditor(
         }
     }
 
+    var hoursTensReady by remember { mutableStateOf(false) }
     var hoursReady by remember { mutableStateOf(false) }
+    var minutesTensReady by remember { mutableStateOf(false) }
     var minutesReady by remember { mutableStateOf(false) }
+    var secondsTensReady by remember { mutableStateOf(false) }
     var secondsReady by remember { mutableStateOf(false) }
-    val readyToShow by rememberUpdatedState(if (LocalInspectionMode.current) true else hoursReady && minutesReady && secondsReady)
+    val readyToShow by rememberUpdatedState(
+        if (LocalInspectionMode.current)
+            true
+        else
+            hoursTensReady && hoursReady
+                    && minutesTensReady && minutesReady
+                    && secondsTensReady && secondsReady)
 
     TitledTwoButtonsDialogWrapper(
         title = title,
@@ -130,7 +154,7 @@ fun TimeEditor(
         show = readyToShow,
         onCancel = onCancel,
         onAccept = {
-            onAccept(getTime(currentHours, currentMinutes, currentSeconds))
+            onAccept(getTime(10 * currentHoursTens + currentHours, 10 * currentMinutesTens + currentMinutes, 10 * currentSecondsTens + currentSeconds))
         }) {
         Row(
             modifier = Modifier
@@ -160,139 +184,86 @@ fun TimeEditor(
                     )
                 )
         ) {
-//            Spacer(modifier = Modifier.weight(0.1f))
+            Spacer(modifier = Modifier.weight(1f))
             NumberScroller(
-                initialNumber = currentHours,
-                range = 0..24,
-                onNumberChange = { currentHours = it },
+                initialNumber = currentHoursTens,
+                range = 0..9,
+                onNumberChange = { currentHoursTens = it },
                 modifier = Modifier
-                    .weight(1f)
-                    .height(height * 5),
+                    .height(height * 5)
+                    .weight(1f),
                 textAlign = TextAlign.Center,
+                firstZero = false,
                 onItemHeight = {
                     height = it
                 },
-                readyToShow = {hoursReady = it}
+                readyToShow = { hoursTensReady = it }
             )
-//            LazyColumn(
-//                state = hoursState,
-//                reverseLayout = true,
-//                modifier = Modifier
-//                    .weight(1f)
-//                    .height(height * 5),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                repeat(2) {
-//                    item {
-//                        Box(modifier = Modifier.height(height)) {}
-//                    }
-//                }
-//                (0..23).forEach {
-//                    item(key = it) {
-//                        Text(
-//                            text = it.toZeroStr(),
-//                            color = if (it == currentHours) colorOnSurface else colorPrimary,
-//                            textAlign = TextAlign.Center,
-//                            style = textStyle,
-//                            modifier = Modifier
-//                                .onGloballyPositioned {
-//                                    height = density.run { it.size.height.toDp() }
-//                                }
-//
-//                        )
-//                    }
-//                }
-//                repeat(2) {
-//                    item {
-//                        Box(modifier = Modifier.height(height)) {}
-//                    }
-//                }
-//            }
+            NumberScroller(
+                initialNumber = currentHours,
+                range = 0..9,
+                onNumberChange = { currentHours = it },
+                modifier = Modifier
+                    .height(height * 5)
+                    .weight(1f),
+                textAlign = TextAlign.Center,
+                firstZero = false,
+                onItemHeight = {
+                    height = it
+                },
+                readyToShow = { hoursReady = it }
+            )
             TimeDivider(height, textStyle)
+            NumberScroller(
+                initialNumber = currentMinutesTens,
+                range = 0..5,
+                onNumberChange = { currentMinutesTens = it },
+                modifier = Modifier
+                    .height(height * 5)
+                    .weight(1f),
+                textAlign = TextAlign.Center,
+                firstZero = false,
+                onItemHeight = {},
+                readyToShow = { minutesTensReady = it }
+            )
             NumberScroller(
                 initialNumber = currentMinutes,
-                range = 0..59,
+                range = 0..9,
                 onNumberChange = { currentMinutes = it },
                 modifier = Modifier
-                    .weight(1f)
-                    .height(height * 5),
+                    .height(height * 5)
+                    .weight(1f),
                 textAlign = TextAlign.Center,
+                firstZero = false,
                 onItemHeight = {},
-                readyToShow = {minutesReady = it}
+                readyToShow = { minutesReady = it }
             )
-//            LazyColumn(
-//                state = minutesState,
-//                reverseLayout = true,
-//                modifier = Modifier
-//                    .weight(1f)
-//                    .height(height * 5),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                repeat(2) {
-//                    item {
-//                        Box(modifier = Modifier.height(height)) {}
-//                    }
-//                }
-//                (0..59).forEach {
-//                    item {
-//                        Text(
-//                            text = it.toZeroStr(),
-//                            textAlign = TextAlign.Center,
-//                            color = if (it == currentMinutes) colorOnSurface else colorPrimary,
-//                            style = textStyle
-//
-//                        )
-//                    }
-//                }
-//                repeat(2) {
-//                    item {
-//                        Box(modifier = Modifier.height(height)) {}
-//                    }
-//                }
-//            }
             TimeDivider(height, textStyle)
             NumberScroller(
+                initialNumber = currentSecondsTens,
+                range = 0..5,
+                onNumberChange = { currentSecondsTens = it },
+                modifier = Modifier
+                    .height(height * 5)
+                    .weight(1f),
+                textAlign = TextAlign.Center,
+                firstZero = false,
+                onItemHeight = {},
+                readyToShow = { secondsTensReady = it }
+            )
+            NumberScroller(
                 initialNumber = currentSeconds,
-                range = 0..59,
+                range = 0..9,
                 onNumberChange = { currentSeconds = it },
                 modifier = Modifier
-                    .weight(1f)
-                    .height(height * 5),
+                    .height(height * 5)
+                    .weight(1f),
                 textAlign = TextAlign.Center,
+                firstZero = false,
                 onItemHeight = {},
-                readyToShow = {secondsReady = it}
+                readyToShow = { secondsReady = it }
             )
-//            LazyColumn(
-//                state = secondsState,
-//                reverseLayout = true,
-//                modifier = Modifier
-//                    .weight(1f)
-//                    .height(height * 5),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                repeat(2) {
-//                    item {
-//                        Box(modifier = Modifier.height(height)) {}
-//                    }
-//                }
-//                (0..59).forEach {
-//                    item {
-//                        Text(
-//                            text = it.toZeroStr(),
-//                            color = if (it == currentSeconds) colorOnSurface else colorPrimary,
-//                            style = textStyle,
-//                            textAlign = TextAlign.Center
-//
-//                        )
-//                    }
-//                }
-//                repeat(2) {
-//                    item {
-//                        Box(modifier = Modifier.height(height)) {}
-//                    }
-//                }
-//            }
-//            Spacer(modifier = Modifier.weight(0.1f))
+            Spacer(modifier = Modifier.weight(1f))
         }
 
     }
@@ -318,9 +289,9 @@ fun TimeDivider(
 
 @Preview(device = Devices.PIXEL_5)
 @Composable
-fun TimeEditorPreview() {
+private fun TimeEditorPreview() {
     TimeEditor(
-        time = 60,
+        time = 1234567,
         onAccept = {},
         onCancel = {})
 }

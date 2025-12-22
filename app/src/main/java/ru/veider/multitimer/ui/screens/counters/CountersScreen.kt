@@ -1,5 +1,6 @@
-package ru.veider.multitimer.ui.screens.timers
+package ru.veider.multitimer.ui.screens.counters
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,17 +22,51 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.rememberReorderableLazyGridState
 import org.burnoutcrew.reorderable.reorderable
+import org.koin.compose.koinInject
 import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.data.Counter
+import ru.veider.multitimer.domain.entity.CurrentState
 import ru.veider.multitimer.ui.assets.counter.ActionCounterItem
 import ru.veider.multitimer.ui.theme.colorSurface
+import ru.veider.multitimer.viewmodel.MainViewModel
 
 @Composable
-fun MyLazyColumn(
+fun TimersScreen(){
+
+    val viewModel: MainViewModel = koinInject()
+
+    val counters = viewModel.counters.collectAsState().value
+    var state by remember { mutableStateOf(CurrentState.Counters) }
+
+
+
+    LaunchedEffect(Unit) {
+        while (coroutineContext.isActive) {
+            delay(1000)
+            Log.d("Counter", "MainState viewModel=$viewModel timerTick: $counters")
+        }
+    }
+
+    TimersScreenBody(
+        counters = counters,
+        onTitleChange = {id, title -> viewModel.updateTitle(id, title)},
+        onCounterChange = { id, maxProgress -> viewModel.updateMaxProgress(id, maxProgress) },
+        onCounterStart = { id -> viewModel.startCounter(id) },
+        onCounterPause = { id -> viewModel.pauseCounter(id) },
+        onCounterStop = { id -> viewModel.stopCounter(id) },
+        onMove = { from, to -> viewModel.swapCounters(from, to) },
+        onSwipeLeft = {},
+        onSwipeRight = {}
+    )
+}
+
+@Composable
+fun TimersScreenBody(
     modifier: Modifier = Modifier,
     counters: List<Counter>,
     onTitleChange: (Int, String) -> Unit,
@@ -61,11 +98,11 @@ fun MyLazyColumn(
 
         items(counters.size, key = { counters[it].id }) { index ->
             val counter = counters[index]
-            ReorderableItem(
-                reorderableState = reordarableState,
-                key = counter.id,
-                index = index + 1
-            ) {
+//            ReorderableItem(
+//                reorderableState = reordarableState,
+//                key = counter.id,
+//                index = index + 1
+//            ) {
 
                 val swipeState = swipeStates[counter.id] ?: SwipeState()
                 val offsetY = remember { Animatable(swipeState.offsetY) }
@@ -110,7 +147,7 @@ fun MyLazyColumn(
                         .offset { IntOffset(0, offsetY.value.toInt()) },
                     onDelete = {}
                 )
-            }
+//            }
         }
     }
 }
@@ -121,10 +158,10 @@ data class SwipeState(
     val isSwiped: Boolean = false // Флаг, указывающий, был ли элемент сдвинут
 )
 
-@Preview(apiLevel = 34)
+@Preview()
 @Composable
 private fun MyLazyColumnPreview() {
-    MyLazyColumn(
+    TimersScreenBody(
         modifier = Modifier,
         counters = listOf(
             Counter(

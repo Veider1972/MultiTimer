@@ -1,5 +1,6 @@
 package ru.veider.multitimer.ui.assets.dialogs.wrappers
 
+import android.R.attr.height
 import android.R.attr.onClick
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -7,7 +8,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.delay
@@ -47,9 +51,26 @@ fun TitledTwoButtonsDialogWrapper(
         usePlatformDefaultWidth = usePlatformDefaultWidth,
         show = dialogShow
     ) {
-        Column(modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-            content(this)
-            Row(modifier = Modifier, horizontalArrangement = Arrangement.End) {
+
+        val density = LocalDensity.current
+        var width by remember { mutableStateOf(0.dp) }
+
+
+        Column(
+            modifier = Modifier
+                .onSizeChanged {
+                    width = density.run { it.width.toDp() }
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+                content(this)
+            Row(
+                modifier = Modifier
+                    .then(
+                        if (width > 0.dp) Modifier.width(width) else Modifier
+                    ),
+                horizontalArrangement = Arrangement.End
+            ) {
                 DialogButton(
                     text = cancelButtonText.uppercase(),
                     onClick = {

@@ -27,10 +27,16 @@
     <string name="about_date">August, 2024</string>
     // my_email
     <string name="about_description_title">About</string>
-    <string name="about_description">The program was designed for those who do not want to miss important events. The number of timers is not limited.\nYou can set any name for each timer.\nThe program\'s widget shows the rest of the time.</string>
+    <string name="about_description_1">The program was designed for those who do not want to miss important events.</string>
+    <string name="about_description_2">The number of timers in the program is not limited.</string>
+    <string name="about_description_3">You can set any name for each timer.</string>
+    <string name="about_description_4">The program\'s widget shows the rest of the time.</string>
     <string name="about_guide_title">Quick guide</string>
-    <string name="about_guide">Timers sorting - by dragging\nTimer deleting - by swiping\nOther actions - by clicking</string>
-    <string name="about_copyrights">Copyright © by Vadim Korkhovoy, 2024</string>
+    <string name="about_guide_0">The timer can only be started if it has a time set.</string>
+    <string name="about_guide_1">Timers sorting - by dragging up/down.</string>
+    <string name="about_guide_2">Timer deleting - by swiping left.</string>
+    <string name="about_guide_3">Other actions - by clicking on the corresponding element.</string>
+    <string name="about_copyrights">Copyright © by Vadim Korkhovoy</string>
 
     // CountersService.kt
     <string name="alarm_channel_name">Alarm notification</string>
@@ -130,12 +136,15 @@
     // CounterWidget
     <string name="setTime">Set time</string>
 
+    // Sound Selector
+    <string name="dialog_profile_set_ringtone_title">Notification sound</string>
+    <string name="no_sound_title">Not set</string>
+
     // ключи настроек
     <string name="keepScreenOn">keepScreenOn</string>
     <string name="keptTime">keptTime</string>
     <string name="isKept">isKept</string>
     <string name="unlimitedCounter">unlimitedCounter</string>
     <string name="counterLimits">counterLimits</string>
-    <string name="title_activity_cmain">CMainActivity</string>
 
 </resources>

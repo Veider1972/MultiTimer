@@ -7,6 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.delay
@@ -44,9 +46,24 @@ fun TitledOneButtonDialogWrapper(
         show = dialogShow,
         usePlatformDefaultWidth = usePlatformDefaultWidth
     ) {
-        Column(modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+
+        val density = LocalDensity.current
+        var width by remember { mutableStateOf(0.dp) }
+
+        Column(
+            modifier = Modifier
+                .onSizeChanged {
+                    width = density.run { it.width.toDp() }
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             content(this)
-            Row(modifier = Modifier, horizontalArrangement = Arrangement.End) {
+            Row(
+                modifier = Modifier.then(
+                    if (width > 0.dp) Modifier.width(width) else Modifier
+                ),
+                horizontalArrangement = Arrangement.End
+            ) {
                 DialogButton(
                     text = buttonText.uppercase(),
                     onClick = {

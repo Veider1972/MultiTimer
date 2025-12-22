@@ -9,6 +9,7 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import ru.veider.multitimer.di.appModule
 import ru.veider.multitimer.di.gsonModule
+import ru.veider.multitimer.di.navigationModule
 import ru.veider.multitimer.di.repoModule
 import ru.veider.multitimer.service.CountersService
 
@@ -27,7 +28,8 @@ class App : Application() {
             modules(
                 appModule,
                 repoModule,
-                gsonModule
+                gsonModule,
+                navigationModule
             )
         }
         val intent = Intent(this, CountersService::class.java)

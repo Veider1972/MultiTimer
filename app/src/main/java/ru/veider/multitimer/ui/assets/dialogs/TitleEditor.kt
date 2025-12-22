@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import ru.veider.multitimer.const.singlePadding
 import ru.veider.multitimer.ui.assets.dialogs.wrappers.TitledTwoButtonsDialogWrapper
 import ru.veider.multitimer.ui.theme.colorTimerSimple
 import ru.veider.multitimer.ui.theme.paddingsDouble
@@ -33,7 +34,7 @@ fun TitleEditor(
         onCancel = onDismiss,
         content = {
             BasicTextField(
-                modifier = Modifier.fillMaxWidth().padding(vertical = paddingsDouble),
+                modifier = Modifier.fillMaxWidth().padding(vertical = paddingsDouble, horizontal = singlePadding),
                 value = text,
                 onValueChange = { text = it },
                 textStyle = textStyle_18_400,

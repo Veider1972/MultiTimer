@@ -35,7 +35,7 @@ fun DialogButton(
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
         contentPadding = PaddingValues(
             vertical = paddingsSingle,
-            horizontal = paddingsDouble
+            horizontal = paddingsSingle
         )
     ) {
         Text(text = text.uppercase(), style = textStyle_16_400)

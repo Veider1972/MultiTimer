@@ -1,5 +1,13 @@
 package ru.veider.multitimer.const
 
+import android.net.Uri
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import ru.veider.multitimer.R
+import ru.veider.multitimer.app
+import ru.veider.multitimer.domain.entity.Sound
+
 enum class CounterState {
     PAUSED, RUN, FINISHED, ALARMED
 }
@@ -27,6 +35,11 @@ const val PREFERENCES = "Multitimer"
 const val PREFERENCE_KEEP_SCREEN_ON = "keepScreenOn"
 const val alphaTransition = 200
 
+val singlePadding = 10.dp
+val doublePadding = 20.dp
+
+@Composable
+fun emptySound() = Sound(stringResource(R.string.no_sound_title), Uri.EMPTY.toString())
 
 fun firstZero(n: Int) = if (n in 0..9) "0$n" else "$n"
 fun Int.toTime():String{

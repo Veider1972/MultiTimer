@@ -12,14 +12,28 @@ compose-bom = "2025.01.01"
 preference-ktx = "1.2.1"
 koin-compose = "4.0.2"
 gson = "2.10.1"
-room = "2.6.1"
+# Room
+room = "2.8.3"
 room-ksp = "1.1.1"
+room-gradle-plugin = "2.8.3"
+
+#Accompanist
 accompanist = "0.30.1"
 composereorderable = "0.9.6"
+# Navigation
+nav3Core = "1.0.0-rc01"
+navigation-router = "1.0.2"
+navigation-material3-adaptive = "1.3.0-alpha03"
 
+# Serialization
+kotlinSerialization = "2.2.21"
+kotlinxSerializationCore = "1.9.0"
+
+#Tests
 test-junit = "4.13.2"
 test-junit-ext = "1.2.1"
 test-espresso = "3.6.1"
+
 
 [libraries]
 core = {module = "androidx.core:core", version.ref="core"}
@@ -35,6 +49,7 @@ compose-activity = {module = "androidx.activity:activity-compose", version.ref="
 compose-foundation = {module = "androidx.compose.foundation:foundation", version.ref="compose-foundation"}
 compose-bom = {module = "androidx.compose:compose-bom", version.ref="compose-bom"}
 compose-ui = {module = "androidx.compose.ui:ui"}
+compose-ui-animation = {module = "androidx.compose.animation:animation"}
 compose-ui-graphics = {module = "androidx.compose.ui:ui-graphics"}
 compose-ui-tooling = {module = "androidx.compose.ui:ui-tooling"}
 compose-ui-tooling-preview = {module = "androidx.compose.ui:ui-tooling-preview"}
@@ -42,15 +57,31 @@ compose-material3 = {module = "androidx.compose.material3:material3"}
 preference-ktx = {module = "androidx.preference:preference-ktx", version.ref="preference-ktx"}
 koin-compose-ktx = {module = "io.insert-koin:koin-androidx-compose", version.ref="koin-compose"}
 gson = {module = "com.google.code.gson:gson", version.ref="gson"}
+
+# Room
 room-compiler = {module = "androidx.room:room-compiler", version.ref="room"}
 room-ktx = {module = "androidx.room:room-ktx", version.ref="room"}
+room-gradle-plugin = {module = "androidx.room:room-gradle-plugin", version.ref="room-gradle-plugin"}
+
+
 arch-room-compiler = {module = "android.arch.persistence.room:compiler", version.ref="room-ksp"}
 accompanist = {module = "com.google.accompanist:accompanist-systemuicontroller", version.ref="accompanist"}
 composereorderable = {module = "org.burnoutcrew.composereorderable:reorderable", version.ref="composereorderable"}
+# Navigation
+navigation-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
+navigation-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
+navigation-router = {module = "io.github.arttttt.nav3router:nav3router", version.ref="navigation-router"}
+navigation-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation3", version.ref = "navigation-material3-adaptive" }
+
+# Serialization
+serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
+
 
 test-junit = {module = "junit:junit", version.ref="test-junit"}
 test-junit-ext = {module = "androidx.test.ext:junit", version.ref="test-junit-ext"}
 test-manifest = {module = "androidx.compose.ui:ui-test-manifest"}
 test-espresso = {module = "androidx.test.espresso:espresso-core", version.ref="test-espresso"}
 androidTest-junit = {module = "androidx.compose.ui:ui-test-junit4"}
+
 [plugins]
+jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization"}
