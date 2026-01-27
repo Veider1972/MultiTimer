@@ -17,13 +17,14 @@ import ru.veider.multitimer.ui.theme.textStyle_16_400
 
 @Composable
 fun DialogButton(
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(6.dp),
-        modifier = Modifier.padding(
+        modifier = modifier.padding(
             start = paddingsDouble,
             bottom = paddingsDouble,
             end = paddingsDouble

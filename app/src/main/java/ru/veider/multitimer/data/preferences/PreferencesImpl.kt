@@ -3,11 +3,10 @@ package ru.veider.multitimer.data.preferences
 import android.content.Context
 import android.net.Uri
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.MutableStateFlow
+import ru.veider.multitimer.R
 import ru.veider.multitimer.core.utils.stateFlow
 import ru.veider.multitimer.domain.entity.Preferences
 import ru.veider.multitimer.domain.entity.Sound
-import java.util.UUID
 
 class PreferencesImpl(
     context: Context
@@ -15,59 +14,63 @@ class PreferencesImpl(
 
     val gson = Gson()
 
-    override var keepScreenOn = stateFlow(
+    override val keepScreenOn = stateFlow(
         initialValue = getBool("keepScreenOn", false),
         onValueChange = { putBool("keepScreenOn", it) }
     )
-    override var unlimitedNotification = stateFlow(
+    override val unlimitedNotification = stateFlow(
         initialValue = getBool("unlimitedCounter", true),
         onValueChange = { putBool("unlimitedCounter", it)}
     )
-    override var notificationLimits = stateFlow(
+    override val notificationLimits = stateFlow(
         initialValue = getInt("counterLimits", 20),
         onValueChange = {putInt("counterLimits", it)}
     )
-    override var keptTime = stateFlow(
+    override val keptTime = stateFlow(
         initialValue = getInt("keptTime", Int.MAX_VALUE),
         onValueChange = {putInt("keptTime", it)}
     )
-    override var isKept = stateFlow(
+    override val isKept = stateFlow(
         initialValue = getBool("isKept", false),
         onValueChange = { putBool("isKept", it)}
     )
-
-    override var sound = stateFlow(
-        initialValue = getString("sound")?.let { gson.fromJson(it, Sound::class.java) } ?: Sound("Не задано", Uri.EMPTY.toString()),
+    override val sound = stateFlow(
+        initialValue = getString("sound")?.let { gson.fromJson(it, Sound::class.java) }
+            ?: Sound(context.resources.getString(R.string.no_sound), Uri.EMPTY.toString()),
         onValueChange = {
             putString("sound", gson.toJson(it))
         }
     )
-
-    override var alarmChannelId = stateFlow(
+    override val alarmChannelId = stateFlow(
         initialValue = getString("alarmChannelId") ?: "ALARM_CHANNEL_ID",
         onValueChange = {
             putString("alarmChannelId", value = it)
         }
     )
-
-    override var alarmChannelNum = stateFlow(
+    override val alarmChannelNum = stateFlow(
         initialValue = getInt("alarmChannelNum", 0),
         onValueChange = {
             putInt("alarmChannelNum", value = it)
         }
     )
-
-    override var simpleChannelId = stateFlow(
+    override val simpleChannelId = stateFlow(
         initialValue = getString("simpleChannelId") ?: "SIMPLE_CHANNEL_ID",
         onValueChange = {
             putString("simpleChannelId", value = it)
         }
     )
 
-    override var simpleChannelNum = stateFlow(
+    override val simpleChannelNum = stateFlow(
         initialValue = getInt("simpleChannelNum", 1),
         onValueChange = {
             putInt("simpleChannelNum", value = it)
+        }
+    )
+
+    override val timeEditorIsMulti = stateFlow(
+        initialValue = getBool("timeEditorIsMulti", false),
+        onValueChange = {
+            putBool("timeEditorIsMulti", value = it)
         }
     )
 }

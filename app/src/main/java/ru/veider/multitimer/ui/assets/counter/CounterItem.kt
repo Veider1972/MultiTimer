@@ -1,5 +1,6 @@
 package ru.veider.multitimer.ui.assets.counter
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,13 +24,20 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import ru.veider.multitimer.App
+import ru.veider.multitimer.MainActivity
+import ru.veider.multitimer.R
 import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.data.Counter
+import ru.veider.multitimer.domain.entity.Preferences
 import ru.veider.multitimer.ui.assets.dialogs.TimeEditor
 import ru.veider.multitimer.ui.assets.dialogs.TitleEditor
 import ru.veider.multitimer.ui.theme.colorOnSurface
@@ -46,6 +55,8 @@ fun CounterItem(
 ) {
 
     val viewModel: MainViewModel = koinInject()
+    val prefs: Preferences = koinInject()
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val currentCounter by rememberUpdatedState(counter)
@@ -71,6 +82,7 @@ fun CounterItem(
     if (timerEditorView)
         TimeEditor(
             time = counter.maxProgress,
+            isMulti = prefs.timeEditorIsMulti.collectAsState().value,
             onAccept = {
                 scope.launch {
                     viewModel.updateMaxProgress(counter.id, it)
@@ -89,7 +101,14 @@ fun CounterItem(
         modifier = modifier,
         counter = currentCounter,
         onTitleClick = { titleEditorView = true },
-        onCounterClick = { timerEditorView = true },
+        onCounterClick = {
+            if (currentCounter.state == CounterState.FINISHED)
+                timerEditorView = true
+            else
+                scope.launch {
+                    Toast.makeText(context, (context as MainActivity).resources.getString(R.string.timer_need_stop_first), Toast.LENGTH_LONG).show()
+                }
+        },
         onCounterStart = { viewModel.startCounter(counter.id) },
         onCounterPause = { viewModel.pauseCounter(counter.id) },
         onCounterStop = { viewModel.stopCounter(counter.id) }
@@ -125,7 +144,7 @@ private fun CounterItemBody(
             modifier = Modifier.padding(horizontal = 6.dp)
         ) {
             Text(
-                text = if (counter.title.isNotEmpty()) counter.title else "Без названия",
+                text = counter.title.ifEmpty { stringResource(R.string.no_name) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -140,19 +159,19 @@ private fun CounterItemBody(
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Button(
-                    text = "СТАРТ",
+                    text = stringResource(R.string.button_text_start),
                     enabled = counter.state == CounterState.FINISHED || counter.state == CounterState.PAUSED,
                     modifier = Modifier.weight(1f),
                     onClick = onCounterStart
                 )
                 Button(
-                    text = "ПАУЗА",
+                    text = stringResource(R.string.button_text_pause),
                     enabled = counter.state == CounterState.RUN,
                     modifier = Modifier.weight(1f),
                     onClick = onCounterPause
                 )
                 Button(
-                    text = if (counter.state == CounterState.RUN || counter.state == CounterState.FINISHED || counter.state == CounterState.ALARMED) "СТОП" else "СБРОС",
+                    text = if (counter.state == CounterState.RUN || counter.state == CounterState.FINISHED || counter.state == CounterState.ALARMED) stringResource(R.string.button_text_stop) else stringResource(R.string.button_text_reset),
                     enabled = counter.state == CounterState.RUN || counter.state == CounterState.PAUSED || counter.state == CounterState.ALARMED,
                     modifier = Modifier.weight(1f),
                     onClick = onCounterStop

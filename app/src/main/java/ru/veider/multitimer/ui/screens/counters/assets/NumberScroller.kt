@@ -37,12 +37,12 @@ import kotlin.math.roundToInt
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun NumberScroller(
-    initialNumber: Int = 0,
-    range: IntRange = 0..24,
-    onNumberChange: (Int) -> Unit,
     modifier: Modifier = Modifier
         .height(60.dp * 5)
         .fillMaxWidth(),
+    initialNumber: Int = 0,
+    range: IntRange = 0..24,
+    onNumberChange: (Int) -> Unit,
     textAlign: TextAlign,
     firstZero: Boolean = true,
     onItemHeight: (Dp) -> Unit,
@@ -124,7 +124,7 @@ fun NumberScroller(
                 textAlign = textAlign,
                 style = textStyle_50_500,
                 modifier = Modifier
-                    .fillMaxWidth()
+//                    .fillMaxWidth()
                     .onGloballyPositioned {
                         itemHeight = density.run { it.size.height.toDp() }
                     }

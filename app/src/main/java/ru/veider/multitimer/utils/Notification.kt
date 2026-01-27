@@ -33,7 +33,6 @@ import org.koin.java.KoinJavaComponent.inject
 import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.R
 import ru.veider.multitimer.SingleAppWidget
-import ru.veider.multitimer.app
 import ru.veider.multitimer.const.ALARM_CHANNEL_ID
 import ru.veider.multitimer.const.ALARM_CHANNEL_NUM
 import ru.veider.multitimer.const.SIMPLE_CHANNEL_ID
@@ -143,10 +142,7 @@ fun Context.createAlarmNotificationChannel(
     channelId: String
 ) {
     val notificationManager = NotificationManagerCompat.from(this)
-    Log.d("SoundDebug", "setSound: ${uri.toString()}")
     val audioAttributes = AudioAttributes.Builder()
-//        .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
-//        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
         .build()
     val notificationChannel = NotificationChannelCompat.Builder(
         channelId,
@@ -161,7 +157,6 @@ fun Context.createAlarmNotificationChannel(
         .setLightColor(Color.WHITE)
         .build()
     notificationManager.createNotificationChannel(notificationChannel)
-    Log.d("SoundDebug", "getSound: ${notificationManager.getNotificationChannel(channelId)?.sound.toString()}")
 }
 
 fun Context.createSimpleNotificationChannel(

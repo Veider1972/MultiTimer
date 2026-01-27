@@ -1,13 +1,17 @@
 package ru.veider.multitimer.ui.assets.dialogs.wrappers
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
+import ru.veider.multitimer.const.doublePadding
+import ru.veider.multitimer.const.singlePadding
 import ru.veider.multitimer.ui.theme.colorPrimary
+import ru.veider.multitimer.ui.theme.textStyle_18_400
 
 @Composable
 fun OneButtonDialog(
@@ -30,10 +34,14 @@ fun OneButtonDialog(
 		buttonText = buttonText,
 		onClick = onClick,
 		usePlatformDefaultWidth = usePlatformDefaultWidth
-	) {
-		Text(
-			text = message
-		)
+	) {scope ->
+        with(scope){
+            Text(
+                text = message,
+                style = textStyle_18_400,
+                modifier = Modifier.padding(horizontal = singlePadding, vertical = doublePadding)
+            )
+        }
 	}
 }
 

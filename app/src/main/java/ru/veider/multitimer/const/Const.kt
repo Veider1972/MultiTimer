@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.veider.multitimer.R
-import ru.veider.multitimer.app
 import ru.veider.multitimer.domain.entity.Sound
 
 enum class CounterState {

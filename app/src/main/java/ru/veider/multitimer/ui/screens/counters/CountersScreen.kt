@@ -3,7 +3,6 @@ package ru.veider.multitimer.ui.screens.counters
 import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,33 +14,36 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.rememberReorderableLazyGridState
-import org.burnoutcrew.reorderable.reorderable
 import org.koin.compose.koinInject
+import ru.veider.multitimer.MainActivity
+import ru.veider.multitimer.R
 import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.domain.entity.CurrentState
 import ru.veider.multitimer.ui.assets.counter.ActionCounterItem
+import ru.veider.multitimer.ui.assets.dialogs.wrappers.TwoButtonDialog
 import ru.veider.multitimer.ui.theme.colorSurface
 import ru.veider.multitimer.viewmodel.MainViewModel
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
-fun TimersScreen(){
+fun TimersScreen() {
 
+    val context = LocalContext.current
     val viewModel: MainViewModel = koinInject()
 
     val counters = viewModel.counters.collectAsState().value
-    var state by remember { mutableStateOf(CurrentState.Counters) }
 
 
 
@@ -52,16 +54,29 @@ fun TimersScreen(){
         }
     }
 
+    var counterIdToDeleting: Int? by remember { mutableStateOf(null) }
+    if (counterIdToDeleting != null) {
+        val counter = remember(counterIdToDeleting) { counters.find { it.id == counterIdToDeleting } }
+        val title = remember(counter) { counter?.title?.ifEmpty { (context as MainActivity).getString(R.string.no_name) } ?: (context as MainActivity).getString(R.string.no_name) }
+        TwoButtonDialog(
+            title = stringResource(R.string.delete_time_ask),
+            message = title,
+            acceptButtonText = stringResource(R.string.button_text_yes),
+            cancelButtonText = stringResource(R.string.button_text_no),
+            onAccept = {
+                counterIdToDeleting?.let {
+                    viewModel.deleteCounter(it)
+                }
+                counterIdToDeleting = null
+            },
+            onCancel = { counterIdToDeleting = null }
+        )
+    }
+
     TimersScreenBody(
         counters = counters,
-        onTitleChange = {id, title -> viewModel.updateTitle(id, title)},
-        onCounterChange = { id, maxProgress -> viewModel.updateMaxProgress(id, maxProgress) },
-        onCounterStart = { id -> viewModel.startCounter(id) },
-        onCounterPause = { id -> viewModel.pauseCounter(id) },
-        onCounterStop = { id -> viewModel.stopCounter(id) },
         onMove = { from, to -> viewModel.swapCounters(from, to) },
-        onSwipeLeft = {},
-        onSwipeRight = {}
+        onDelete = { counterIdToDeleting = it }
     )
 }
 
@@ -69,85 +84,53 @@ fun TimersScreen(){
 fun TimersScreenBody(
     modifier: Modifier = Modifier,
     counters: List<Counter>,
-    onTitleChange: (Int, String) -> Unit,
-    onCounterChange: (Int, Int) -> Unit,
-    onCounterStart: (Int) -> Unit,
-    onCounterPause: (Int) -> Unit,
-    onCounterStop: (Int) -> Unit,
-    onSwipeLeft: (Int) -> Unit,
-    onSwipeRight: (Int) -> Unit,
-    onMove: (Int, Int) -> Unit // Функция для изменения порядка элементов
+    onMove: (Int, Int) -> Unit,
+    onDelete: (Int) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
+    val hapticFeedback = LocalHapticFeedback.current
     val listState = rememberLazyListState()
     // Состояние для каждого элемента
     val swipeStates = remember { mutableStateMapOf<Int, SwipeState>() }
     var draggedItem by remember { mutableStateOf<Counter?>(null) }
-    val reordarableState = rememberReorderableLazyGridState(
-        onMove = { from, to -> onMove(counters[from.index].id, counters[to.index].id) }
-    )
+    val reordarableState = rememberReorderableLazyListState(listState) { from, to ->
+        onMove(counters[from.index].id, counters[to.index].id)
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+    }
     var horizontalSwipeEnable by remember { mutableStateOf(true) }
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(color = colorSurface)
-            .reorderable(reordarableState),
+            .background(color = colorSurface),
         state = listState
     ) {
 
         items(counters.size, key = { counters[it].id }) { index ->
             val counter = counters[index]
-//            ReorderableItem(
-//                reorderableState = reordarableState,
-//                key = counter.id,
-//                index = index + 1
-//            ) {
-
+            ReorderableItem(
+                state = reordarableState,
+                key = counter.id
+            ) {
                 val swipeState = swipeStates[counter.id] ?: SwipeState()
                 val offsetY = remember { Animatable(swipeState.offsetY) }
 
                 ActionCounterItem(
                     counter = counter,
-                    horisontalSwipeEnable = horizontalSwipeEnable,
+                    horizontalSwipeEnable = horizontalSwipeEnable,
                     modifier = Modifier
                         .zIndex(if (draggedItem?.id == counter.id) 1f else 0f)
-                        .pointerInput(Unit) {
-                            detectDragGesturesAfterLongPress(
-                                onDragStart = {
-                                    scope.launch {
-                                        horizontalSwipeEnable = false
-                                        draggedItem = counter
-                                    }
-                                },
-                                onDragEnd = {
-                                    scope.launch {
-                                        horizontalSwipeEnable = true
-                                        draggedItem = null
-                                        offsetY.snapTo(0f) // Сброс смещения по вертикали
-                                    }
-
-                                },
-                                onDrag = { change, dragAmount ->
-                                    scope.launch {
-                                        change.consume()
-                                        // Обработка вертикального перетаскивания
-                                        offsetY.snapTo(offsetY.value + dragAmount.y)
-                                        // Определяем новый индекс элемента
-                                        val newIndex = (index + (dragAmount.y / 50).toInt())
-                                            .coerceIn(0, counters.size - 1)
-                                        if (newIndex != index) {
-                                            onMove(index, newIndex)
-                                        }
-                                    }
-
-                                }
-                            )
-                        }
+                        .draggableHandle(
+                            onDragStarted = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                            },
+                            onDragStopped = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                            }
+                        )
                         .offset { IntOffset(0, offsetY.value.toInt()) },
-                    onDelete = {}
+                    onDelete = { onDelete(counter.id) }
                 )
-//            }
+            }
         }
     }
 }
@@ -171,13 +154,7 @@ private fun MyLazyColumnPreview() {
                 id = 1, currentProgress = 25000, maxProgress = 30000, startTime = 2000000, state = CounterState.PAUSED, title = "Прилёт флота"
             )
         ),
-        onTitleChange = { _, _ -> },
-        onCounterChange = { _, _ -> },
-        onCounterStart = {},
-        onCounterPause = {},
-        onCounterStop = {},
-        onSwipeLeft = {},
-        onSwipeRight = {},
-        onMove = { _, _ -> }
+        onMove = { _, _ -> },
+        onDelete = {}
     )
 }

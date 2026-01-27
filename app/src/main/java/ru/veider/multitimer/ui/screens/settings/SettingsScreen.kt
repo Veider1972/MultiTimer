@@ -1,9 +1,5 @@
 package ru.veider.multitimer.ui.screens.settings
 
-import android.R.attr.checked
-import android.R.id.message
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -40,24 +36,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import org.koin.compose.koinInject
-import android.provider.Settings
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import ru.veider.multitimer.R
-import ru.veider.multitimer.const.ALARM_CHANNEL_ID
+import ru.veider.multitimer.const.doublePadding
 import ru.veider.multitimer.const.emptySound
-import ru.veider.multitimer.core.utils.getAndroidMedia
 import ru.veider.multitimer.domain.entity.Preferences
-import ru.veider.multitimer.domain.entity.Sound
 import ru.veider.multitimer.ui.assets.dialogs.NumberEditor
 import ru.veider.multitimer.ui.assets.dialogs.SoundSelector
 import ru.veider.multitimer.ui.theme.colorPrimary
 import ru.veider.multitimer.ui.theme.textStyle_14_400
-import ru.veider.multitimer.ui.theme.textStyle_14_500
 import ru.veider.multitimer.ui.theme.textStyle_14_700
-import ru.veider.multitimer.ui.theme.textStyle_18_400
 import ru.veider.multitimer.ui.theme.textStyle_18_500
 import ru.veider.multitimer.ui.theme.textStyle_18_700
 import ru.veider.multitimer.utils.createAlarmNotificationChannel
@@ -73,14 +62,8 @@ fun SettingsScreen() {
     val keepScreenOn = prefs?.keepScreenOn?.collectAsState()?.value ?: true
     val unlimitedNotification = prefs?.unlimitedNotification?.collectAsState()?.value ?: true
     val notificationLimits = prefs?.notificationLimits?.collectAsState()?.value ?: 20
+    val timeEditorIsMulti = prefs?.timeEditorIsMulti?.collectAsState()?.value ?: true
     val sound = prefs?.sound?.collectAsState()?.value ?: emptySound()
-//    val sound by rememberUpdatedState(
-//        NotificationManagerCompat.from(context).let {
-//            val allSounds = getAndroidMedia(context)
-//            val currentUri = it.getNotificationChannel(ALARM_CHANNEL_ID)?.sound
-//            allSounds.firstOrNull() { it.uri == currentUri?.path } ?: emptySound()
-//        }
-//    )
     var width by remember { mutableStateOf(0.dp) }
 
     var notificationLimitsDialogShow by remember { mutableStateOf(false) }
@@ -118,7 +101,7 @@ fun SettingsScreen() {
 
     Column {
         Text(
-            text = stringResource(R.string.preferences_title),
+            text = stringResource(R.string.preferences_common_title),
             style = textStyle_18_700,
             modifier = Modifier.padding(start = 6.dp, top = 6.dp, end = 6.dp)
         )
@@ -130,6 +113,12 @@ fun SettingsScreen() {
             width = width,
             onWidthChange = { width = max(width, it) }
         )
+        Text(
+            text = stringResource(R.string.preferences_notification_title),
+            style = textStyle_18_700,
+            modifier = Modifier.padding(start = 6.dp, top = doublePadding, end = 6.dp)
+        )
+        HorizontalDivider(thickness = 1.dp, color = colorPrimary)
         CheckedSettings(
             message = stringResource(R.string.preferences_repeat_counters),
             checked = unlimitedNotification,
@@ -189,7 +178,7 @@ fun SettingsScreen() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Звук уведомления",
+                text = stringResource(R.string.notification_sound),
                 style = textStyle_14_400,
                 modifier = Modifier
                     .weight(1f)
@@ -201,28 +190,23 @@ fun SettingsScreen() {
                 modifier = Modifier
                     .clickable {
                         soundSelectorDialogShow = true
-//                        val intent = Intent().apply {
-//                            action = Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS
-//                            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-//                            putExtra(Settings.EXTRA_CHANNEL_ID, ALARM_CHANNEL_ID)
-//                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                        }
-//
-//                        try {
-//                            context.startActivity(intent)
-//                        } catch (e: Exception) {
-//                            // Fallback на общие настройки
-//                            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-//                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-//                                }.apply {
-//                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                            }
-//
-//                            context.startActivity(intent)
-//                        }
                     }
             )
         }
+        Text(
+            text = stringResource(R.string.preferences_timer_title),
+            style = textStyle_18_700,
+            modifier = Modifier.padding(start = 6.dp, top = doublePadding, end = 6.dp)
+        )
+        HorizontalDivider(thickness = 1.dp, color = colorPrimary)
+        CheckedSettings(
+            message = stringResource(R.string.multi_time_edit),
+            checked = timeEditorIsMulti,
+            onCheckedChange = { prefs?.timeEditorIsMulti?.value = it },
+            width = width,
+            onWidthChange = { width = max(width, it) }
+
+        )
     }
 }
 

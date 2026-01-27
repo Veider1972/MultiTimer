@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -132,7 +133,7 @@ class MainViewModel(
                         if (counter.currentProgress == 0) {
                             counter.also {
                                 viewModelScope.launch {
-                                    Toast.makeText(app, app.getText(R.string.timer_need_set), Toast.LENGTH_LONG).show()
+                                    Toast.makeText(this@MainViewModel.application, this@MainViewModel.application.getText(R.string.timer_need_set), Toast.LENGTH_LONG).show()
                                 }
                             }
                         } else {
@@ -243,7 +244,7 @@ class MainViewModel(
 //    }
 
     private fun startService(counters: List<Counter>) {
-        val intent = Intent(app, CountersService::class.java).apply {
+        val intent = Intent(this@MainViewModel.application, CountersService::class.java).apply {
             putExtra(EVENT, ON_START_SERVICE)
             putExtra(COUNTERS, Bundle().apply {
                 putString(COUNTERS_BUNDLE, gson.toJson(counters))
@@ -254,8 +255,8 @@ class MainViewModel(
 
     private fun sendToService(counter: Counter, event: String) {
         if (event != ON_RUN_CLICK && event != ON_PAUSE_CLICK && event != ON_STOP_CLICK && event != ON_ALARM_TIMER)
-            throw Exception(app.resources?.getString(R.string.error_service_event))
-        startService(Intent(app, CountersService::class.java).apply {
+            throw Exception(this@MainViewModel.application.resources?.getString(R.string.error_service_event))
+        startService(Intent(this@MainViewModel.application, CountersService::class.java).apply {
             putExtra(EVENT, event)
             putExtra(COUNTER, counter)
         })
@@ -263,7 +264,7 @@ class MainViewModel(
 
     private fun startService(intent: Intent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            ContextCompat.startForegroundService(app, intent)
+            ContextCompat.startForegroundService(this@MainViewModel.application, intent)
         else
             this.startService(intent)
     }

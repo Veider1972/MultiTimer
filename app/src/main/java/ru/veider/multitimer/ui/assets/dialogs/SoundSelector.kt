@@ -135,7 +135,7 @@ private fun SoundSelectorBody(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Текущий: ",
+                        text = "${stringResource(R.string.current)} ",
                         style = textStyle_15_400
                     )
                     Text(

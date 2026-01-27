@@ -32,7 +32,7 @@ fun TitledDialogWrapper(
 ) {
 
     val density = LocalDensity.current
-    var width by remember {mutableStateOf(0.dp)}
+    var width by remember { mutableStateOf(0.dp) }
 
     DialogWrapper(
         modifier = modifier,
@@ -43,21 +43,22 @@ fun TitledDialogWrapper(
         show = show && width > 0.dp,
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.onSizeChanged{
+            modifier = Modifier.onSizeChanged {
                 width = density.run { it.width.toDp() }
             }
         ) {
-            Row(modifier = Modifier
-                .then(
-                    if (width > 0.dp)
-                        Modifier.width(width)
-                    else
-                        Modifier
-                )
-                .background(color = colorPrimary)
-                .padding(paddingsDouble),
-                horizontalArrangement = Arrangement.Center){
+            Row(
+                modifier = Modifier
+                    .then(
+                        if (width > 0.dp)
+                            Modifier.width(width)
+                        else
+                            Modifier
+                    )
+                    .background(color = colorPrimary)
+                    .padding(paddingsDouble),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Text(
                     text = title.uppercase(),
                     color = colorSurface,
@@ -66,11 +67,7 @@ fun TitledDialogWrapper(
                     )
             }
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                content(this)
-            }
+            content(this)
         }
     }
 }
@@ -79,5 +76,6 @@ fun TitledDialogWrapper(
 @Composable
 fun TitledDialogShow() {
     TitledDialogWrapper(
-        title = "Заголовок"){}
+        title = "Заголовок"
+    ) {}
 }

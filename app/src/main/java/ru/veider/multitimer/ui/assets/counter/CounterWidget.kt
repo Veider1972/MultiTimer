@@ -64,7 +64,7 @@ fun CounterWidget(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val sample by rememberUpdatedState(if (counter.maxProgress == 0) stringResource(R.string.setTime) else counter.currentProgress.HhMmSs)
+    val sample by rememberUpdatedState(if (counter.maxProgress == 0) stringResource(R.string.set_time) else counter.currentProgress.HhMmSs)
     val density = LocalDensity.current
     val dotSize = remember { density.run { 7.dp.toPx() } }
     val lineWidth = remember { density.run { 3.dp.toPx() } }
@@ -79,9 +79,9 @@ fun CounterWidget(
     val angle by rememberUpdatedState(360 * ratio)
     val degree by rememberUpdatedState((angle * PI / 180).toFloat())
 
-    var color by remember {mutableStateOf(Color.Black)}
+    var color by remember { mutableStateOf(Color.Black) }
     var rotation by remember { mutableFloatStateOf(0f) }
-    var scale  by remember { mutableFloatStateOf(0f) }
+    var scale by remember { mutableFloatStateOf(0f) }
 
     val steps = 20
 
@@ -89,29 +89,29 @@ fun CounterWidget(
         color = Color.Black
         rotation = 0f
         scale = 0f
-            launch {
-                while (alarmed){
-                    val delta = (500 / steps).toLong()
-                    (0..steps).forEach {
-                        rotation = getValue(0f, 1f, steps, it)
-                        scale = rotation
-                        delay(delta)
-                    }
-                    (0..2*steps).forEach {
-                        rotation = getValue(1f, -1f, 2*steps, it)
-                        scale = rotation
-                        delay(delta)
-                    }
-                    (0..steps).forEach {
-                        rotation = getValue(-1f, 0f, steps, it)
-                        scale = rotation
-                        delay(delta)
-                    }
-                }
-
-            }
         launch {
-            while (alarmed){
+            while (alarmed) {
+                val delta = (500 / steps).toLong()
+                (0..steps).forEach {
+                    rotation = getValue(0f, 1f, steps, it)
+                    scale = rotation
+                    delay(delta)
+                }
+                (0..2 * steps).forEach {
+                    rotation = getValue(1f, -1f, 2 * steps, it)
+                    scale = rotation
+                    delay(delta)
+                }
+                (0..steps).forEach {
+                    rotation = getValue(-1f, 0f, steps, it)
+                    scale = rotation
+                    delay(delta)
+                }
+            }
+
+        }
+        launch {
+            while (alarmed) {
                 val delta = (500 / steps).toLong()
                 (0..steps).forEach {
                     color = getColor(Color.Black, Color.Red, steps, it)

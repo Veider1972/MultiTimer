@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import kotlinx.coroutines.launch
+import ru.veider.multitimer.R
 import ru.veider.multitimer.core.utils.fadingEdge
 import ru.veider.multitimer.core.utils.getTime
 import ru.veider.multitimer.core.utils.hours
@@ -88,8 +90,8 @@ fun NumberEditor(
     TitledTwoButtonsDialogWrapper(
         title = title,
         border = BorderStroke(1.dp, colorPrimary),
-        cancelButtonText = "Отменить",
-        acceptButtonText = "Принять",
+        cancelButtonText = stringResource(R.string.button_text_cancel),
+        acceptButtonText = stringResource(R.string.button_text_accept),
         show = valueReady,
         onCancel = onCancel,
         onAccept = {
@@ -145,7 +147,7 @@ fun NumberEditor(
 @Composable
 private fun NumberEditorPreview() {
     NumberEditor(
-        title = "Число повторов",
+        title = stringResource(R.string.preferences_repeat_nums),
         value = 60,
         onAccept = {},
         onCancel = {})

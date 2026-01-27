@@ -16,16 +16,23 @@ android {
     namespace = "ru.veider.multitimer"
     compileSdk = 36
 
+    signingConfigs {
+        create("all") {
+            storeFile = file("sign/Multitimer.jks")
+            storePassword = "LBOdmQd82AUH"
+            keyAlias = "Multitimer"
+            keyPassword = "LBOdmQd82AUH"
+        }
+    }
+
     defaultConfig {
         applicationId = "ru.veider.multitimer"
         minSdk =29
         targetSdk =34
         // Не забыть обновить about_date
-        versionCode = 27
-        versionName = "1.4.0"
-
-//        setProperty("archivesName", "multitimer-${versionName}-${versionCode}")
-
+        versionCode = 28
+        versionName = "1.5.0"
+        setProperty("archivesBaseName", "multitimer_$versionName")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -34,12 +41,14 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BUILD_DATE", "\"${DateTimeFormatter.ofPattern("LLLL, yyyy").format(LocalDateTime.now())}\"")
-            buildConfigField("String", "BUILD_YEAR", "\"${LocalDateTime.now().year}\"")
+            signingConfig = signingConfigs.getByName("all")
+            buildConfigField("Integer", "BUILD_MONTH", "${LocalDateTime.now().month.value}")
+            buildConfigField("Integer", "BUILD_YEAR", "${LocalDateTime.now().year}")
         }
         release {
-            buildConfigField("String", "BUILD_DATE", "\"${DateTimeFormatter.ofPattern("LLLL, yyyy").format(LocalDateTime.now())}\"")
-            buildConfigField("String", "BUILD_YEAR", "\"${LocalDateTime.now().year}\"")
+            signingConfig = signingConfigs.getByName("all")
+            buildConfigField("Integer", "BUILD_MONTH", "${LocalDateTime.now().month.value}")
+            buildConfigField("Integer", "BUILD_YEAR", "${LocalDateTime.now().year}")
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -48,8 +57,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        jvmToolchain(17)
     }
     buildFeatures {
         compose = true

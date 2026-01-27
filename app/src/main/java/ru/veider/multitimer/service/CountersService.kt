@@ -34,7 +34,6 @@ import org.koin.android.ext.android.inject
 import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.R
 import ru.veider.multitimer.SingleAppWidget
-import ru.veider.multitimer.app
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.domain.entity.Preferences

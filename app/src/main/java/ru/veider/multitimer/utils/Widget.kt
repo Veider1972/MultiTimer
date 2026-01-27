@@ -15,6 +15,7 @@ fun Context.setWidget(currentTime: Int, maxTime: Int, status: String) {
     }
     sendBroadcast(updateIntent)
 }
+
 fun Context.getAlarmTitle(count: Int) =
     if (count == 1)
         resources.getText(R.string.notification_alarm_finished)

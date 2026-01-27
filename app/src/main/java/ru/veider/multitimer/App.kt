@@ -40,4 +40,4 @@ class App : Application() {
     }
 }
 
-val app get()= App.instance!!
+//val app get()= App.instance!!

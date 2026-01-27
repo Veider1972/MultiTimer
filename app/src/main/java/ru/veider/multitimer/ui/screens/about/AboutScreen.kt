@@ -1,20 +1,14 @@
 package ru.veider.multitimer.ui.screens.about
 
-import android.R.attr.text
-import android.R.attr.thickness
-import android.R.id.message
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,28 +25,30 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import ru.veider.multitimer.BuildConfig
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.singlePadding
 import ru.veider.multitimer.ui.theme.colorPrimary
 import ru.veider.multitimer.ui.theme.colorPrimaryDark
 import ru.veider.multitimer.ui.theme.textStyle_10_300
-import ru.veider.multitimer.ui.theme.textStyle_11_500
-import ru.veider.multitimer.ui.theme.textStyle_12_500
-import ru.veider.multitimer.ui.theme.textStyle_13_400
-import ru.veider.multitimer.ui.theme.textStyle_14_400
-import ru.veider.multitimer.ui.theme.textStyle_14_500
-import ru.veider.multitimer.ui.theme.textStyle_14_700
-import ru.veider.multitimer.ui.theme.textStyle_17_700
-import ru.veider.multitimer.ui.theme.textStyle_18_400
-import androidx.core.net.toUri
 import ru.veider.multitimer.ui.theme.textStyle_13_500
+import ru.veider.multitimer.ui.theme.textStyle_14_400
+import ru.veider.multitimer.ui.theme.textStyle_14_700
 import ru.veider.multitimer.ui.theme.textStyle_15_500
+import ru.veider.multitimer.ui.theme.textStyle_17_700
+import java.time.LocalDate
+import java.time.Month
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AboutScreen() {
 
     val context = LocalContext.current
+
+    val buildDate  = remember {
+        "${ Month.of(BuildConfig.BUILD_MONTH).name.lowercase().replaceFirstChar { it.uppercase() } }, ${BuildConfig.BUILD_YEAR}"
+    }
 
     Box(modifier = Modifier.fillMaxSize()){
         Column(
@@ -79,7 +75,7 @@ fun AboutScreen() {
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
                     Text(
-                        text = BuildConfig.BUILD_DATE.replaceFirstChar { it.uppercase() },
+                        text = buildDate,
                         style = textStyle_13_500,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
@@ -178,7 +174,7 @@ private fun Message(
     }
 }
 
-@Preview(locale = "ru")
+@Preview(locale = "en")
 @Composable
 private fun AboutScreenPreview() {
     AboutScreen()

@@ -30,7 +30,7 @@ import ru.veider.multitimer.ui.theme.colorPrimary
 @Composable
 fun ActionCounterItem(
     counter: Counter,
-    horisontalSwipeEnable: Boolean,
+    horizontalSwipeEnable: Boolean,
     modifier: Modifier = Modifier,
     onDelete: (Int) -> Unit
 ) {
@@ -54,7 +54,7 @@ fun ActionCounterItem(
         modifier = modifier
             .fillMaxWidth()
             .then(
-                if (horisontalSwipeEnable)
+                if (horizontalSwipeEnable)
                     Modifier.pointerInput(Unit) {
                         detectHorizontalDragGestures { _, dragAmount ->
                             scope.launch {
@@ -106,7 +106,7 @@ data class HorizontalSwipeState(
 private fun ActionCounterItemPreview() {
     ActionCounterItem(
         counter = Counter(id = 0, currentProgress = 10000, maxProgress = 20000, startTime = 10000, state = CounterState.RUN, title = "Приготовление супа"),
-        horisontalSwipeEnable = true,
+        horizontalSwipeEnable = true,
         onDelete = {}
     )
 }

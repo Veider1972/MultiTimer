@@ -1,31 +1,30 @@
 <resources>
 
-    // menu -> multi_timer.xml
     <string name="adding_new_counter">Add new timer</string>
 
-    // menu -> activity_main_drawer.xml
     <string name="menu_counters">Timers</string>
     <string name="menu_about">About</string>
     <string name="menu_settings">Preferences</string>
 
-    // layout -> navigation_header.xml
     <string name="app_name">MultiTimer</string>
     <string name="my_email">veider@inbox.ru</string>
 
-    // layout -> layout_query.xml
     <string name="query_text_hint">Event\'s title</string>
 
-    // layout -> item_counter.xml
-    <string name="title_hint">No name</string>
-    <string name="button_text_start">Run</string>
-    <string name="button_text_pause">Pause</string>
-    <string name="button_text_stop">Stop</string>
+    <string name="no_name">No name</string>
 
-    // layout -> fragment_about.xml
-    // app_name
+    <string name="button_text_start">RUN</string>
+    <string name="button_text_pause">PAUSE</string>
+    <string name="button_text_stop">STOP</string>
+    <string name="button_text_reset">RESET</string>
+    <string name="button_text_accept">Accept</string>
+    <string name="button_text_cancel">Cancel</string>
+    <string name="button_text_yes">Yes</string>
+    <string name="button_text_no">No</string>
+
     <string name="about_version">Version</string>
     <string name="about_date">August, 2024</string>
-    // my_email
+
     <string name="about_description_title">About</string>
     <string name="about_description_1">The program was designed for those who do not want to miss important events.</string>
     <string name="about_description_2">The number of timers in the program is not limited.</string>
@@ -38,7 +37,6 @@
     <string name="about_guide_3">Other actions - by clicking on the corresponding element.</string>
     <string name="about_copyrights">Copyright © by Vadim Korkhovoy</string>
 
-    // CountersService.kt
     <string name="alarm_channel_name">Alarm notification</string>
     <string name="alarm_channel_description">Counter Service Channel</string>
     <string name="simple_channel_name">Countdown notification</string>
@@ -54,30 +52,24 @@
     <string name="time_min_sec_pattern">%d min. %d sec.</string>
     <string name="time_hours_min_sec_pattern">%d h. %d min. %d sec.</string>
 
-    // CountersViewModel.kt
     <string name="error_service_event">Error\'s code</string>
 
-    // InputDialog.kt
-    <string name="button_text_accept">Accept</string>
-    <string name="button_text_cancel">Cancel</string>
 
-    // TimeSelector.kt
+
     <string name="button_text_set">Accept</string>
     <string name="time_set_dialog_title">Time setting</string>
     <string name="appwidget_hours_minutes_text">00:00</string>
     <string name="appwidget_seconds_text">00</string>
     <string name="add_widget">Add Multitimer\'s widget</string>
 
-    //Review Flow
     <string name="review_complete">Thank you for rating the app!</string>
 
-    //Content descriptors
     <string name="navigation_drawer">Navigation Drawer</string>
     <string name="toolbar">Toolbar</string>
     <string name="timer_run">Run timer</string>
     <string name="timer_pause">Pause timer</string>
     <string name="timer_stop">Stop timer</string>
-    <string name="title">Timer\'s title</string>
+    <string name="timerTitle">Timer\'s title</string>
     <string name="timer_set">Set timer</string>
     <string name="mail_me">Mail to author</string>
     <string name="copyright">Copyright</string>
@@ -91,26 +83,19 @@
     <string name="timers_list">Timer\'s list</string>
 
     <string name="timer_need_set">You should set the time first…</string>
-    <!-- Preference Titles -->
+    <string name="timer_need_stop_first">You need to turn off the timer at first</string>
+
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-
-    <string name="preferences_title">General settings</string>
+    <string name="preferences_common_title">General settings</string>
+    <string name="preferences_notification_title">Notification settings</string>
+    <string name="preferences_timer_title">Timer settings</string>
     <string name="permission_write_settings_description">To enable this option, you must grant the program the right to manage the phone settings</string>
     <string name="preferences_keep_screen_on">Do not turn off the screen when the timer is running</string>
     <string name="preferences_repeat_counters">Unlimited number of notification repeats</string>
     <string name="preferences_repeat_nums">Number of repeats</string>
-    <string-array name="repeatsList">
+    <string-array name="repeats_list">
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -132,19 +117,19 @@
         <item>19</item>
         <item>20</item>
     </string-array>
+    <string name="notification_sound">Notification sound</string>
+    <string name="no_sound">Not specified</string>
 
     // CounterWidget
-    <string name="setTime">Set time</string>
+    <string name="set_time">Set time</string>
+    <string name="delete_time_ask">Delete timer?</string>
+    <string name="set_timer_name">Enter timer name</string>
+    <string name="timer_settings">Setting the timer</string>
+    <string name="current">Current:</string>
+    <string name="multi_time_edit">Separate editing of tens and units of time</string>
 
     // Sound Selector
     <string name="dialog_profile_set_ringtone_title">Notification sound</string>
     <string name="no_sound_title">Not set</string>
-
-    // ключи настроек
-    <string name="keepScreenOn">keepScreenOn</string>
-    <string name="keptTime">keptTime</string>
-    <string name="isKept">isKept</string>
-    <string name="unlimitedCounter">unlimitedCounter</string>
-    <string name="counterLimits">counterLimits</string>
 
 </resources>
