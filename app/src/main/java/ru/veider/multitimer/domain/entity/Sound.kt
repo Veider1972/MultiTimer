@@ -1,6 +1,11 @@
 package ru.veider.multitimer.domain.entity
 
 import android.net.Uri
+import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
-data class Sound(val title: String, val uri: String)
+@Keep
+data class Sound(
+    @SerializedName("title") val title: String,
+    @SerializedName("uri") val uri: String)

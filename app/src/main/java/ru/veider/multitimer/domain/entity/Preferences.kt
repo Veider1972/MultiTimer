@@ -9,6 +9,7 @@ interface Preferences {
     val keptTime: MutableStateFlow<Int>
     val isKept: MutableStateFlow<Boolean>
     val sound: MutableStateFlow<Sound>
+    val notificationInterval: MutableStateFlow<Int>
     val alarmChannelId: MutableStateFlow<String>
     val alarmChannelNum: MutableStateFlow<Int>
     val simpleChannelId: MutableStateFlow<String>

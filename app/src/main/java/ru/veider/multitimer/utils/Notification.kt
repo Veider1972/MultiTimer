@@ -1,48 +1,30 @@
 package ru.veider.multitimer.utils
 
 import android.Manifest
-import android.R.attr.description
-import android.R.attr.path
-import android.R.attr.priority
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.AudioAttributes
-import android.media.AudioAttributes.Builder
-import android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION
-import android.media.AudioAttributes.USAGE_ALARM
-import android.media.RingtoneManager
 import android.media.RingtoneManager.getRingtone
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationChannelCompat
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.net.toUri
 import org.koin.java.KoinJavaComponent.inject
+import ru.veider.multitimer.BuildConfig
 import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.R
 import ru.veider.multitimer.SingleAppWidget
-import ru.veider.multitimer.const.ALARM_CHANNEL_ID
-import ru.veider.multitimer.const.ALARM_CHANNEL_NUM
-import ru.veider.multitimer.const.SIMPLE_CHANNEL_ID
-import ru.veider.multitimer.const.SIMPLE_CHANNEL_NUM
-import ru.veider.multitimer.const.vibroPattern
-import ru.veider.multitimer.data.preferences.PreferencesImpl
 import ru.veider.multitimer.domain.entity.Preferences
 import ru.veider.multitimer.service.CountersService
 import java.util.Hashtable
-import kotlin.text.ifEmpty
 
 fun Context.sendTickNotification(
     timers: Hashtable<Int, CountersService.CounterTimer>
@@ -97,11 +79,20 @@ fun Context.sendTickNotification(
 }
 
 
+val android12 = Build.VERSION.SDK_INT in listOf(Build.VERSION_CODES.S, Build.VERSION_CODES.S_V2)
+
 fun Context.sendAlarmNotification(
     alarmes: Hashtable<Int, CountersService.AlarmTimer>
 ) {
 
     val prefs: Preferences by inject(Preferences::class.java)
+
+    if (android12){
+        val sound = prefs.sound.value.uri.toUri()
+        val player = getRingtone(this, sound)
+        player.isLooping = false
+        player.play()
+    }
 
     val notificationBuilder = Notification.Builder(this, prefs.alarmChannelId.value).apply {
         setCategory(Notification.CATEGORY_ALARM)
@@ -116,6 +107,7 @@ fun Context.sendAlarmNotification(
                 it.addLine(timer.value.counter.title.ifEmpty { "Таймер ${i++}" })
             }
         }
+
         setOngoing(true)
         setVisibility(Notification.VISIBILITY_PUBLIC)
         setAutoCancel(true)
@@ -141,22 +133,31 @@ fun Context.createAlarmNotificationChannel(
     uri: Uri,
     channelId: String
 ) {
-    val notificationManager = NotificationManagerCompat.from(this)
-    val audioAttributes = AudioAttributes.Builder()
-        .build()
-    val notificationChannel = NotificationChannelCompat.Builder(
+    val notificationManager = getSystemService(NotificationManager::class.java)
+    val channel = NotificationChannel(
         channelId,
+        resources.getString(R.string.alarm_channel_name),
         NotificationManager.IMPORTANCE_HIGH
-    )
-        .setName(resources.getString(R.string.alarm_channel_name))
-        .setDescription(resources.getString(R.string.alarm_channel_description))
-        .setSound(uri, audioAttributes)
-        .setVibrationEnabled(true)
-        .setVibrationPattern(vibroPattern)
-        .setLightsEnabled(true)
-        .setLightColor(Color.WHITE)
-        .build()
-    notificationManager.createNotificationChannel(notificationChannel)
+    ).apply {
+        description = resources.getString(R.string.alarm_channel_description)
+        if (!android12){
+            setSound(
+                uri,
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .build()
+            )
+        }
+
+        enableVibration(true)
+        vibrationPattern = arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()
+        enableLights(true)
+        lightColor = Color.WHITE
+        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        setBypassDnd(true)
+    }
+    notificationManager.createNotificationChannel(channel)
 }
 
 fun Context.createSimpleNotificationChannel(

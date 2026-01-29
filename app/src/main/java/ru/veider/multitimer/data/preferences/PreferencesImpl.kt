@@ -41,6 +41,12 @@ class PreferencesImpl(
             putString("sound", gson.toJson(it))
         }
     )
+    override val notificationInterval = stateFlow(
+        initialValue = getInt("interval", 5),
+        onValueChange = {
+            putInt("interval", value = it)
+        }
+    )
     override val alarmChannelId = stateFlow(
         initialValue = getString("alarmChannelId") ?: "ALARM_CHANNEL_ID",
         onValueChange = {

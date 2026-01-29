@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import org.koin.compose.koinInject
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.core.net.toUri
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.doublePadding
@@ -63,6 +64,7 @@ fun SettingsScreen() {
     val unlimitedNotification = prefs?.unlimitedNotification?.collectAsState()?.value ?: true
     val notificationLimits = prefs?.notificationLimits?.collectAsState()?.value ?: 20
     val timeEditorIsMulti = prefs?.timeEditorIsMulti?.collectAsState()?.value ?: true
+    val notificationInterval = prefs?.notificationInterval?.collectAsState()?.value ?: 5
     val sound = prefs?.sound?.collectAsState()?.value ?: emptySound()
     var width by remember { mutableStateOf(0.dp) }
 
@@ -97,6 +99,22 @@ fun SettingsScreen() {
                 soundSelectorDialogShow = false
             },
             onCancel = { soundSelectorDialogShow = false }
+        )
+
+    var notificationIntervalDialogShow by remember { mutableStateOf(false) }
+    if (notificationIntervalDialogShow)
+        NumberEditor(
+            title = stringResource(R.string.notification_interval),
+            value = notificationInterval,
+            minValue = 5,
+            maxValue = 30,
+            onAccept = {
+                prefs?.notificationInterval?.value = it
+                notificationIntervalDialogShow = false
+            },
+            onCancel = {
+                notificationIntervalDialogShow = false
+            }
         )
 
     Column {
@@ -169,30 +187,18 @@ fun SettingsScreen() {
                 )
             }
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = LocalMinimumInteractiveComponentSize.current)
-                .padding(start = 6.dp, end = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = stringResource(R.string.notification_sound),
-                style = textStyle_14_400,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 6.dp)
-            )
-            Text(
-                text = sound.title,
-                style = textStyle_14_700,
-                modifier = Modifier
-                    .clickable {
-                        soundSelectorDialogShow = true
-                    }
-            )
-        }
+        StringSettings(
+            title = stringResource(R.string.notification_sound),
+            value = sound.title,
+            width = width,
+            onClick = { soundSelectorDialogShow = true }
+        )
+        StringSettings(
+            title = stringResource(R.string.notification_interval),
+            value = "$notificationInterval ${stringResource(R.string.seconds)}",
+            width = width,
+            onClick = { notificationIntervalDialogShow = true }
+        )
         Text(
             text = stringResource(R.string.preferences_timer_title),
             style = textStyle_18_700,
@@ -252,6 +258,47 @@ fun CheckedSettings(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors()
+        )
+    }
+}
+
+@Composable
+private fun StringSettings(
+    title: String,
+    value: String,
+    width: Dp,
+    onClick: () -> Unit,
+) {
+
+    val density = LocalDensity.current
+    val measurer = rememberTextMeasurer()
+    val style = textStyle_14_700
+    val textWidth = remember(value) { density.run { measurer.measure(value, style).size.width.toDp() } }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = LocalMinimumInteractiveComponentSize.current)
+            .padding(start = 6.dp, end = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = title,
+            style = textStyle_14_400,
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 6.dp)
+        )
+        Text(
+            text = value,
+            style = style,
+            modifier = Modifier
+                .width(max(width, textWidth))
+                .clickable {
+                    onClick()
+                },
+            textAlign = if (width >= textWidth) TextAlign.Center else TextAlign.End
         )
     }
 }

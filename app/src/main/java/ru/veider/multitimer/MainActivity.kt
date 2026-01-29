@@ -1,13 +1,17 @@
 package ru.veider.multitimer
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.TypedArray
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -45,34 +49,37 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
-import ru.veider.multitimer.const.ALARM_CHANNEL_ID
-import ru.veider.multitimer.const.SIMPLE_CHANNEL_ID
 import ru.veider.multitimer.ui.screens.MainState
 import ru.veider.multitimer.ui.assets.SetSystemBarsContrast
 import ru.veider.multitimer.ui.theme.MultiTimerTheme
 
 class MainActivity : ComponentActivity() {
+
+    val permissions =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            listOf(
+                "android.permission.POST_NOTIFICATIONS",
+                Manifest.permission.READ_MEDIA_AUDIO
+            ).toTypedArray()
+    else
+        emptyList<String>().toTypedArray()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val notificationManager = NotificationManagerCompat.from(this)
-        if (notificationManager.getNotificationChannel(ALARM_CHANNEL_ID) != null)
-            notificationManager.deleteNotificationChannel(ALARM_CHANNEL_ID)
-        if (notificationManager.getNotificationChannel(SIMPLE_CHANNEL_ID) != null)
-            notificationManager.deleteNotificationChannel(SIMPLE_CHANNEL_ID)
 
         enableEdgeToEdge()
         setContent {
             MultiTimerTheme {
                 if (
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                        checkPermission("android.permission.POST_NOTIFICATIONS")
+                    if (Build.VERSION.SDK_INT >= 32)
+                        hasPermissions(this.applicationContext, permissions)
                     else
                         true
                 ) {
                     MainScreen()
                 } else
                     PermissionHandler(
+                        permissions = permissions,
                         onPermissionsGranted = {
                             // Запускаем основное приложение
                             MainScreen()
@@ -92,67 +99,50 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun checkPermission(permission: String) =
-        ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
-
 }
 
 @Composable
 fun PermissionHandler(
+    permissions: Array<String>,
     onPermissionsGranted: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    var showPermissionScreen by remember { mutableStateOf(true) }
-
-    // Определяем необходимые разрешения
-    val requiredPermissions = remember {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//             Android 13+ - нужно POST_NOTIFICATIONS
-            listOf(
-                "android.permission.POST_NOTIFICATIONS",
-            )
-        } else {
-            // Для старых Android - разрешений не требуется
-            listOf(
-            )
-        }
-    }
+    var showPermissionScreen by remember { mutableStateOf(false) }
 
     // Лончер для запроса разрешений
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsMap ->
+
+        permissionsMap.entries.forEach {
+            Log.d("Permissions", "${it.key} - ${it.value}")
+        }
+
+        val allGranted = permissionsMap.values.all { it }
+
+        if (allGranted) {
+            // Все разрешения получены
+            //Toast.makeText(context, "All permissions granted!", Toast.LENGTH_SHORT).show()
             showPermissionScreen = false
         } else {
-            // Можно показать объяснение или открыть настройки
+            // Некоторые разрешения не получены
+//            val deniedPermissions = permissionsMap.filter { !it.value }.keys
+//            Log.w("Permission", "Denied: $deniedPermissions")
             showPermissionRationaleDialog(context)
         }
     }
 
     // Проверяем разрешения при запуске
     LaunchedEffect(Unit) {
-        if (requiredPermissions.isEmpty()) {
-            // Для старых версий Android разрешения не нужны
-            showPermissionScreen = false
-        } else {
-            val hasPermission = hasPermission(context, requiredPermissions[0])
-            if (hasPermission) {
-                showPermissionScreen = false
-            } else {
-                // Запрашиваем разрешение
-                permissionLauncher.launch(requiredPermissions[0])
-            }
+        if (permissions.isNotEmpty() && !hasPermissions(context, permissions)){
+            showPermissionScreen = true
         }
     }
 
     if (showPermissionScreen) {
         PermissionRequestScreen(
-            permissions = requiredPermissions,
             onRequestPermission = {
-                if (requiredPermissions.isNotEmpty()) {
-                    permissionLauncher.launch(requiredPermissions[0])
-                }
+                    permissionLauncher.launch(permissions)
             },
             onSkip = {
                 showPermissionScreen = false
@@ -165,7 +155,6 @@ fun PermissionHandler(
 
 @Composable
 fun PermissionRequestScreen(
-    permissions: List<String>,
     onRequestPermission: () -> Unit,
     onSkip: () -> Unit
 ) {
@@ -217,17 +206,18 @@ fun PermissionRequestScreen(
     }
 }
 
-private fun hasPermission(context: Context, permission: String): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        permission
-    ) == PackageManager.PERMISSION_GRANTED
-}
+private fun hasPermissions(context: Context, permissions: Array<String>): Boolean =
+    permissions.all { permission ->
+        ContextCompat.checkSelfPermission(
+            context,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 
 private fun showPermissionRationaleDialog(context: Context) {
     AlertDialog.Builder(context)
-        .setTitle("Уведомления отключены")
-        .setMessage("Без разрешения на уведомления таймер не сможет:\n\n• Показывать оповещения\n• Работать в фоновом режиме\n• Вибрировать при завершении\n\nВы можете включить уведомления в настройках.")
+        .setTitle("Не все разрешения предоставлены")
+        .setMessage("Без разрешений таймер не сможет полноценно работать")
         .setPositiveButton("Открыть настройки") { _, _ ->
             openAppSettings(context)
         }

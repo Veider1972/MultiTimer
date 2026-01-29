@@ -24,7 +24,6 @@
     <string name="button_text_set">Задать</string>
 
     <string name="about_version">Версия</string>
-    <string name="about_date">Август, 2024</string>
 
     <string name="about_description_title">Описание</string>
     <string name="about_description_1">Программа разработана для тех, кто не хочет пропустить важные события.</string>
@@ -124,6 +123,8 @@
     <string name="timer_settings">Настройка таймера</string>
     <string name="current">Текущий:</string>
     <string name="multi_time_edit">Раздельное редактирование десятков и единиц времени</string>
+    <string name="notification_interval">Интервал повторов</string>
+    <string name="seconds">сек.</string>
 
     // Sound Selector
     <string name="dialog_profile_set_ringtone_title">Звук уведомления</string>

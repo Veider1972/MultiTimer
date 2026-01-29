@@ -27,15 +27,24 @@ android {
 
     defaultConfig {
         applicationId = "ru.veider.multitimer"
-        minSdk =29
+        minSdk =27
         targetSdk =34
         // Не забыть обновить about_date
-        versionCode = 28
-        versionName = "1.5.0"
+        versionCode = 29
+        versionName = "1.6.0"
         setProperty("archivesBaseName", "multitimer_$versionName")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+        androidResources {
+            localeFilters.apply {
+                add("en")
+                add("ru")
+            }
+            aaptOptions.additionalParameters.apply {
+                add("--no-version-vectors")
+            }
         }
     }
 

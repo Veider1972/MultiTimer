@@ -69,7 +69,7 @@ fun getAndroidMedia(context: Context): List<Sound> {
 
                     // Создаем content URI
                     val uri = ContentUris.withAppendedId(audioUri, id)
-                        sounds.add(Sound(title ?: "Без названия", uri.toString()))
+                    sounds.add(Sound(title ?: "Без названия", uri.toString()))
                 }
             }
         } catch (e: Exception) {

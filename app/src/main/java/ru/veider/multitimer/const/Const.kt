@@ -1,23 +1,24 @@
 package ru.veider.multitimer.const
 
 import android.net.Uri
+import androidx.annotation.Keep
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.google.gson.annotations.SerializedName
 import ru.veider.multitimer.R
 import ru.veider.multitimer.domain.entity.Sound
 
+@Keep
 enum class CounterState {
-    PAUSED, RUN, FINISHED, ALARMED
+    @SerializedName("PAUSED") PAUSED,
+    @SerializedName("RUN") RUN,
+    @SerializedName("FINISHED") FINISHED,
+    @SerializedName("ALARMED") ALARMED
 }
 
 const val TAG = "TAG"
 
-const val SIMPLE_CHANNEL_ID = "SIMPLE_CHANNEL_ID"
-const val SIMPLE_CHANNEL_NUM = 1
-const val ALARM_CHANNEL_ID = "ALARM_CHANNEL_ID"
-const val ALARM_CHANNEL_NUM = 2
-const val COUNTER_ID = "COUNTER_ID"
 const val COUNTER = "COUNTER"
 const val COUNTERS = "COUNTERS"
 const val COUNTERS_BUNDLE = "COUNTERS_BUNDLE"
@@ -30,8 +31,6 @@ const val ON_START_SERVICE = "ON_START_SERVICE"
 const val ON_STOP_SERVICE = "ON_STOP_SERVICE"
 const val DB_NAME = "Counters.db"
 
-const val PREFERENCES = "Multitimer"
-const val PREFERENCE_KEEP_SCREEN_ON = "keepScreenOn"
 const val alphaTransition = 200
 
 val singlePadding = 10.dp
@@ -60,4 +59,3 @@ fun Int.toShortTime():String{
 }
 
 var PRIMARY_KEY = 0L
-val vibroPattern = arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()

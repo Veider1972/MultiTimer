@@ -189,7 +189,7 @@ class CountersService() : LifecycleService() {
             intent?.getSerializableExtra(COUNTER, Counter::class.java)
 
     private fun getCountersFromBundle(intent: Intent?): List<Counter>? =
-        intent?.getBundleExtra(COUNTERS)?.getString(COUNTERS_BUNDLE)?.let { gson.fromJson(it, object : TypeToken<List<Counter>>() {}.type) }
+        intent?.getBundleExtra(COUNTERS)?.getString(COUNTERS_BUNDLE)?.let { gson.fromJson<List<Counter>>(it, object : TypeToken<List<Counter>>() {}.type) }
 
 
     private fun addAlarmed(counter: Counter) {
@@ -240,7 +240,7 @@ class CountersService() : LifecycleService() {
             else 0
     }
 
-    inner class AlarmTimer(val counter: Counter) : Timer(600 * 1000L, 10 * 1000L) {
+    inner class AlarmTimer(val counter: Counter) : Timer(600000L, prefs.notificationInterval.value * 1000L) {
         val unlimited = prefs.unlimitedNotification.value
         var repeats = prefs.notificationLimits.value
         override fun onTick(millisUntilFinished: Long) {
