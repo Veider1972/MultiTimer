@@ -13,8 +13,8 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager.getRingtone
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import org.koin.java.KoinJavaComponent.inject
@@ -87,17 +87,20 @@ fun Context.sendAlarmNotification(
 
     val prefs: Preferences by inject(Preferences::class.java)
 
-    if (android12){
+    if (android12) {
         val sound = prefs.sound.value.uri.toUri()
         val player = getRingtone(this, sound)
-        player.isLooping = false
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P)
+            player.isLooping = false
         player.play()
     }
 
-    val notificationBuilder = Notification.Builder(this, prefs.alarmChannelId.value).apply {
+    val notificationBuilder = Notification.Builder(
+        this,
+        prefs.alarmChannelId.value
+    ).apply {
         setCategory(Notification.CATEGORY_ALARM)
         setContentTitle(getAlarmTitle(alarmes.size))
-
 
         style = Notification.InboxStyle().also {
             var i = 1
@@ -133,14 +136,14 @@ fun Context.createAlarmNotificationChannel(
     uri: Uri,
     channelId: String
 ) {
-    val notificationManager = getSystemService(NotificationManager::class.java)
+    val manager = getSystemService(NotificationManager::class.java)
     val channel = NotificationChannel(
         channelId,
         resources.getString(R.string.alarm_channel_name),
         NotificationManager.IMPORTANCE_HIGH
     ).apply {
         description = resources.getString(R.string.alarm_channel_description)
-        if (!android12){
+        if (!android12) {
             setSound(
                 uri,
                 AudioAttributes.Builder()
@@ -157,23 +160,23 @@ fun Context.createAlarmNotificationChannel(
         lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         setBypassDnd(true)
     }
-    notificationManager.createNotificationChannel(channel)
+    manager.createNotificationChannel(channel)
 }
 
 fun Context.createSimpleNotificationChannel(
     channelId: String
 ) {
-    val notificationManager = NotificationManagerCompat.from(this)
-    val notificationChannel = NotificationChannelCompat.Builder(
+    val manager = getSystemService(NotificationManager::class.java)
+    val channel = NotificationChannel(
         channelId,
+        resources.getString(R.string.simple_channel_name),
         NotificationManager.IMPORTANCE_NONE
-    )
-        .setName(resources.getString(R.string.simple_channel_name))
-        .setDescription(resources.getString(R.string.simple_channel_description))
-        .setVibrationEnabled(false)
-        .setLightsEnabled(false)
-        .build()
-    notificationManager.createNotificationChannel(notificationChannel)
+    ).apply {
+        description = resources.getString(R.string.simple_channel_description)
+        enableVibration(false)
+        enableLights(false)
+    }
+    manager.createNotificationChannel(channel)
 }
 
 fun Context.deleteChannel(
