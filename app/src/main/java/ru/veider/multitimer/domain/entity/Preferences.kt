@@ -15,4 +15,6 @@ interface Preferences {
     val simpleChannelId: MutableStateFlow<String>
     val simpleChannelNum: MutableStateFlow<Int>
     val timeEditorIsMulti: MutableStateFlow<Boolean>
+    val runCounter: MutableStateFlow<Long>
+    val hasFeedback: MutableStateFlow<Boolean>
 }

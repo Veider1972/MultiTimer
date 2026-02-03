@@ -13,6 +13,9 @@ abstract class BasePreferences(
     fun getInt(key: String, default: Int): Int = prefs.getInt(key, default)
     fun putInt(key: String, value: Int) = prefs.edit { putInt(key, value) }
 
+    fun getLong(key: String, default: Long): Long = prefs.getLong(key, default)
+    fun putLong(key: String, value: Long) = prefs.edit { putLong(key, value) }
+
     fun getBool(key: String, default: Boolean): Boolean = prefs.getBoolean(key, default)
     fun putBool(key: String, value: Boolean) = prefs.edit { putBoolean(key, value) }
 

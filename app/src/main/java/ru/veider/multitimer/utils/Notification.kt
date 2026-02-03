@@ -111,7 +111,7 @@ fun Context.sendAlarmNotification(
             }
         }
 
-        setOngoing(true)
+//        setOngoing(true)
         setVisibility(Notification.VISIBILITY_PUBLIC)
         setAutoCancel(true)
         setSmallIcon(R.drawable.animated_timer)

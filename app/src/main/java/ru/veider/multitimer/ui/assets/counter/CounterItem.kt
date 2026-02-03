@@ -109,7 +109,9 @@ fun CounterItem(
                     Toast.makeText(context, (context as MainActivity).resources.getString(R.string.timer_need_stop_first), Toast.LENGTH_LONG).show()
                 }
         },
-        onCounterStart = { viewModel.startCounter(counter.id) },
+        onCounterStart = {
+            prefs.runCounter.value++
+            viewModel.startCounter(counter.id) },
         onCounterPause = { viewModel.pauseCounter(counter.id) },
         onCounterStop = { viewModel.stopCounter(counter.id) }
     )

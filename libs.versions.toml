@@ -5,13 +5,14 @@ material = "1.12.0"
 constraintlayout = "2.2.0"
 lifecycle = "2.8.7"
 work-runtime-ktx = "2.10.0"
-rustore-sdk = "7.0.0"
 compose-activity = "1.10.0"
 compose-foundation = "1.7.7"
 compose-bom = "2025.01.01"
 preference-ktx = "1.2.1"
 koin-compose = "4.0.2"
 gson = "2.10.1"
+# Rustore
+rustore-sdk-bom = "2025.11.01"
 # Room
 room = "2.8.3"
 room-ksp = "1.1.1"
@@ -44,7 +45,7 @@ constraintlayout = {module = "androidx.constraintlayout:constraintlayout", versi
 lifecycle-viewmodel-ktx = {module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref="lifecycle"}
 lifecycle-service = {module = "androidx.lifecycle:lifecycle-service", version.ref="lifecycle"}
 work-runtime-ktx = {module = "androidx.work:work-runtime-ktx", version.ref="work-runtime-ktx"}
-rustore-sdk = {module = "ru.rustore.sdk:review", version.ref="rustore-sdk"}
+
 compose-activity = {module = "androidx.activity:activity-compose", version.ref="compose-activity"}
 compose-foundation = {module = "androidx.compose.foundation:foundation", version.ref="compose-foundation"}
 compose-bom = {module = "androidx.compose:compose-bom", version.ref="compose-bom"}
@@ -59,6 +60,10 @@ koin-compose-ktx = {module = "io.insert-koin:koin-androidx-compose", version.ref
 gson = {module = "com.google.code.gson:gson", version.ref="gson"}
 
 material-icons = {module = "androidx.compose.material:material-icons-core"}
+
+#Rustore
+rustore-sdk = {module = "ru.rustore.sdk:review"}
+rustore-sdk-bom = {module = "ru.rustore.sdk:bom", version.ref="rustore-sdk-bom"}
 
 # Room
 room-compiler = {module = "androidx.room:room-compiler", version.ref="room"}

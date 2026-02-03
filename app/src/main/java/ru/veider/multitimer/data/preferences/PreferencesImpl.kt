@@ -3,6 +3,7 @@ package ru.veider.multitimer.data.preferences
 import android.content.Context
 import android.net.Uri
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.MutableStateFlow
 import ru.veider.multitimer.R
 import ru.veider.multitimer.core.utils.stateFlow
 import ru.veider.multitimer.domain.entity.Preferences
@@ -77,6 +78,20 @@ class PreferencesImpl(
         initialValue = getBool("timeEditorIsMulti", false),
         onValueChange = {
             putBool("timeEditorIsMulti", value = it)
+        }
+    )
+
+    override val runCounter = stateFlow(
+        initialValue = getLong("bootUpCounter", 0),
+        onValueChange = {
+            putLong("bootUpCounter", value = it)
+        }
+    )
+
+    override val hasFeedback = stateFlow(
+        initialValue = getBool("reviewCounter", false),
+        onValueChange = {
+            putBool("reviewCounter", value = it)
         }
     )
 }

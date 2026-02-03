@@ -51,6 +51,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
 import ru.veider.multitimer.ui.screens.MainState
 import ru.veider.multitimer.ui.assets.SetSystemBarsContrast
+import ru.veider.multitimer.ui.screens.ruStore.RunCounter
 import ru.veider.multitimer.ui.theme.MultiTimerTheme
 
 class MainActivity : ComponentActivity() {
@@ -93,6 +94,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable()
     fun MainScreen() {
+        RunCounter()
         SetSystemBarsContrast()
         Scaffold(modifier = Modifier.fillMaxSize()) {
             MainState()

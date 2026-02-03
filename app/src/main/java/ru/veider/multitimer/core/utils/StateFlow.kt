@@ -1,10 +1,12 @@
 package ru.veider.multitimer.core.utils
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+@OptIn(ExperimentalForInheritanceCoroutinesApi::class)
 fun <T> stateFlow(
     initialValue: T,
     onValueChange: (T) -> Unit

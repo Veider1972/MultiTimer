@@ -1,7 +1,5 @@
-import org.gradle.cache.internal.ProducerGuard.adaptive
-import org.gradle.internal.impldep.org.joda.time.format.DateTimeFormat
+import com.android.build.api.dsl.ApkSigningConfig
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 plugins {
     id("com.android.application")
@@ -17,8 +15,9 @@ android {
     compileSdk = 36
 
     signingConfigs {
-        create("all") {
-            storeFile = file("sign/Multitimer.jks")
+
+        getByName<ApkSigningConfig>("debug") {
+            storeFile = file("sign/release.keystore")
             storePassword = "LBOdmQd82AUH"
             keyAlias = "Multitimer"
             keyPassword = "LBOdmQd82AUH"
@@ -27,35 +26,26 @@ android {
 
     defaultConfig {
         applicationId = "ru.veider.multitimer"
-        minSdk =27
-        targetSdk =34
+        minSdk = 27
+        targetSdk = 34
         // Не забыть обновить about_date
-        versionCode = 29
-        versionName = "1.6.0"
+        versionCode = 31
+        versionName = "1.8.0"
         setProperty("archivesBaseName", "multitimer_$versionName")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
-        androidResources {
-            localeFilters.apply {
-                add("en")
-                add("ru")
-            }
-            aaptOptions.additionalParameters.apply {
-                add("--no-version-vectors")
-            }
-        }
     }
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("all")
+            signingConfig = signingConfigs.getByName<ApkSigningConfig>("debug")
             buildConfigField("Integer", "BUILD_MONTH", "${LocalDateTime.now().month.value}")
             buildConfigField("Integer", "BUILD_YEAR", "${LocalDateTime.now().year}")
         }
         release {
-            signingConfig = signingConfigs.getByName("all")
+            signingConfig = signingConfigs.getByName<ApkSigningConfig>("debug")
             buildConfigField("Integer", "BUILD_MONTH", "${LocalDateTime.now().month.value}")
             buildConfigField("Integer", "BUILD_YEAR", "${LocalDateTime.now().year}")
             isMinifyEnabled = true
@@ -89,6 +79,7 @@ dependencies {
     implementation(libs.lifecycle.service)
     // RuStore review
     implementation(libs.rustore.sdk)
+    implementation(platform(libs.rustore.sdk.bom))
     // Google review
     implementation(libs.preference.ktx)
     implementation(libs.compose.activity)
