@@ -37,9 +37,6 @@ fun MainState() {
 
     val viewModel: MainViewModel = koinInject()
 
-    val counters = viewModel.counters.collectAsState().value
-    var state by remember { mutableStateOf(CurrentState.Counters) }
-
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val backStack = rememberNavBackStack(Screen.Counters)

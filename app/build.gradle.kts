@@ -15,7 +15,6 @@ android {
     compileSdk = 36
 
     signingConfigs {
-
         getByName<ApkSigningConfig>("debug") {
             storeFile = file("sign/release.keystore")
             storePassword = "LBOdmQd82AUH"
@@ -29,8 +28,8 @@ android {
         minSdk = 27
         targetSdk = 34
         // Не забыть обновить about_date
-        versionCode = 31
-        versionName = "1.8.0"
+        versionCode = 32
+        versionName = "1.8.1"
         setProperty("archivesBaseName", "multitimer_$versionName")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

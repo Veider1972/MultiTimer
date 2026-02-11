@@ -3,6 +3,9 @@ package ru.veider.multitimer.ui.screens.counters
 import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
@@ -109,7 +112,7 @@ fun TimersScreenBody(
             val counter = counters[index]
             ReorderableItem(
                 state = reordarableState,
-                key = counter.id
+                key = counter.id,
             ) {
                 val swipeState = swipeStates[counter.id] ?: SwipeState()
                 val offsetY = remember { Animatable(swipeState.offsetY) }
@@ -119,7 +122,7 @@ fun TimersScreenBody(
                     horizontalSwipeEnable = horizontalSwipeEnable,
                     modifier = Modifier
                         .zIndex(if (draggedItem?.id == counter.id) 1f else 0f)
-                        .draggableHandle(
+                        .longPressDraggableHandle(
                             onDragStarted = {
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
                             },
