@@ -1,6 +1,7 @@
 package ru.veider.multitimer.ui.assets.dialogs
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -467,7 +468,7 @@ fun TimeDivider(
     }
 }
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun Preview() {
     TimeEditor(

@@ -246,6 +246,5 @@ private fun CounterItemPreview() {
             {}, {}, {}, {}, {}
         )
     }
-
 }
 

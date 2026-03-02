@@ -3,12 +3,10 @@ package ru.veider.multitimer.ui.screens.counters
 import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -34,6 +33,7 @@ import ru.veider.multitimer.R
 import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.ui.assets.counter.ActionCounterItem
+import ru.veider.multitimer.ui.assets.counter.CounterItem
 import ru.veider.multitimer.ui.assets.dialogs.wrappers.TwoButtonDialog
 import ru.veider.multitimer.ui.theme.colorSurface
 import ru.veider.multitimer.viewmodel.MainViewModel
@@ -59,8 +59,12 @@ fun TimersScreen() {
 
     var counterIdToDeleting: Int? by remember { mutableStateOf(null) }
     if (counterIdToDeleting != null) {
-        val counter = remember(counterIdToDeleting) { counters.find { it.id == counterIdToDeleting } }
-        val title = remember(counter) { counter?.title?.ifEmpty { (context as MainActivity).getString(R.string.no_name) } ?: (context as MainActivity).getString(R.string.no_name) }
+        val counter =
+            remember(counterIdToDeleting) { counters.find { it.id == counterIdToDeleting } }
+        val title = remember(counter) {
+            counter?.title?.ifEmpty { (context as MainActivity).getString(R.string.no_name) }
+                ?: (context as MainActivity).getString(R.string.no_name)
+        }
         TwoButtonDialog(
             title = stringResource(R.string.delete_time_ask),
             message = title,
@@ -90,6 +94,7 @@ fun TimersScreenBody(
     onMove: (Int, Int) -> Unit,
     onDelete: (Int) -> Unit
 ) {
+    val inspectionMode = LocalInspectionMode.current
     val hapticFeedback = LocalHapticFeedback.current
     val listState = rememberLazyListState()
     // Состояние для каждого элемента
@@ -108,6 +113,13 @@ fun TimersScreenBody(
         state = listState
     ) {
 
+        if (inspectionMode) {
+            items(items = counters) {
+                CounterItem(
+                    counter = it
+                )
+            }
+        }
         items(counters.size, key = { counters[it].id }) { index ->
             val counter = counters[index]
             ReorderableItem(
@@ -147,14 +159,25 @@ data class SwipeState(
 @Preview()
 @Composable
 private fun MyLazyColumnPreview() {
+    val context = LocalContext.current
     TimersScreenBody(
         modifier = Modifier,
         counters = listOf(
             Counter(
-                id = 0, currentProgress = 10000, maxProgress = 20000, startTime = 10000, state = CounterState.RUN, title = "Приготовление супа"
+                id = 0,
+                currentProgress = 10000,
+                maxProgress = 20000,
+                startTime = 10000,
+                state = CounterState.RUN,
+                title = "Приготовление супа"
             ),
             Counter(
-                id = 1, currentProgress = 25000, maxProgress = 30000, startTime = 2000000, state = CounterState.PAUSED, title = "Прилёт флота"
+                id = 1,
+                currentProgress = 25000,
+                maxProgress = 30000,
+                startTime = 2000000,
+                state = CounterState.PAUSED,
+                title = "Прилёт флота"
             )
         ),
         onMove = { _, _ -> },
