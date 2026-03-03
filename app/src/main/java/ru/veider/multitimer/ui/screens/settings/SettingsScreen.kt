@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,8 @@ import org.koin.compose.koinInject
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.core.net.toUri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.doublePadding
 import ru.veider.multitimer.const.emptySound
@@ -59,6 +62,7 @@ fun SettingsScreen() {
 
     val context = LocalContext.current
     val density = LocalDensity.current
+    val scope = rememberCoroutineScope()
     val prefs: Preferences? = if (LocalInspectionMode.current) null else koinInject()
     val keepScreenOn = prefs?.keepScreenOn?.collectAsState()?.value ?: true
     val unlimitedNotification = prefs?.unlimitedNotification?.collectAsState()?.value ?: true
@@ -66,6 +70,7 @@ fun SettingsScreen() {
     val timeEditorIsMulti = prefs?.timeEditorIsMulti?.collectAsState()?.value ?: true
     val notificationInterval = prefs?.notificationInterval?.collectAsState()?.value ?: 5
     val sound = prefs?.sound?.collectAsState()?.value ?: emptySound()
+    val alternativeSoundOut = prefs?.alternativeSoundOut?.collectAsState()?.value ?: false
     var width by remember { mutableStateOf(0.dp) }
 
     var notificationLimitsDialogShow by remember { mutableStateOf(false) }
@@ -193,6 +198,27 @@ fun SettingsScreen() {
             width = width,
             onClick = { soundSelectorDialogShow = true }
         )
+        CheckedSettings(
+            message = stringResource(R.string.alternative_sound_out),
+            checked = alternativeSoundOut,
+            onCheckedChange = {
+                prefs?.alternativeSoundOut?.value = it
+                scope.launch(Dispatchers.IO){
+                    prefs?.alarmChannelId?.value?.let { oldChannel ->
+                        context.deleteChannel(oldChannel)
+                        val newChannelId = UUID.randomUUID().toString()
+                        prefs.alarmChannelId.value = newChannelId
+                        context.createAlarmNotificationChannel(
+                            uri = sound.uri.toUri(),
+                            channelId = newChannelId
+                        )
+                    }
+                }
+                              },
+            width = width,
+            onWidthChange = { width = max(width, it) }
+
+        )
         StringSettings(
             title = stringResource(R.string.notification_interval),
             value = "$notificationInterval ${stringResource(R.string.seconds)}",
@@ -211,7 +237,6 @@ fun SettingsScreen() {
             onCheckedChange = { prefs?.timeEditorIsMulti?.value = it },
             width = width,
             onWidthChange = { width = max(width, it) }
-
         )
     }
 }

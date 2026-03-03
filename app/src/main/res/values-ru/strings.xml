@@ -123,6 +123,7 @@
     <string name="timer_settings">Настройка таймера</string>
     <string name="current">Текущий:</string>
     <string name="multi_time_edit">Раздельное редактирование десятков и единиц времени</string>
+    <string name="alternative_sound_out">Использовать альтернативный способ вывода звука</string>
     <string name="notification_interval">Интервал повторов</string>
     <string name="seconds">сек.</string>
 

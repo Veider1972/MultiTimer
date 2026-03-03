@@ -42,6 +42,12 @@ class PreferencesImpl(
             putString("sound", gson.toJson(it))
         }
     )
+    override val alternativeSoundOut = stateFlow(
+        initialValue = getBool("alternativeSoundOut", false),
+        onValueChange = {
+            putBool("alternativeSoundOut", it)
+        }
+    )
     override val notificationInterval = stateFlow(
         initialValue = getInt("interval", 5),
         onValueChange = {

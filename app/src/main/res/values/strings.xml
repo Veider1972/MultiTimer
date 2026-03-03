@@ -126,6 +126,7 @@
     <string name="timer_settings">Setting the timer</string>
     <string name="current">Current:</string>
     <string name="multi_time_edit">Separate editing of tens and units of time</string>
+    <string name="alternative_sound_out">Use an alternative audio output method</string>
     <string name="notification_interval">Retry interval</string>
     <string name="seconds">sec.</string>
 

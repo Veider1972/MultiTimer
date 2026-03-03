@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.AudioAttributes
+import android.media.AudioManager
 import android.media.RingtoneManager.getRingtone
 import android.net.Uri
 import android.os.Build
@@ -79,17 +80,16 @@ fun Context.sendTickNotification(
 }
 
 
-val android12 = Build.VERSION.SDK_INT in listOf(Build.VERSION_CODES.S, Build.VERSION_CODES.S_V2)
-
 fun Context.sendAlarmNotification(
     alarmes: Hashtable<Int, CountersService.AlarmTimer>
 ) {
 
     val prefs: Preferences by inject(Preferences::class.java)
 
-    if (android12) {
+    if (prefs.alternativeSoundOut.value) {
         val sound = prefs.sound.value.uri.toUri()
         val player = getRingtone(this, sound)
+        player.streamType = AudioManager.STREAM_NOTIFICATION
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P)
             player.isLooping = false
         player.play()
@@ -136,6 +136,7 @@ fun Context.createAlarmNotificationChannel(
     uri: Uri,
     channelId: String
 ) {
+    val prefs: Preferences by inject(Preferences::class.java)
     val manager = getSystemService(NotificationManager::class.java)
     val channel = NotificationChannel(
         channelId,
@@ -143,9 +144,17 @@ fun Context.createAlarmNotificationChannel(
         NotificationManager.IMPORTANCE_HIGH
     ).apply {
         description = resources.getString(R.string.alarm_channel_description)
-        if (!android12) {
+        if (!prefs.alternativeSoundOut.value) {
             setSound(
                 uri,
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .build()
+            )
+        } else {
+            setSound(
+                Uri.EMPTY,
                 AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
