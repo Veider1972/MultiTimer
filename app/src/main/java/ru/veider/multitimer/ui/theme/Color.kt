@@ -1,7 +1,6 @@
 package ru.veider.multitimer.ui.theme
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import ru.veider.multitimer.R
 
@@ -27,4 +26,10 @@ val colorTimerAlarm @Composable get()= colorResource(id = R.color.timer_alarm_co
 
 val colorTransparent @Composable get()= colorResource(id = R.color.transparent)
 
-val colorDivider @Composable get()= colorResource(id = R.color.color_primary)
+val titleColor @Composable get()= colorResource(id = R.color.title)
+val drawerMenuSelected @Composable get()= colorResource(id = R.color.drawer_menu_selected)
+val drawerMenuUnselected @Composable get()= colorResource(id = R.color.drawer_menu_unselected)
+val buttonTextActive @Composable get()= colorResource(id = R.color.button_text_active)
+val buttonTextInactive @Composable get()= colorResource(id = R.color.button_text_inactive)
+val buttonBackgroundActive @Composable get()= colorResource(id = R.color.button_background_active)
+val buttonBackgroundInactive @Composable get()= colorResource(id = R.color.button_background_inactive)

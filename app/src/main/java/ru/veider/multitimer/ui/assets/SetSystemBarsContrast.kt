@@ -16,11 +16,11 @@ fun SetSystemBarsContrast() {
         // Устанавливаем контрастные цвета для статус-бара и навигации
         systemUiController.setStatusBarColor(
             color = darkColor,
-            darkIcons = !isDarkTheme
+            darkIcons = true
         )
-        systemUiController.setNavigationBarColor(
-            color = darkColor,
-            darkIcons = !isDarkTheme
-        )
+//        systemUiController.setNavigationBarColor(
+//            color = darkColor,
+//            darkIcons = true
+//        )
     }
 }

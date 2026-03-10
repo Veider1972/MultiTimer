@@ -17,7 +17,7 @@
     <color name="color_tertiary_container">#B6ECEE</color>
     <color name="color_on_tertiary_container">#081E20</color>
     <color name="timer_alarm_color">#BF360C</color>
-    <color name="timer_simple_color">#D3D3D3</color>
+    <color name="timer_simple_color">#5D5D5D</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="divider">?attr/colorPrimary</color>
@@ -25,4 +25,13 @@
     <color name="widget_background_color_start">#000000</color>
     <color name="widget_background_color_end">#404040</color>
     <color name="transparent">#00000000</color>
+
+    <color name="title">#000000</color>
+    <color name="drawer_menu_selected">#DBDBDB</color>
+    <color name="drawer_menu_unselected">#DBDBDB</color>
+    <color name="button_text_active">#000000</color>
+    <color name="button_text_inactive">#DBDBDB</color>
+    <color name="button_background_active">#7CAA46</color>
+    <color name="button_background_inactive">#454545</color>
+
 </resources>

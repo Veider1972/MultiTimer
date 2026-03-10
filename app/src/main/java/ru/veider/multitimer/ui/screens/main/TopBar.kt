@@ -15,6 +15,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import ru.veider.multitimer.R
+import ru.veider.multitimer.ui.theme.colorPrimary
+import ru.veider.multitimer.ui.theme.titleColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +30,8 @@ fun TopBar(
     TopAppBar(
         windowInsets = TopAppBarDefaults.windowInsets,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colorResource(R.color.color_primary)
+            containerColor = colorPrimary,
+            titleContentColor = titleColor
         ),
         navigationIcon = {
             Image(

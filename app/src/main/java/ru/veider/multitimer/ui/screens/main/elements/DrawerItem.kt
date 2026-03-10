@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemColors
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,6 +15,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ru.veider.multitimer.ui.theme.drawerMenuSelected
+import ru.veider.multitimer.ui.theme.drawerMenuUnselected
 
 @Composable
 fun DrawerItem(
@@ -23,6 +27,12 @@ fun DrawerItem(
 ) {
     NavigationDrawerItem(
         modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp).width(200.dp),
+        colors = NavigationDrawerItemDefaults.colors(
+            selectedTextColor = drawerMenuSelected,
+            selectedIconColor = drawerMenuSelected,
+            unselectedTextColor = drawerMenuUnselected,
+            unselectedIconColor = drawerMenuUnselected
+        ),
         icon = {
             Icon(
                 painter = painterResource(icon),

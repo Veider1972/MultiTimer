@@ -29,4 +29,12 @@
     <color name="widget_background_color_start">#BFBFBF</color>
     <color name="widget_background_color_end">#FFFFFF</color>
     <color name="transparent">#00000000</color>
+
+    <color name="title">#000000</color>
+    <color name="drawer_menu_selected">#000000</color>
+    <color name="drawer_menu_unselected">#000000</color>
+    <color name="button_text_active">#DBDBDB</color>
+    <color name="button_text_inactive">#000000</color>
+    <color name="button_background_active">#7CAA46</color>
+    <color name="button_background_inactive">#DEDEDE</color>
 </resources>

@@ -24,15 +24,14 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
-import ru.veider.multitimer.App
 import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.CounterState
@@ -40,10 +39,13 @@ import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.domain.entity.Preferences
 import ru.veider.multitimer.ui.assets.dialogs.TimeEditor
 import ru.veider.multitimer.ui.assets.dialogs.TitleEditor
+import ru.veider.multitimer.ui.theme.buttonBackgroundActive
+import ru.veider.multitimer.ui.theme.buttonBackgroundInactive
 import ru.veider.multitimer.ui.theme.colorOnSurface
-import ru.veider.multitimer.ui.theme.colorPrimary
 import ru.veider.multitimer.ui.theme.colorSurface
 import ru.veider.multitimer.ui.theme.colorTimerSimple
+import ru.veider.multitimer.ui.theme.buttonTextActive
+import ru.veider.multitimer.ui.theme.buttonTextInactive
 import ru.veider.multitimer.ui.theme.textStyle_13_400
 import ru.veider.multitimer.ui.theme.textStyle_18_700
 import ru.veider.multitimer.viewmodel.MainViewModel
@@ -160,21 +162,27 @@ private fun CounterItemBody(
                 modifier = Modifier.padding(top = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
+                val runButtonEnabled by rememberUpdatedState(counter.state == CounterState.FINISHED || counter.state == CounterState.PAUSED)
                 Button(
                     text = stringResource(R.string.button_text_start),
-                    enabled = counter.state == CounterState.FINISHED || counter.state == CounterState.PAUSED,
+                    enabled = runButtonEnabled,
+                    textColor = if (runButtonEnabled) buttonTextActive else buttonTextInactive,
                     modifier = Modifier.weight(1f),
                     onClick = onCounterStart
                 )
+                val pauseButtonEnabled by rememberUpdatedState(counter.state == CounterState.RUN)
                 Button(
                     text = stringResource(R.string.button_text_pause),
-                    enabled = counter.state == CounterState.RUN,
+                    enabled = pauseButtonEnabled,
+                    textColor = if (pauseButtonEnabled) buttonTextActive else buttonTextInactive,
                     modifier = Modifier.weight(1f),
                     onClick = onCounterPause
                 )
+                val stopButtonEnabled by rememberUpdatedState(counter.state == CounterState.RUN || counter.state == CounterState.PAUSED || counter.state == CounterState.ALARMED)
                 Button(
-                    text = if (counter.state == CounterState.RUN || counter.state == CounterState.FINISHED || counter.state == CounterState.ALARMED) stringResource(R.string.button_text_stop) else stringResource(R.string.button_text_reset),
-                    enabled = counter.state == CounterState.RUN || counter.state == CounterState.PAUSED || counter.state == CounterState.ALARMED,
+                    text = if (stopButtonEnabled) stringResource(R.string.button_text_stop) else stringResource(R.string.button_text_reset),
+                    enabled = stopButtonEnabled,
+                    textColor = if (stopButtonEnabled)  buttonTextActive else buttonTextInactive,
                     modifier = Modifier.weight(1f),
                     onClick = onCounterStop
                 )
@@ -185,14 +193,20 @@ private fun CounterItemBody(
 }
 
 @Composable
-fun Button(text: String, enabled: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun Button(
+    text: String,
+    enabled: Boolean,
+    textColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Button(
         onClick = onClick,
         enabled = enabled,
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colorPrimary,
-
+            containerColor = buttonBackgroundActive,
+            disabledContainerColor = buttonBackgroundInactive
             ),
         shape = RoundedCornerShape(6.dp),
         modifier = modifier
@@ -200,7 +214,7 @@ fun Button(text: String, enabled: Boolean, onClick: () -> Unit, modifier: Modifi
         Text(
             text = text,
             style = textStyle_13_400,
-            color = colorOnSurface
+            color = textColor
         )
     }
 }

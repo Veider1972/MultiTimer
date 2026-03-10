@@ -34,6 +34,7 @@ import ru.veider.multitimer.navigation.Screen
 import ru.veider.multitimer.ui.screens.main.elements.DrawerItem
 import ru.veider.multitimer.ui.theme.colorPrimary
 import ru.veider.multitimer.ui.theme.colorPrimaryDark
+import ru.veider.multitimer.ui.theme.titleColor
 
 @Composable
 fun DrawerSheet(
@@ -81,12 +82,14 @@ fun DrawerSheet(
                 Text(
                     text = stringResource(R.string.app_name).uppercase(),
                     fontSize = 16.sp,
+                    color = titleColor,
                     modifier = Modifier
                         .padding(start = 16.dp, top = 10.dp)
                 )
                 Text(
                     text = stringResource(R.string.my_email),
                     fontSize = 14.sp,
+                    color = titleColor,
                     modifier = Modifier
                         .padding(start = 16.dp, bottom = 16.dp)
                 )
