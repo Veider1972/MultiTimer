@@ -1,5 +1,6 @@
 package ru.veider.multitimer.ui.assets.dialogs
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
@@ -11,10 +12,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_MASK
+import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Preview
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.singlePadding
 import ru.veider.multitimer.ui.assets.dialogs.wrappers.TitledTwoButtonsDialogWrapper
+import ru.veider.multitimer.ui.theme.colorOnSurface
 import ru.veider.multitimer.ui.theme.colorTimerSimple
 import ru.veider.multitimer.ui.theme.paddingsDouble
 import ru.veider.multitimer.ui.theme.textStyle_18_400
@@ -40,7 +44,7 @@ fun TitleEditor(
                 modifier = Modifier.fillMaxWidth().padding(vertical = paddingsDouble, horizontal = singlePadding),
                 value = text,
                 onValueChange = { text = it },
-                textStyle = textStyle_18_400,
+                textStyle = textStyle_18_400.copy(color = colorOnSurface),
                 decorationBox = { innerTextField ->
                     if (text.isEmpty()) {
                         Text(
@@ -56,11 +60,12 @@ fun TitleEditor(
     )
 }
 
-@Preview
+@Preview(name = "Light Mode")
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun TitleEditDialogPreview() {
     TitleEditor(
-        title = "",
+        title = "Заданное время",
         {}, {}
     )
 }

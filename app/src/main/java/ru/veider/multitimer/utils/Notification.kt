@@ -14,16 +14,22 @@ import android.media.AudioManager
 import android.media.RingtoneManager.getRingtone
 import android.net.Uri
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
+import com.google.gson.Gson
+import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
-import ru.veider.multitimer.BuildConfig
 import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.R
 import ru.veider.multitimer.SingleAppWidget
+import ru.veider.multitimer.const.COUNTER
+import ru.veider.multitimer.const.COUNTERS
+import ru.veider.multitimer.const.EVENT
+import ru.veider.multitimer.const.ON_STOP_CLICK
+import ru.veider.multitimer.const.ON_STOP_TIMERS_LIST
 import ru.veider.multitimer.domain.entity.Preferences
+import ru.veider.multitimer.repository.CountersRepository
 import ru.veider.multitimer.service.CountersService
 import java.util.Hashtable
 
@@ -55,7 +61,13 @@ fun Context.sendTickNotification(
                 }
             }
         }
-        setContentText("${resources.getText(R.string.notification_description)}${minTime.toMinSec(this@sendTickNotification)}")
+        setContentText(
+            "${resources.getText(R.string.notification_description)}${
+                minTime.toMinSec(
+                    this@sendTickNotification
+                )
+            }"
+        )
         setWidget(minTime, setTime, SingleAppWidget.Companion.WidgetStatus.RUN.toString())
         style = notificationStyle
         setSmallIcon(R.drawable.clock)
@@ -74,7 +86,8 @@ fun Context.sendTickNotification(
             Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
     ) {
-        NotificationManagerCompat.from(this).notify(prefs.simpleChannelNum.value, notificationBuilder.build())
+        NotificationManagerCompat.from(this)
+            .notify(prefs.simpleChannelNum.value, notificationBuilder.build())
     }
 
 }
@@ -85,6 +98,8 @@ fun Context.sendAlarmNotification(
 ) {
 
     val prefs: Preferences by inject(Preferences::class.java)
+    val repo: CountersRepository by inject(CountersRepository::class.java)
+    val gson: Gson by inject(Gson::class.java)
 
     if (prefs.alternativeSoundOut.value) {
         val sound = prefs.sound.value.uri.toUri()
@@ -115,12 +130,22 @@ fun Context.sendAlarmNotification(
         setVisibility(Notification.VISIBILITY_PUBLIC)
         setAutoCancel(true)
         setSmallIcon(R.drawable.animated_timer)
-        val intent = Intent(this@sendAlarmNotification, MainActivity::class.java)
-        val pendingIntent =
-            PendingIntent.getActivity(
+        val counter = runBlocking { repo.get(alarmes.entries.first().value.counter.id) }
+        val intent = counter?.let { counter ->
+            Intent(this@sendAlarmNotification, CountersService::class.java).apply {
+                putExtra(EVENT, ON_STOP_TIMERS_LIST)
+                putExtra(COUNTERS, gson.toJson(alarmes.keys.toList()))
+            }
+        } ?: Intent(this@sendAlarmNotification, MainActivity::class.java)
+        val pendingIntent = counter?.let {
+            PendingIntent.getService(
                 this@sendAlarmNotification, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
+        } ?: PendingIntent.getActivity(
+            this@sendAlarmNotification, 0, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         setContentIntent(pendingIntent)
     }
     if (ActivityCompat.checkSelfPermission(
@@ -128,7 +153,8 @@ fun Context.sendAlarmNotification(
             Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
     )
-        NotificationManagerCompat.from(this).notify(prefs.alarmChannelNum.value, notificationBuilder.build())
+        NotificationManagerCompat.from(this)
+            .notify(prefs.alarmChannelNum.value, notificationBuilder.build())
     setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.ALARM.toString())
 }
 
@@ -163,7 +189,8 @@ fun Context.createAlarmNotificationChannel(
         }
 
         enableVibration(true)
-        vibrationPattern = arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()
+        vibrationPattern =
+            arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()
         enableLights(true)
         lightColor = Color.WHITE
         lockscreenVisibility = Notification.VISIBILITY_PUBLIC

@@ -12,9 +12,6 @@ class BootUpReceiver : BroadcastReceiver() {
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
         val newIntent = Intent(context, CountersService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            ContextCompat.startForegroundService(context, newIntent)
-        else
-            context.startService(newIntent)
+        ContextCompat.startForegroundService(context, newIntent)
     }
 }

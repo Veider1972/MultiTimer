@@ -11,6 +11,7 @@ class CountersRepositoryImpl(
 ) : CountersRepository {
 
     override suspend fun getAll() = db.dao().getAll().map { it.toCounter() }
+    override suspend fun get(id: Int) = db.dao().get(id)?.toCounter()
 
     override suspend fun upsert(counter: Counter) = db.dao().upsert(counter.toCounterEntity()).also {  Log.d(TAG, "Счётчик сохранён : $counter") }
 

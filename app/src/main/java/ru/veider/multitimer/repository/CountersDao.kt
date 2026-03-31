@@ -14,7 +14,7 @@ interface CountersDao {
     suspend fun getAll(): List<CounterEntity>
 
     @Query("SELECT * FROM CounterEntity WHERE id=:id")
-    suspend fun getById(id: Int): List<CounterEntity>
+    suspend fun get(id: Int): CounterEntity?
 
     @Insert
     suspend fun insert(counter: CounterEntity)
@@ -24,7 +24,7 @@ interface CountersDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(counter: CounterEntity){
-        if (getById(counter.id).isEmpty())
+        if (get(counter.id) == null)
             insert(counter)
         else
             update(counter.id, counter.currentProgress, counter.maxProgress, counter.startTime, counter.state, counter.title)

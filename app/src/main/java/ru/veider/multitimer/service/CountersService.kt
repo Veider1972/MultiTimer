@@ -30,6 +30,11 @@ import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.R
@@ -37,6 +42,7 @@ import ru.veider.multitimer.SingleAppWidget
 import ru.veider.multitimer.const.*
 import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.domain.entity.Preferences
+import ru.veider.multitimer.repository.CountersRepository
 import ru.veider.multitimer.utils.createAlarmNotificationChannel
 import ru.veider.multitimer.utils.createSimpleNotificationChannel
 import ru.veider.multitimer.utils.sendAlarmNotification
@@ -54,6 +60,7 @@ class CountersService() : LifecycleService() {
     private var alarmes: Hashtable<Int, CountersService.AlarmTimer> = Hashtable()
     private val viewModel: MainViewModel by inject()
     private val prefs: Preferences by inject()
+    private val repo: CountersRepository by inject()
     private val gson: Gson by inject()
 
     override fun onCreate() {
@@ -123,6 +130,34 @@ class CountersService() : LifecycleService() {
                         if (timers.isEmpty && alarmes.isEmpty) stopSelf()
                         setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.STOP.toString())
                     }
+                }
+
+                ON_STOP_TIMERS_LIST -> {
+                    intent.getStringExtra(COUNTERS)?.let {
+                            val keys: List<Int> = gson.fromJson(it, object:TypeToken<List<Int>>(){}.type)
+                            keys.forEach {
+                                val counter = alarmes[it]?.counter
+                                counter?.let { counter ->
+                                    removeTimer(counter)
+                                    removeAlarmed(counter)
+                                    runBlocking(Dispatchers.IO) {
+                                        repo.upsert(counter.copy(state = CounterState.FINISHED, currentProgress = counter.maxProgress))
+                                    }
+                                    if (alarmes.isEmpty)
+                                        NotificationManagerCompat.from(this@CountersService).cancel(prefs.alarmChannelNum.value)
+                                    if (timers.isEmpty)
+                                        NotificationManagerCompat.from(this@CountersService).cancel(prefs.simpleChannelNum.value)
+
+                                    viewModel.timerFinish(counter.id)
+                                    if (alarmes.isEmpty)
+                                        removeIdleMessage()
+                                    if (timers.isEmpty && alarmes.isEmpty) stopSelf()
+                                    setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.STOP.toString())
+                                }
+                            }
+
+                    }
+
                 }
 
                 ON_ALARM_TIMER -> {
