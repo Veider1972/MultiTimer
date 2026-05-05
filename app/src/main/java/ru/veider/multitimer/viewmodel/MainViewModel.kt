@@ -14,8 +14,9 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import ru.veider.multitimer.R
 import ru.veider.multitimer.const.COUNTER
 import ru.veider.multitimer.const.COUNTERS
@@ -42,15 +43,21 @@ class MainViewModel(
 ) : AndroidViewModel(app) {
 
     private val _counters: MutableStateFlow<List<Counter>> = MutableStateFlow(emptyList())
-    val counters get()= _counters.asStateFlow()
+    val counters get() = _counters.asStateFlow()
+    val mutex = Mutex()
 
     init {
         viewModelScope.launch {
-            _counters.tryEmit(repo.getAll())
-            Log.d(TAG, "Таймеры загружены: ${counters.value}")
-            if (counters.value.isEmpty())
-                _counters.value = _counters.value.addNew().also { saveCounters(it) }
-            startService(_counters.value)
+            try {
+                _counters.tryEmit(repo.getAll())
+                Log.d(TAG, "Таймеры загружены: ${counters.value}")
+                if (counters.value.isEmpty())
+                    _counters.value = _counters.value.addNew().also { saveCounters(it) }
+                startService(_counters.value)
+            } catch (t: Throwable) {
+                Log.d(TAG, "Ошибка загрузки таймеров: ${t.message}")
+            }
+
         }
     }
 
@@ -58,190 +65,280 @@ class MainViewModel(
 
     fun saveCounters(counters: List<Counter>) {
         viewModelScope.launch {
-            repo.deleteAll()
-            Log.d(TAG, "Таймеры в репо удалены")
-            repo.upsert(counters)
-            Log.d(TAG, "Таймеры $counters сохранены")
+            try {
+                mutex.withLock {
+                    repo.deleteAll()
+                    Log.d(TAG, "Таймеры в репо удалены")
+                    repo.upsert(counters)
+                    Log.d(TAG, "Таймеры $counters сохранены")
+                }
+            } catch (t: Throwable) {
+                Log.d(TAG, "Ошибка сохранения списка таймеров: ${t.message}")
+            }
+
         }
     }
 
     private fun updateCounters(counters: List<Counter>) {
         viewModelScope.launch {
-            _counters.value = counters
-            saveCounters(counters)
-            Log.d(TAG, "Таймеры обновлены $counters")
+            try {
+                mutex.withLock {
+                    _counters.value = counters
+                    saveCounters(counters)
+                    Log.d(TAG, "Таймеры обновлены $counters")
+                }
+            } catch (t: Throwable) {
+                Log.d(TAG, "Не удалось обновить таймеры: ${t.message}")
+            }
+
         }
     }
 
     fun addCounter() {
         viewModelScope.launch {
-            _counters.value = counters.value.addNew().also {
-                updateCounters(it)
-                Log.d(TAG, "Таймер добавлен ${it.last()}")
+            try {
+                mutex.withLock {
+                    _counters.value = counters.value.addNew().also {
+                        updateCounters(it)
+                        Log.d(TAG, "Таймер добавлен ${it.last()}")
+                    }
+                }
+            } catch (t: Throwable) {
+                Log.d(TAG, "Не удалось добавить таймер: ${t.message}")
             }
+
         }
     }
 
     fun deleteCounter(id: Int) {
         viewModelScope.launch {
-            _counters.value = counters.value.deleteById(id).also {
-                repo.delete(id)
-                Log.d(TAG, "Таймер удалён: ${counters.value}")
+            try {
+                mutex.withLock {
+                    if (_counters.value.size > 1)
+                    _counters.value = counters.value.deleteById(id).also {
+                        repo.delete(id)
+                        Log.d(TAG, "Таймер удалён: ${counters.value}")
+                    }
+                    else
+                        viewModelScope.launch {
+                            Toast.makeText(
+                                app,
+                                app.getString(R.string.cant_remove_last_timer),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                }
+            } catch (t: Throwable) {
+                Log.d(TAG, "Ошибка удаления таймера $id: ${t.message}")
             }
+
         }
     }
 
     fun updateTitle(id: Int, title: String) {
         viewModelScope.launch {
-            _counters.value = counters.value.map { counter ->
-                if (counter.id == id)
-                    counter.copy(title = title).also {
-                        viewModelScope.launch(Dispatchers.IO) {
-                            repo.upsert(it)
-                            Log.d(TAG, "Таймер обновлен $it")
-                        }
+            try {
+                mutex.withLock {
+                    _counters.value = counters.value.map { counter ->
+                        if (counter.id == id)
+                            counter.copy(title = title).also {
+                                viewModelScope.launch(Dispatchers.IO) {
+                                    repo.upsert(it)
+                                    Log.d(TAG, "Таймер обновлен $it")
+                                }
 
+                            }
+                        else
+                            counter
                     }
-                else
-                    counter
+                }
+            } catch (t: Throwable) {
+                Log.d(TAG, "Ошибка обновления заголовка таймера $id: ${t.message}")
             }
         }
     }
 
     fun updateMaxProgress(id: Int, time: Int) {
         viewModelScope.launch {
-            _counters.value = counters.value.map { counter ->
-                if (counter.id == id)
-                    counter.copy(maxProgress = time, currentProgress = time).also {
-                        viewModelScope.launch(Dispatchers.IO) {
-                            repo.upsert(it)
-                            Log.d(TAG, "Таймер обновлен $it")
-                        }
+            try {
+                mutex.withLock {
+                    _counters.value = counters.value.map { counter ->
+                        if (counter.id == id)
+                            counter.copy(maxProgress = time, currentProgress = time).also {
+                                viewModelScope.launch(Dispatchers.IO) {
+                                    repo.upsert(it)
+                                    Log.d(TAG, "Таймер $it обновлен")
+                                }
 
+                            }
+                        else
+                            counter
                     }
-                else
-                    counter
+                }
+            } catch(t: Throwable){
+                Log.d(TAG, "Ошибка обновления прогресса таймера $id: ${t.message}")
             }
+
         }
     }
 
     fun startCounter(id: Int) {
         viewModelScope.launch {
-            _counters.value = counters.value.map { counter ->
-                if (counter.id == id) {
-                    if (counter.state == CounterState.PAUSED || counter.state == CounterState.FINISHED) {
-                        if (counter.currentProgress == 0) {
-                            counter.also {
-                                viewModelScope.launch {
-                                    Toast.makeText(this@MainViewModel.application, this@MainViewModel.application.getText(R.string.timer_need_set), Toast.LENGTH_LONG).show()
+            try {
+                mutex.withLock {
+                    _counters.value = counters.value.map { counter ->
+                        if (counter.id == id) {
+                            if (counter.state == CounterState.PAUSED || counter.state == CounterState.FINISHED) {
+                                if (counter.currentProgress == 0) {
+                                    counter.also {
+                                        viewModelScope.launch {
+                                            Toast.makeText(
+                                                app,
+                                                app.getString(R.string.timer_need_set),
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    }
+                                } else {
+                                    counter.copy(state = CounterState.RUN, startTime = Date().time).also {
+                                        viewModelScope.launch {
+                                            repo.upsert(it)
+                                            sendToService(it, ON_RUN_CLICK)
+                                            Log.d(TAG, "Таймер $it запущен")
+                                        }
+                                    }
                                 }
-                            }
-                        } else {
-                            counter.copy(state = CounterState.RUN, startTime = Date().time).also {
-                                viewModelScope.launch {
-                                    repo.upsert(it)
-                                    sendToService(it, ON_RUN_CLICK)
-                                }
-                            }
-                        }
-                    } else
-                        counter
-                } else
-                    counter
+                            } else
+                                counter
+                        } else
+                            counter
+                    }
+                }
+            } catch (t: Throwable){
+                Log.d(TAG, "Ошибка старта таймера $id: ${t.message}")
             }
+
         }
     }
 
     fun pauseCounter(id: Int) {
         viewModelScope.launch {
-            _counters.value = counters.value.map { counter ->
-                if (counter.id == id && counter.state == CounterState.RUN)
-                    counter.copy(state = CounterState.PAUSED).also {
-                        viewModelScope.launch {
-                            repo.upsert(it)
-                            sendToService(it, ON_PAUSE_CLICK)
-                        }
+            try {
+                mutex.withLock {
+                    _counters.value = counters.value.map { counter ->
+                        if (counter.id == id && counter.state == CounterState.RUN)
+                            counter.copy(state = CounterState.PAUSED).also {
+                                viewModelScope.launch {
+                                    repo.upsert(it)
+                                    sendToService(it, ON_PAUSE_CLICK)
+                                }
+                            }
+                        else
+                            counter
                     }
-                else
-                    counter
+                    Log.d(TAG, "Таймер $id на паузе")
+                }
+            } catch(t: Throwable){
+                Log.d(TAG, "Ошибка паузы таймера $id: ${t.message}")
             }
+
         }
     }
 
     fun stopCounter(id: Int) {
         viewModelScope.launch {
-            _counters.value = counters.value.map { counter ->
-                if (counter.id == id && counter.state != CounterState.FINISHED)
-                    counter.copy(state = CounterState.FINISHED, currentProgress = counter.maxProgress).also {
-                        viewModelScope.launch {
-                            repo.upsert(it)
-                            sendToService(it, ON_STOP_CLICK)
-                        }
+            try {
+                mutex.withLock {
+                    _counters.value = counters.value.map { counter ->
+                        if (counter.id == id && counter.state != CounterState.FINISHED)
+                            counter.copy(
+                                state = CounterState.FINISHED,
+                                currentProgress = counter.maxProgress
+                            ).also {
+                                viewModelScope.launch {
+                                    repo.upsert(it)
+                                    sendToService(it, ON_STOP_CLICK)
+                                }
+                            }
+                        else
+                            counter
                     }
-                else
-                    counter
+                    Log.d(TAG, "Таймера $id остановлен")
+                }
+            } catch (t: Throwable){
+                Log.d(TAG, "Ошибка остановки таймера $id: ${t.message}")
             }
         }
     }
 
     fun timerTick(id: Int, progress: Int) {
         viewModelScope.launch {
-            _counters.value = counters.value.map { counter ->
-                if (counter.id == id)
-                    counter.copy(currentProgress = progress)
-                else
-                    counter
+            try {
+                mutex.withLock {
+                    _counters.value = counters.value.map { counter ->
+                        if (counter.id == id)
+                            counter.copy(currentProgress = progress)
+                        else
+                            counter
+                    }
+                    Log.d("Counter","timerTick id=$id, progress=$progress")
+                }
+            } catch (t: Throwable){
+                Log.d("Counter","Ошибка timerTick id=$id, progress=$progress: ${t.message}")
             }
-            Log.d("Counter", "viewModel viewModel=${this@MainViewModel} timerTick: ${counters.value}")
+
         }
     }
 
     fun timerFinish(id: Int) {
         viewModelScope.launch {
-            _counters.value = counters.value.map { counter ->
-                if (counter.id == id)
-                    counter.copy(
-                        state = CounterState.FINISHED,
-                        currentProgress = counter.maxProgress,
-                        startTime = 0,
-                    )
-                else
-                    counter
+            try {
+                mutex.withLock {
+                    _counters.value = counters.value.map { counter ->
+                        if (counter.id == id)
+                            counter.copy(
+                                state = CounterState.FINISHED,
+                                currentProgress = counter.maxProgress,
+                                startTime = 0,
+                            )
+                        else
+                            counter
+                    }
+                    Log.d("Counter","Таймер $id остановлен")
+                }
+            } catch (t: Throwable){
+                Log.d("Counter","Ошибка остановки таймера $id: ${t.message}")
             }
+
         }
     }
 
     fun timerAlarmed(id: Int) {
         viewModelScope.launch {
-            _counters.value = counters.value.map { counter ->
-                if (counter.id == id)
-                    counter.copy(
-                        state = CounterState.ALARMED,
-                        currentProgress = 0,
-                        startTime = 0,
-                    ).also {
-                        viewModelScope.launch {
-                            repo.upsert(it)
-                        }
+            try {
+                mutex.withLock {
+                    _counters.value = counters.value.map { counter ->
+                        if (counter.id == id)
+                            counter.copy(
+                                state = CounterState.ALARMED,
+                                currentProgress = 0,
+                                startTime = 0,
+                            ).also {
+                                viewModelScope.launch {
+                                    repo.upsert(it)
+                                    Log.d("Counter","Таймера $it сработал")
+                                }
+                            }
+                        else
+                            counter
                     }
-                else
-                    counter
+                }
+            } catch (t: Throwable){
+                Log.d("Counter","Ошибка срабатывания таймера ${t.message}")
             }
+
         }
     }
-
-//    private fun deleteCounter(id: Int) {
-//        viewModelScope.launch {
-//            repo.delete(id)
-//        }
-//    }
-//
-//    private fun storeCounter(counter: Counter) {
-//        viewModelScope.launch {
-//            repo.upsert(counter)
-//
-//        }
-//    }
 
     private fun startService(counters: List<Counter>) {
         val intent = Intent(this@MainViewModel.application, CountersService::class.java).apply {
@@ -274,11 +371,11 @@ class MainViewModel(
             it.state == CounterState.RUN
         }
 
-    fun swapCounters(from: Int, to: Int){
+    fun swapCounters(from: Int, to: Int) {
         val fromCounter = counters.value.first { it.id == from }
         val toCounter = counters.value.first { it.id == to }
-        _counters.value = counters.value.map{
-            when (it.id){
+        _counters.value = counters.value.map {
+            when (it.id) {
                 from -> toCounter
                 to -> fromCounter
                 else -> it

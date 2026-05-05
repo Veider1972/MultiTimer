@@ -10,5 +10,4 @@ import ru.veider.multitimer.viewmodel.*
 val appModule = module {
     single<Preferences>{ PreferencesImpl(get()) }
     singleOf(::MainViewModel)
-    viewModelOf(::PreferenceViewModel)
 }

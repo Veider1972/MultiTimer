@@ -228,30 +228,40 @@ class CountersService() : LifecycleService() {
 
 
     private fun addAlarmed(counter: Counter) {
-        if (!alarmes.containsKey(counter.id))
-            alarmes[counter.id] = AlarmTimer(counter).also {
-                it.start()
-            }
+        synchronized(alarmes){
+            if (!alarmes.containsKey(counter.id))
+                alarmes[counter.id] = AlarmTimer(counter).also {
+                    it.start()
+                }
+        }
+
     }
 
     private fun removeAlarmed(counter: Counter) {
-        alarmes[counter.id]?.apply {
-            this.cancel()
-            alarmes.remove(counter.id)
+        synchronized(alarmes){
+            alarmes[counter.id]?.apply {
+                this.cancel()
+                alarmes.remove(counter.id)
+            }
         }
+
     }
 
     private fun addTimer(counter: Counter) {
-        if (!timers.containsKey(counter.id))
-            timers[counter.id] = CounterTimer(counter).also {
-                it.start()
-            }
+        synchronized(timers){
+            if (!timers.containsKey(counter.id))
+                timers[counter.id] = CounterTimer(counter).also {
+                    it.start()
+                }
+        }
     }
 
     private fun removeTimer(counter: Counter) {
-        timers[counter.id]?.apply {
-            this.cancel()
-            timers.remove(counter.id)
+        synchronized(timers){
+            timers[counter.id]?.apply {
+                this.cancel()
+                timers.remove(counter.id)
+            }
         }
     }
 

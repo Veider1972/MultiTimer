@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
+import ru.veider.multitimer.service.CountersService
 import ru.veider.multitimer.ui.screens.MainState
 import ru.veider.multitimer.ui.assets.SetSystemBarsContrast
 import ru.veider.multitimer.ui.screens.ruStore.RunCounter
@@ -59,20 +60,31 @@ class MainActivity : ComponentActivity() {
     val permissions =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             listOf(
-                "android.permission.POST_NOTIFICATIONS",
+                Manifest.permission.USE_EXACT_ALARM,
+                Manifest.permission.POST_NOTIFICATIONS,
                 Manifest.permission.READ_MEDIA_AUDIO
             ).toTypedArray()
+    else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        listOf(
+            Manifest.permission.SCHEDULE_EXACT_ALARM
+        ).toTypedArray()
     else
         emptyList<String>().toTypedArray()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val intent = Intent(this, CountersService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            ContextCompat.startForegroundService(applicationContext, intent)
+        else
+            this.startService(intent)
+
         enableEdgeToEdge()
         setContent {
             MultiTimerTheme {
                 if (
-                    if (Build.VERSION.SDK_INT >= 32)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
                         hasPermissions(this.applicationContext, permissions)
                     else
                         true

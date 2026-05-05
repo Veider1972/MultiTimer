@@ -81,6 +81,7 @@
 
     <string name="timer_need_set">Сначала надо установить время…</string>
     <string name="timer_need_stop_first">Сначала надо выключить таймер</string>
+    <string name="cant_remove_last_timer">Нельзя удалить последний таймер</string>
 
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>

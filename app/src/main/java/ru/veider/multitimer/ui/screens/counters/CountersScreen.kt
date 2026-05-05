@@ -1,13 +1,17 @@
 package ru.veider.multitimer.ui.screens.counters
 
+import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -15,7 +19,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -24,6 +30,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -35,15 +42,18 @@ import ru.veider.multitimer.data.Counter
 import ru.veider.multitimer.ui.assets.counter.ActionCounterItem
 import ru.veider.multitimer.ui.assets.counter.CounterItem
 import ru.veider.multitimer.ui.assets.dialogs.wrappers.TwoButtonDialog
+import ru.veider.multitimer.ui.theme.colorPrimary
 import ru.veider.multitimer.ui.theme.colorSurface
 import ru.veider.multitimer.viewmodel.MainViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun TimersScreen() {
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val viewModel: MainViewModel = koinInject()
 
     val counters = viewModel.counters.collectAsState().value
@@ -80,10 +90,20 @@ fun TimersScreen() {
         )
     }
 
+
     TimersScreenBody(
         counters = counters,
         onMove = { from, to -> viewModel.swapCounters(from, to) },
-        onDelete = { counterIdToDeleting = it }
+        onDelete = {
+            if (counters.size > 1)
+                counterIdToDeleting = it
+            else
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.cant_remove_last_timer),
+                    Toast.LENGTH_LONG
+                ).show()
+        }
     )
 }
 
@@ -113,39 +133,45 @@ fun TimersScreenBody(
         state = listState
     ) {
 
-        if (inspectionMode) {
-            items(items = counters) {
-                CounterItem(
-                    counter = it
-                )
-            }
-        }
         items(counters.size, key = { counters[it].id }) { index ->
             val counter = counters[index]
-            ReorderableItem(
-                state = reordarableState,
-                key = counter.id,
-            ) {
-                val swipeState = swipeStates[counter.id] ?: SwipeState()
-                val offsetY = remember { Animatable(swipeState.offsetY) }
+            if (counters.size <= 1)
+                Box{
+                    CounterItem(
+                        counter = counter
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        thickness = 1.dp,
+                        color = colorPrimary
+                    )
+                }
 
-                ActionCounterItem(
-                    counter = counter,
-                    horizontalSwipeEnable = horizontalSwipeEnable,
-                    modifier = Modifier
-                        .zIndex(if (draggedItem?.id == counter.id) 1f else 0f)
-                        .longPressDraggableHandle(
-                            onDragStarted = {
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
-                            },
-                            onDragStopped = {
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
-                            }
-                        )
-                        .offset { IntOffset(0, offsetY.value.toInt()) },
-                    onDelete = { onDelete(counter.id) }
-                )
-            }
+            else
+                ReorderableItem(
+                    state = reordarableState,
+                    key = counter.id,
+                ) {
+                    val swipeState = swipeStates[counter.id] ?: SwipeState()
+                    val offsetY = remember { Animatable(swipeState.offsetY) }
+
+                    ActionCounterItem(
+                        counter = counter,
+                        horizontalSwipeEnable = horizontalSwipeEnable,
+                        modifier = Modifier
+                            .zIndex(if (draggedItem?.id == counter.id) 1f else 0f)
+                            .longPressDraggableHandle(
+                                onDragStarted = {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                                },
+                                onDragStopped = {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                                }
+                            )
+                            .offset { IntOffset(0, offsetY.value.toInt()) },
+                        onDelete = { onDelete(counter.id) }
+                    )
+                }
         }
     }
 }

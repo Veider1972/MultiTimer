@@ -32,11 +32,7 @@ class App : Application() {
                 navigationModule
             )
         }
-        val intent = Intent(this, CountersService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            ContextCompat.startForegroundService(applicationContext, intent)
-        else
-            this.startService(intent)
+
     }
 }
 

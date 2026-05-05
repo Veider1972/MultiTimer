@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.AudioAttributes
-import android.media.AudioManager
 import android.media.RingtoneManager.getRingtone
 import android.net.Uri
 import android.os.Build
@@ -23,15 +22,16 @@ import org.koin.java.KoinJavaComponent.inject
 import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.R
 import ru.veider.multitimer.SingleAppWidget
-import ru.veider.multitimer.const.COUNTER
 import ru.veider.multitimer.const.COUNTERS
 import ru.veider.multitimer.const.EVENT
-import ru.veider.multitimer.const.ON_STOP_CLICK
 import ru.veider.multitimer.const.ON_STOP_TIMERS_LIST
 import ru.veider.multitimer.domain.entity.Preferences
 import ru.veider.multitimer.repository.CountersRepository
 import ru.veider.multitimer.service.CountersService
 import java.util.Hashtable
+
+private fun Context.getNotificationManager() = getSystemService(NotificationManager::class.java)
+
 
 fun Context.sendTickNotification(
     timers: Hashtable<Int, CountersService.CounterTimer>
@@ -86,8 +86,7 @@ fun Context.sendTickNotification(
             Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
     ) {
-        NotificationManagerCompat.from(this)
-            .notify(prefs.simpleChannelNum.value, notificationBuilder.build())
+        getNotificationManager().notify(prefs.simpleChannelNum.value, notificationBuilder.build())
     }
 
 }
@@ -104,7 +103,6 @@ fun Context.sendAlarmNotification(
     if (prefs.alternativeSoundOut.value) {
         val sound = prefs.sound.value.uri.toUri()
         val player = getRingtone(this, sound)
-        player.streamType = AudioManager.STREAM_NOTIFICATION
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P)
             player.isLooping = false
         player.play()
@@ -114,9 +112,8 @@ fun Context.sendAlarmNotification(
         this,
         prefs.alarmChannelId.value
     ).apply {
-        setCategory(Notification.CATEGORY_ALARM)
+        setSmallIcon(R.drawable.animated_timer)
         setContentTitle(getAlarmTitle(alarmes.size))
-
         style = Notification.InboxStyle().also {
             var i = 1
             it.setBigContentTitle(getAlarmTitle(alarmes.size))
@@ -126,10 +123,10 @@ fun Context.sendAlarmNotification(
             }
         }
 
+        setAutoCancel(true)
 //        setOngoing(true)
         setVisibility(Notification.VISIBILITY_PUBLIC)
-        setAutoCancel(true)
-        setSmallIcon(R.drawable.animated_timer)
+
         val counter = runBlocking { repo.get(alarmes.entries.first().value.counter.id) }
         val intent = counter?.let { counter ->
             Intent(this@sendAlarmNotification, CountersService::class.java).apply {
@@ -153,8 +150,7 @@ fun Context.sendAlarmNotification(
             Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
     )
-        NotificationManagerCompat.from(this)
-            .notify(prefs.alarmChannelNum.value, notificationBuilder.build())
+        getNotificationManager().notify(prefs.alarmChannelNum.value, notificationBuilder.build())
     setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.ALARM.toString())
 }
 
@@ -163,13 +159,12 @@ fun Context.createAlarmNotificationChannel(
     channelId: String
 ) {
     val prefs: Preferences by inject(Preferences::class.java)
-    val manager = getSystemService(NotificationManager::class.java)
     val channel = NotificationChannel(
         channelId,
         resources.getString(R.string.alarm_channel_name),
         NotificationManager.IMPORTANCE_HIGH
     ).apply {
-        description = resources.getString(R.string.alarm_channel_description)
+
         if (!prefs.alternativeSoundOut.value) {
             setSound(
                 uri,
@@ -187,22 +182,20 @@ fun Context.createAlarmNotificationChannel(
                     .build()
             )
         }
-
+        description = resources.getString(R.string.alarm_channel_description)
         enableVibration(true)
         vibrationPattern =
             arrayOf(500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L, 500L).toLongArray()
         enableLights(true)
         lightColor = Color.WHITE
         lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        setBypassDnd(true)
     }
-    manager.createNotificationChannel(channel)
+    getNotificationManager().createNotificationChannel(channel)
 }
 
 fun Context.createSimpleNotificationChannel(
     channelId: String
 ) {
-    val manager = getSystemService(NotificationManager::class.java)
     val channel = NotificationChannel(
         channelId,
         resources.getString(R.string.simple_channel_name),
@@ -212,12 +205,12 @@ fun Context.createSimpleNotificationChannel(
         enableVibration(false)
         enableLights(false)
     }
-    manager.createNotificationChannel(channel)
+    getNotificationManager().createNotificationChannel(channel)
 }
 
 fun Context.deleteChannel(
     id: String
 ) {
-    val notificationManager = NotificationManagerCompat.from(this)
+    val notificationManager = getNotificationManager()
     notificationManager.deleteNotificationChannel(id)
 }
