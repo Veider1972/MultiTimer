@@ -201,6 +201,7 @@ class CountersService() : LifecycleService() {
                             }
                         }
                         if (!hasRunCounters) {
+                            setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.STOP.toString())
                             stopSelf()
                         }
                     }

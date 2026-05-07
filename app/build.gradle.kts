@@ -28,8 +28,8 @@ android {
         minSdk = 27
         targetSdk = 34
         // Не забыть обновить about_date
-        versionCode = 38
-        versionName = "1.8.7"
+        versionCode = 39
+        versionName = "1.8.8"
         setProperty("archivesBaseName", "multitimer_$versionName")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
