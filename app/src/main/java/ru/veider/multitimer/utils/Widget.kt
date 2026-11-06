@@ -1,6 +1,6 @@
 package ru.veider.multitimer.utils
 
-import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import ru.veider.multitimer.R
@@ -8,7 +8,8 @@ import ru.veider.multitimer.SingleAppWidget
 
 fun Context.setWidget(currentTime: Int, maxTime: Int, status: String) {
     val updateIntent = Intent().apply {
-        action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        action = SingleAppWidget.ACTION_WIDGET_UPDATE_STATUS
+        component = ComponentName(this@setWidget, SingleAppWidget::class.java)
         putExtra(SingleAppWidget.WIDGET_CURRENT_TIME, currentTime)
         putExtra(SingleAppWidget.WIDGET_MAX_TIME, maxTime)
         putExtra(SingleAppWidget.WIDGET_STATUS, status)

@@ -134,30 +134,26 @@ class CountersService() : LifecycleService() {
 
                 ON_STOP_TIMERS_LIST -> {
                     intent.getStringExtra(COUNTERS)?.let {
-                            val keys: List<Int> = gson.fromJson(it, object:TypeToken<List<Int>>(){}.type)
-                            keys.forEach {
-                                val counter = alarmes[it]?.counter
-                                counter?.let { counter ->
-                                    removeTimer(counter)
-                                    removeAlarmed(counter)
-                                    runBlocking(Dispatchers.IO) {
-                                        repo.upsert(counter.copy(state = CounterState.FINISHED, currentProgress = counter.maxProgress))
-                                    }
-                                    if (alarmes.isEmpty)
-                                        NotificationManagerCompat.from(this@CountersService).cancel(prefs.alarmChannelNum.value)
-                                    if (timers.isEmpty)
-                                        NotificationManagerCompat.from(this@CountersService).cancel(prefs.simpleChannelNum.value)
-
-                                    viewModel.timerFinish(counter.id)
-                                    if (alarmes.isEmpty)
-                                        removeIdleMessage()
-                                    if (timers.isEmpty && alarmes.isEmpty) stopSelf()
-                                    setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.STOP.toString())
+                        val keys: List<Int> = gson.fromJson(it, object : TypeToken<List<Int>>() {}.type)
+                        keys.forEach { id ->
+                            alarmes[id]?.counter?.let { counter ->
+                                removeTimer(counter)
+                                removeAlarmed(counter)
+                                runBlocking(Dispatchers.IO) {
+                                    repo.upsert(counter.copy(state = CounterState.FINISHED, currentProgress = counter.maxProgress))
                                 }
                             }
-
+                            viewModel.timerFinish(id)
+                        }
+                        if (alarmes.isEmpty)
+                            NotificationManagerCompat.from(this@CountersService).cancel(prefs.alarmChannelNum.value)
+                        if (timers.isEmpty)
+                            NotificationManagerCompat.from(this@CountersService).cancel(prefs.simpleChannelNum.value)
+                        if (alarmes.isEmpty)
+                            removeIdleMessage()
+                        setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.STOP.toString())
+                        if (timers.isEmpty && alarmes.isEmpty) stopSelf()
                     }
-
                 }
 
                 ON_ALARM_TIMER -> {
@@ -299,10 +295,15 @@ class CountersService() : LifecycleService() {
         }
 
         override fun onFinish() {
-            if (unlimited)
+            if (unlimited) {
                 onAlarmed(counter)
-            else
+            } else {
                 removeAlarmed(counter)
+                NotificationManagerCompat.from(this@CountersService).cancel(prefs.alarmChannelNum.value)
+                viewModel.timerFinish(counter.id)
+                setWidget(0, 0, SingleAppWidget.Companion.WidgetStatus.STOP.toString())
+                if (timers.isEmpty && alarmes.isEmpty) stopSelf()
+            }
         }
 
     }

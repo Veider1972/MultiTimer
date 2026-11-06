@@ -20,7 +20,7 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
         maven {
-            url = uri("https://artifactory-external.vkpartner.ru/artifactory/maven")
+            url = uri("https://nexus-external.rustore.ru/repository/maven-rustore-exposed")
         }
     }
 }

@@ -12,7 +12,7 @@ preference-ktx = "1.2.1"
 koin-compose = "4.0.2"
 gson = "2.10.1"
 # Rustore
-rustore-sdk-bom = "2025.11.01"
+rustore-sdk = "10.5.2"
 # Room
 room = "2.8.3"
 room-ksp = "1.1.1"
@@ -62,8 +62,7 @@ gson = {module = "com.google.code.gson:gson", version.ref="gson"}
 material-icons = {module = "androidx.compose.material:material-icons-core"}
 
 #Rustore
-rustore-sdk = {module = "ru.rustore.sdk:review"}
-rustore-sdk-bom = {module = "ru.rustore.sdk:bom", version.ref="rustore-sdk-bom"}
+rustore-sdk = {module = "ru.rustore.sdk:review", version.ref="rustore-sdk"}
 
 # Room
 room-compiler = {module = "androidx.room:room-compiler", version.ref="room"}

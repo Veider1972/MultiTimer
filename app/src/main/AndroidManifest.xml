@@ -38,9 +38,10 @@
 
         <receiver
             android:name=".SingleAppWidget"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="ru.veider.multitimer.ACTION_WIDGET_UPDATE_STATUS" />
             </intent-filter>
 
             <meta-data

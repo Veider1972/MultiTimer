@@ -48,6 +48,7 @@ android {
             buildConfigField("Integer", "BUILD_MONTH", "${LocalDateTime.now().month.value}")
             buildConfigField("Integer", "BUILD_YEAR", "${LocalDateTime.now().year}")
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -78,7 +79,6 @@ dependencies {
     implementation(libs.lifecycle.service)
     // RuStore review
     implementation(libs.rustore.sdk)
-    implementation(platform(libs.rustore.sdk.bom))
     // Google review
     implementation(libs.preference.ktx)
     implementation(libs.compose.activity)
