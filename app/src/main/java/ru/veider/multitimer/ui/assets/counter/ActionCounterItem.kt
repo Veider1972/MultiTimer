@@ -6,9 +6,10 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -25,7 +26,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.data.Counter
-import ru.veider.multitimer.ui.theme.colorPrimary
+import ru.veider.multitimer.ui.theme.colorErrorContainer
+import ru.veider.multitimer.ui.theme.colorOnErrorContainer
 
 @Composable
 fun ActionCounterItem(
@@ -76,22 +78,23 @@ fun ActionCounterItem(
         IconButton(
             onClick = { /*onSwipeLeft(counter.id)*/ },
             modifier = Modifier
-                .background(Color.Red)
+                .padding(end = 18.dp)
+                .background(colorErrorContainer, RoundedCornerShape(14.dp))
                 .align(Alignment.CenterEnd)
         ) {
-            Icon(Icons.Default.Delete, contentDescription = "Delete")
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete",
+                tint = colorOnErrorContainer
+            )
         }
 
         // Основной контент элемента
         CounterItem(
-            modifier = Modifier.offset { IntOffset(offsetX.value.toInt(), 0) },
+            modifier = Modifier
+                .offset { IntOffset(offsetX.value.toInt(), 0) }
+                .padding(horizontal = 12.dp, vertical = 6.dp),
             counter = counter
-        )
-
-        HorizontalDivider(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            thickness = 1.dp,
-            color = colorPrimary
         )
     }
 }

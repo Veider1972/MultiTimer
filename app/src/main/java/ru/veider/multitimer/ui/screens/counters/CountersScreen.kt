@@ -7,8 +7,10 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
@@ -130,22 +132,17 @@ fun TimersScreenBody(
         modifier = modifier
             .fillMaxSize()
             .background(color = colorSurface),
-        state = listState
+        state = listState,
+        contentPadding = PaddingValues(bottom = 16.dp)
     ) {
 
         items(counters.size, key = { counters[it].id }) { index ->
             val counter = counters[index]
             if (counters.size <= 1)
-                Box{
-                    CounterItem(
-                        counter = counter
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.align(Alignment.BottomCenter),
-                        thickness = 1.dp,
-                        color = colorPrimary
-                    )
-                }
+                CounterItem(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    counter = counter
+                )
 
             else
                 ReorderableItem(

@@ -7,20 +7,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContentProviderCompat.requireContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
-import ru.rustore.sdk.core.tasks.OnFailureListener
-import ru.rustore.sdk.core.tasks.OnSuccessListener
 import ru.rustore.sdk.review.RuStoreReviewManagerFactory
-import ru.rustore.sdk.review.model.ReviewInfo
-import ru.veider.multitimer.App
 import ru.veider.multitimer.MainActivity
 import ru.veider.multitimer.domain.entity.Preferences
-import ru.veider.multitimer.utils.BootUpCounter
 
 @Composable
 fun RunCounter() {

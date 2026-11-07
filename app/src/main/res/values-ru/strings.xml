@@ -83,6 +83,11 @@
     <string name="timer_need_stop_first">Сначала надо выключить таймер</string>
     <string name="cant_remove_last_timer">Нельзя удалить последний таймер</string>
 
+    <string name="counter_status_running">Идёт отсчёт</string>
+    <string name="counter_status_paused">Пауза</string>
+    <string name="counter_status_alarmed">Время вышло</string>
+    <string name="counter_status_idle">Не запущен</string>
+
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
 

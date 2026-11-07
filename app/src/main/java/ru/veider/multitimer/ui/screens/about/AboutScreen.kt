@@ -2,13 +2,17 @@ package ru.veider.multitimer.ui.screens.about
 
 import android.content.Intent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,9 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import ru.veider.multitimer.BuildConfig
 import ru.veider.multitimer.R
+import ru.veider.multitimer.const.doublePadding
 import ru.veider.multitimer.const.singlePadding
+import ru.veider.multitimer.ui.theme.colorOnSurfaceVariant
 import ru.veider.multitimer.ui.theme.colorPrimary
-import ru.veider.multitimer.ui.theme.colorPrimaryDark
+import ru.veider.multitimer.ui.theme.colorSurfaceContainer
 import ru.veider.multitimer.ui.theme.textStyle_10_300
 import ru.veider.multitimer.ui.theme.textStyle_13_500
 import ru.veider.multitimer.ui.theme.textStyle_14_400
@@ -50,96 +56,96 @@ fun AboutScreen() {
         "${ Month.of(BuildConfig.BUILD_MONTH).name.lowercase().replaceFirstChar { it.uppercase() } }, ${BuildConfig.BUILD_YEAR}"
     }
 
-    Box(modifier = Modifier.fillMaxSize()){
-        Column(
-            modifier = Modifier.padding(singlePadding)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(R.drawable.about_timer),
-                    contentDescription = null,
-                    modifier = Modifier.size(150.dp, 168.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(singlePadding)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(R.drawable.about_timer),
+                contentDescription = null,
+                modifier = Modifier.size(150.dp, 168.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.app_name).uppercase(),
+                    style = textStyle_17_700,
+                    modifier = Modifier.padding(bottom = 6.dp)
                 )
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = stringResource(R.string.app_name).uppercase(),
-                        style = textStyle_17_700,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                    Text(
-                        text = "${stringResource(R.string.about_version)} ${BuildConfig.VERSION_NAME}",
-                        style = textStyle_15_500,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                    Text(
-                        text = buildDate,
-                        style = textStyle_13_500,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                    Text(
-                        text = buildAnnotatedString {
-                            pushStringAnnotation(tag = "URL", annotation = "mailto:${stringResource(R.string.my_email)}")
-                            withStyle(style = SpanStyle(color = colorPrimary, textDecoration = TextDecoration.Underline)) {
-                                append(stringResource(R.string.my_email))
+                Text(
+                    text = "${stringResource(R.string.about_version)} ${BuildConfig.VERSION_NAME}",
+                    style = textStyle_15_500,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+                Text(
+                    text = buildDate,
+                    style = textStyle_13_500,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+                Text(
+                    text = buildAnnotatedString {
+                        pushStringAnnotation(tag = "URL", annotation = "mailto:${stringResource(R.string.my_email)}")
+                        withStyle(style = SpanStyle(color = colorPrimary, textDecoration = TextDecoration.Underline)) {
+                            append(stringResource(R.string.my_email))
+                        }
+                    },
+                    style = textStyle_14_700,
+                    fontStyle = FontStyle.Italic,
+                    modifier = Modifier
+                        .clickable{
+                            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = "mailto:${context.applicationContext.getString(R.string.my_email)}".toUri()
                             }
-                        },
-                        style = textStyle_14_700,
-                        fontStyle = FontStyle.Italic,
-                        modifier = Modifier
-                            .clickable{
-                                val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                    data = "mailto:${context.applicationContext.getString(R.string.my_email)}".toUri()
-                                }
-                                if (intent.resolveActivity(context.packageManager) != null) {
-                                    context.startActivity(intent)
-                                }
+                            if (intent.resolveActivity(context.packageManager) != null) {
+                                context.startActivity(intent)
                             }
-                    )
-                }
+                        }
+                )
             }
-            Title(
-                text = stringResource(R.string.about_description_title)
-            )
-            Message(
-                text = stringResource(R.string.about_description_1)
-            )
-            Message(
-                text = stringResource(R.string.about_description_2)
-            )
-            Message(
-                text = stringResource(R.string.about_description_3)
-            )
-            Message(
-                text = stringResource(R.string.about_description_4)
-            )
-            Title(
-                text = stringResource(R.string.about_guide_title)
-            )
-            Message(
-                text = stringResource(R.string.about_guide_0)
-            )
-             Message(
-                text = stringResource(R.string.about_guide_1)
-            )
-            Message(
-                text = stringResource(R.string.about_guide_2)
-            )
-            Message(
-                text = stringResource(R.string.about_guide_3)
-            )
         }
+        Title(
+            text = stringResource(R.string.about_description_title)
+        )
+        Message(
+            text = stringResource(R.string.about_description_1)
+        )
+        Message(
+            text = stringResource(R.string.about_description_2)
+        )
+        Message(
+            text = stringResource(R.string.about_description_3)
+        )
+        Message(
+            text = stringResource(R.string.about_description_4)
+        )
+        Title(
+            text = stringResource(R.string.about_guide_title)
+        )
+        Message(
+            text = stringResource(R.string.about_guide_0)
+        )
+        Message(
+            text = stringResource(R.string.about_guide_1)
+        )
+        Message(
+            text = stringResource(R.string.about_guide_2)
+        )
+        Message(
+            text = stringResource(R.string.about_guide_3)
+        )
         Text(
             text = "${stringResource(R.string.about_copyrights)}, ${BuildConfig.BUILD_YEAR}",
             style = textStyle_10_300,
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = singlePadding)
+                .align(Alignment.CenterHorizontally)
+                .padding(top = doublePadding, bottom = singlePadding)
         )
     }
-
 }
 
 @Composable
@@ -147,7 +153,7 @@ private fun Title(
     text: String
 ) {
     Column(
-        modifier = Modifier.padding(top = singlePadding)
+        modifier = Modifier.padding(top = doublePadding)
     ) {
         Text(
             text = text,
@@ -155,8 +161,10 @@ private fun Title(
         )
         HorizontalDivider(
             thickness = 2.dp,
-            color = colorPrimaryDark,
-            modifier = Modifier.padding(bottom = 3.dp)
+            color = colorPrimary,
+            modifier = Modifier
+                .padding(top = 6.dp)
+                .fillMaxWidth(0.28f)
         )
     }
 }
@@ -169,7 +177,8 @@ private fun Message(
         Text(
             text = text,
             style = textStyle_14_400,
-            modifier = Modifier.padding(bottom = 3.dp)
+            color = colorOnSurfaceVariant,
+            modifier = Modifier.padding(bottom = 6.dp)
         )
     }
 }

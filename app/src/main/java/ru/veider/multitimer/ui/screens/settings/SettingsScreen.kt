@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Switch
@@ -48,7 +52,10 @@ import ru.veider.multitimer.const.emptySound
 import ru.veider.multitimer.domain.entity.Preferences
 import ru.veider.multitimer.ui.assets.dialogs.NumberEditor
 import ru.veider.multitimer.ui.assets.dialogs.SoundSelector
+import ru.veider.multitimer.ui.theme.colorOnPrimary
+import ru.veider.multitimer.ui.theme.colorOutlineVariant
 import ru.veider.multitimer.ui.theme.colorPrimary
+import ru.veider.multitimer.ui.theme.colorSurfaceContainer
 import ru.veider.multitimer.ui.theme.textStyle_14_400
 import ru.veider.multitimer.ui.theme.textStyle_14_700
 import ru.veider.multitimer.ui.theme.textStyle_18_500
@@ -122,13 +129,19 @@ fun SettingsScreen() {
             }
         )
 
-    Column {
+    Column(
+        modifier = Modifier.verticalScroll(rememberScrollState())
+    ) {
         Text(
             text = stringResource(R.string.preferences_common_title),
             style = textStyle_18_700,
-            modifier = Modifier.padding(start = 6.dp, top = 6.dp, end = 6.dp)
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
         )
-        HorizontalDivider(thickness = 1.dp, color = colorPrimary)
+        HorizontalDivider(
+            modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp),
+            thickness = 1.dp,
+            color = colorOutlineVariant
+        )
         CheckedSettings(
             message = stringResource(R.string.preferences_keep_screen_on),
             checked = keepScreenOn,
@@ -139,9 +152,13 @@ fun SettingsScreen() {
         Text(
             text = stringResource(R.string.preferences_notification_title),
             style = textStyle_18_700,
-            modifier = Modifier.padding(start = 6.dp, top = doublePadding, end = 6.dp)
+            modifier = Modifier.padding(start = 16.dp, top = doublePadding, end = 16.dp)
         )
-        HorizontalDivider(thickness = 1.dp, color = colorPrimary)
+        HorizontalDivider(
+            modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp),
+            thickness = 1.dp,
+            color = colorOutlineVariant
+        )
         CheckedSettings(
             message = stringResource(R.string.preferences_repeat_counters),
             checked = unlimitedNotification,
@@ -159,7 +176,7 @@ fun SettingsScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = LocalMinimumInteractiveComponentSize.current)
-                    .padding(start = 6.dp, end = 6.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -228,9 +245,13 @@ fun SettingsScreen() {
         Text(
             text = stringResource(R.string.preferences_timer_title),
             style = textStyle_18_700,
-            modifier = Modifier.padding(start = 6.dp, top = doublePadding, end = 6.dp)
+            modifier = Modifier.padding(start = 16.dp, top = doublePadding, end = 16.dp)
         )
-        HorizontalDivider(thickness = 1.dp, color = colorPrimary)
+        HorizontalDivider(
+            modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp),
+            thickness = 1.dp,
+            color = colorOutlineVariant
+        )
         CheckedSettings(
             message = stringResource(R.string.multi_time_edit),
             checked = timeEditorIsMulti,
@@ -257,7 +278,7 @@ fun CheckedSettings(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = LocalMinimumInteractiveComponentSize.current)
-            .padding(start = 6.dp, end = 6.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -266,7 +287,7 @@ fun CheckedSettings(
             style = textStyle_14_400,
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 6.dp)
+                .padding(end = 16.dp)
         )
         Switch(
             modifier = Modifier
@@ -282,7 +303,11 @@ fun CheckedSettings(
                 ),
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors()
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = colorOnPrimary,
+                checkedTrackColor = colorPrimary,
+                checkedBorderColor = colorPrimary
+            )
         )
     }
 }
@@ -304,7 +329,7 @@ private fun StringSettings(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = LocalMinimumInteractiveComponentSize.current)
-            .padding(start = 6.dp, end = 6.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -313,13 +338,15 @@ private fun StringSettings(
             style = textStyle_14_400,
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 6.dp)
+                .padding(end = 16.dp)
         )
         Text(
             text = value,
             style = style,
             modifier = Modifier
                 .width(max(width, textWidth))
+                .background(colorSurfaceContainer, RoundedCornerShape(8.dp))
+                .padding(horizontal = 12.dp, vertical = 6.dp)
                 .clickable {
                     onClick()
                 },

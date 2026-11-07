@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,13 +41,16 @@ import ru.veider.multitimer.ui.assets.dialogs.TimeEditor
 import ru.veider.multitimer.ui.assets.dialogs.TitleEditor
 import ru.veider.multitimer.ui.theme.buttonBackgroundActive
 import ru.veider.multitimer.ui.theme.buttonBackgroundInactive
-import ru.veider.multitimer.ui.theme.colorOnSurface
-import ru.veider.multitimer.ui.theme.colorSurface
-import ru.veider.multitimer.ui.theme.colorTimerSimple
+import ru.veider.multitimer.ui.theme.buttonCornerRadius
 import ru.veider.multitimer.ui.theme.buttonTextActive
 import ru.veider.multitimer.ui.theme.buttonTextInactive
+import ru.veider.multitimer.ui.theme.colorOnSurface
+import ru.veider.multitimer.ui.theme.colorOnSurfaceVariant
+import ru.veider.multitimer.ui.theme.colorSurfaceContainer
+import ru.veider.multitimer.ui.theme.colorTimerSimple
 import ru.veider.multitimer.ui.theme.textStyle_13_400
 import ru.veider.multitimer.ui.theme.textStyle_18_700
+import ru.veider.multitimer.ui.theme.textStyle_13_500
 import ru.veider.multitimer.viewmodel.MainViewModel
 
 @Composable
@@ -131,8 +134,8 @@ private fun CounterItemBody(
 ) {
     Row(
         modifier = modifier
-            .background(color = colorSurface)
-            .padding(vertical = 6.dp)
+            .background(color = colorSurfaceContainer, shape = RoundedCornerShape(6.dp))
+            .padding(horizontal = 6.dp, vertical = 6.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -140,12 +143,14 @@ private fun CounterItemBody(
             counter = rememberUpdatedState(counter).value,
             alarmed = counter.state == CounterState.ALARMED,
             modifier = Modifier
-                .padding(start = 6.dp)
-                .size(80.dp),
+                .padding(start = 2.dp)
+                .size(78.dp),
             onClick = onCounterClick
         )
         Column(
-            modifier = Modifier.padding(horizontal = 6.dp)
+            modifier = Modifier
+                .padding(start = 14.dp)
+                .weight(1f)
         ) {
             Text(
                 text = counter.title.ifEmpty { stringResource(R.string.no_name) },
@@ -156,34 +161,42 @@ private fun CounterItemBody(
                     },
                 style = textStyle_18_700,
                 color = if (counter.title.isNotEmpty()) colorOnSurface else colorTimerSimple,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 2
+            )
+            Text(
+                text = counter.statusLabel(),
+                style = textStyle_13_500,
+                color = colorOnSurfaceVariant,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Row(
-                modifier = Modifier.padding(top = 6.dp),
+                modifier = Modifier.padding(top = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 val runButtonEnabled by rememberUpdatedState(counter.state == CounterState.FINISHED || counter.state == CounterState.PAUSED)
-                Button(
+                CounterActionButton(
                     text = stringResource(R.string.button_text_start),
                     enabled = runButtonEnabled,
                     textColor = if (runButtonEnabled) buttonTextActive else buttonTextInactive,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).height(36.dp),
                     onClick = onCounterStart
                 )
                 val pauseButtonEnabled by rememberUpdatedState(counter.state == CounterState.RUN)
-                Button(
+                CounterActionButton(
                     text = stringResource(R.string.button_text_pause),
                     enabled = pauseButtonEnabled,
                     textColor = if (pauseButtonEnabled) buttonTextActive else buttonTextInactive,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).height(36.dp),
                     onClick = onCounterPause
                 )
                 val stopButtonEnabled by rememberUpdatedState(counter.state == CounterState.RUN || counter.state == CounterState.PAUSED || counter.state == CounterState.ALARMED)
-                Button(
+                CounterActionButton(
                     text = if (stopButtonEnabled) stringResource(R.string.button_text_stop) else stringResource(R.string.button_text_reset),
                     enabled = stopButtonEnabled,
                     textColor = if (stopButtonEnabled)  buttonTextActive else buttonTextInactive,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).height(36.dp),
                     onClick = onCounterStop
                 )
             }
@@ -193,14 +206,22 @@ private fun CounterItemBody(
 }
 
 @Composable
-fun Button(
+private fun Counter.statusLabel(): String = when (state) {
+    CounterState.RUN -> stringResource(R.string.counter_status_running)
+    CounterState.PAUSED -> stringResource(R.string.counter_status_paused)
+    CounterState.ALARMED -> stringResource(R.string.counter_status_alarmed)
+    CounterState.FINISHED -> stringResource(R.string.counter_status_idle)
+}
+
+@Composable
+fun CounterActionButton(
     text: String,
     enabled: Boolean,
     textColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Button(
+    androidx.compose.material3.Button(
         onClick = onClick,
         enabled = enabled,
         contentPadding = PaddingValues(0.dp),
@@ -208,7 +229,7 @@ fun Button(
             containerColor = buttonBackgroundActive,
             disabledContainerColor = buttonBackgroundInactive
             ),
-        shape = RoundedCornerShape(6.dp),
+        shape = RoundedCornerShape(buttonCornerRadius),
         modifier = modifier
     ) {
         Text(
@@ -254,11 +275,10 @@ private fun CounterItemPreview() {
                 currentProgress = 10000,
                 maxProgress = 20000,
                 startTime = 0,
-                state = CounterState.PAUSED,
-                title = "Прилёт флота"
+                state = CounterState.RUN,
+                title = "Приготовление супа"
             ),
             {}, {}, {}, {}, {}
         )
     }
 }
-

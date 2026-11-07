@@ -1,36 +1,43 @@
 package ru.veider.multitimer.ui.theme
 
-import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.colorResource
 import ru.veider.multitimer.R
 
-val colorPrimary @Composable get()= colorResource(id = R.color.color_primary)
-val colorPrimaryDark  @Composable get()= colorResource(id = R.color.color_primary_dark)
-val colorSurface @Composable get()= colorResource(id = R.color.color_surface)
-val colorOnSurface @Composable get()= colorResource(id = R.color.color_on_surface)
-val colorOnPrimary @Composable get()= colorResource(id = R.color.color_on_primary)
-val colorPrimaryContainer @Composable get()= colorResource(id = R.color.color_primary_container)
-val colorOnPrimaryContainer @Composable get()= colorResource(id = R.color.color_on_primary_container)
+val colorPrimary @Composable get() = colorResource(id = R.color.color_primary)
+val colorPrimaryDark @Composable get() = colorResource(id = R.color.color_primary_dark)
+val colorSurface @Composable get() = colorResource(id = R.color.color_surface)
+val colorOnSurface @Composable get() = colorResource(id = R.color.color_on_surface)
+val colorOnPrimary @Composable get() = colorResource(id = R.color.color_on_primary)
+val colorPrimaryContainer @Composable get() = colorResource(id = R.color.color_primary_container)
+val colorOnPrimaryContainer @Composable get() = colorResource(id = R.color.color_on_primary_container)
 
-val colorSecondary @Composable get()= colorResource(id = R.color.color_secondary)
-val colorOnSecondary @Composable get()= colorResource(id = R.color.color_on_secondary)
-val colorOnSecondaryContainer @Composable get()= colorResource(id = R.color.color_on_secondary_container)
+val colorSecondary @Composable get() = colorResource(id = R.color.color_secondary)
+val colorOnSecondary @Composable get() = colorResource(id = R.color.color_on_secondary)
+val colorOnSecondaryContainer @Composable get() = colorResource(id = R.color.color_on_secondary_container)
 
-val colorTertiary @Composable get()= colorResource(id = R.color.color_tertiary)
-val colorOnTertiary @Composable get()= colorResource(id = R.color.color_on_tertiary)
-val colorTertiaryContainer @Composable get()= colorResource(id = R.color.color_tertiary_container)
-val colorOnTertiaryContainer @Composable get()= colorResource(id = R.color.color_on_tertiary_container)
+val colorTertiary @Composable get() = colorResource(id = R.color.color_tertiary)
+val colorOnTertiary @Composable get() = colorResource(id = R.color.color_on_tertiary)
+val colorTertiaryContainer @Composable get() = colorResource(id = R.color.color_tertiary_container)
+val colorOnTertiaryContainer @Composable get() = colorResource(id = R.color.color_on_tertiary_container)
 
-val colorTimerSimple @Composable get()= colorResource(id = R.color.timer_simple_color)
-val colorTimerAlarm @Composable get()= colorResource(id = R.color.timer_alarm_color)
+val colorTimerSimple @Composable get() = colorResource(id = R.color.timer_simple_color)
+val colorTimerAlarm @Composable get() = colorResource(id = R.color.timer_alarm_color)
 
-val colorTransparent @Composable get()= colorResource(id = R.color.transparent)
+val colorTransparent @Composable get() = colorResource(id = R.color.transparent)
 
-val titleColor @Composable get()= colorResource(id = R.color.title)
-val drawerMenuSelected @Composable get()= colorResource(id = R.color.drawer_menu_selected)
-val drawerMenuUnselected @Composable get()= colorResource(id = R.color.drawer_menu_unselected)
-val buttonTextActive @Composable get()= colorResource(id = R.color.button_text_active)
-val buttonTextInactive @Composable get()= colorResource(id = R.color.button_text_inactive)
-val buttonBackgroundActive @Composable get()= colorResource(id = R.color.button_background_active)
-val buttonBackgroundInactive @Composable get()= colorResource(id = R.color.button_background_inactive)
+val colorSurfaceVariant @Composable get() = colorResource(id = R.color.color_surface_variant)
+val colorOnSurfaceVariant @Composable get() = colorResource(id = R.color.color_on_surface_variant)
+val colorSurfaceContainer @Composable get() = colorResource(id = R.color.color_surface_container)
+val colorSurfaceContainerHigh @Composable get() = colorResource(id = R.color.color_surface_container_high)
+val colorOutlineVariant @Composable get() = colorResource(id = R.color.color_outline_variant)
+val colorErrorContainer @Composable get() = colorResource(id = R.color.color_error_container)
+val colorOnErrorContainer @Composable get() = colorResource(id = R.color.color_on_error_container)
+
+val titleColor @Composable get() = colorResource(id = R.color.title)
+val drawerMenuSelected @Composable get() = colorResource(id = R.color.drawer_menu_selected)
+val drawerMenuUnselected @Composable get() = colorResource(id = R.color.drawer_menu_unselected)
+val buttonTextActive @Composable get() = colorResource(id = R.color.button_text_active)
+val buttonTextInactive @Composable get() = colorResource(id = R.color.button_text_inactive)
+val buttonBackgroundActive @Composable get() = colorResource(id = R.color.button_background_active)
+val buttonBackgroundInactive @Composable get() = colorResource(id = R.color.button_background_inactive)

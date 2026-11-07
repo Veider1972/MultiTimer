@@ -97,6 +97,13 @@ val textStyle_20_500 = TextStyle(fontSize = 20.sp, fontFamily = fontFamily500)
 val textStyle_20_700 = TextStyle(fontSize = 20.sp, fontFamily = fontFamily700)
 val textStyle_20_900 = TextStyle(fontSize = 20.sp, fontFamily = fontFamily900)
 
+val textStyle_22_100 = TextStyle(fontSize = 22.sp, fontFamily = fontFamily100)
+val textStyle_22_300 = TextStyle(fontSize = 22.sp, fontFamily = fontFamily300)
+val textStyle_22_400 = TextStyle(fontSize = 22.sp, fontFamily = fontFamily400)
+val textStyle_22_500 = TextStyle(fontSize = 22.sp, fontFamily = fontFamily500)
+val textStyle_22_700 = TextStyle(fontSize = 22.sp, fontFamily = fontFamily700)
+val textStyle_22_900 = TextStyle(fontSize = 22.sp, fontFamily = fontFamily900)
+
 val textStyle_24_100 = TextStyle(fontSize = 24.sp, fontFamily = fontFamily100)
 val textStyle_24_300 = TextStyle(fontSize = 24.sp, fontFamily = fontFamily300)
 val textStyle_24_400 = TextStyle(fontSize = 24.sp, fontFamily = fontFamily400)

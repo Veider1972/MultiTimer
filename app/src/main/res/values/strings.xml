@@ -85,6 +85,12 @@
     <string name="timer_need_stop_first">You need to turn off the timer at first</string>
     <string name="cant_remove_last_timer">Can\'t delete last timer</string>
 
+    <!-- Counter states -->
+    <string name="counter_status_running">Running</string>
+    <string name="counter_status_paused">Paused</string>
+    <string name="counter_status_alarmed">Time is up</string>
+    <string name="counter_status_idle">Not started</string>
+
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
 

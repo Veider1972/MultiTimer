@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,10 +30,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -45,11 +47,13 @@ import ru.veider.multitimer.R
 import ru.veider.multitimer.const.CounterState
 import ru.veider.multitimer.core.utils.HhMmSs
 import ru.veider.multitimer.data.Counter
+import ru.veider.multitimer.ui.theme.colorOnSurface
 import ru.veider.multitimer.ui.theme.colorPrimary
 import ru.veider.multitimer.ui.theme.colorPrimaryDark
+import ru.veider.multitimer.ui.theme.colorSurfaceVariant
 import ru.veider.multitimer.ui.theme.colorTimerAlarm
-import ru.veider.multitimer.ui.theme.colorTimerSimple
 import ru.veider.multitimer.ui.theme.fontFamily400
+import ru.veider.multitimer.ui.theme.textStyle_22_500
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -62,7 +66,7 @@ fun CounterWidget(
     dotColor: Color = colorPrimaryDark,
     startColor: Color = colorPrimary,
     endColor: Color = colorTimerAlarm,
-    backgroundColor: Color = colorTimerSimple,
+    backgroundColor: Color = colorSurfaceVariant,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -170,7 +174,8 @@ fun CounterWidget(
                         path = path,
                         color = currentLineColor,
                         style = Stroke(
-                            width = lineWidth
+                            width = lineWidth,
+                            cap = StrokeCap.Round
                         )
 
                     )
@@ -197,7 +202,7 @@ fun CounterWidget(
             exit = fadeOut()
         ) {
             Icon(
-                painter = painterResource(R.drawable.notifications),
+                imageVector = Icons.Default.Notifications,
                 contentDescription = null,
                 modifier = Modifier
                     .scale(1.5f + 0.3f * abs(scale))
@@ -212,8 +217,9 @@ fun CounterWidget(
         ) {
             Text(
                 text = sample,
-                fontSize = textSize,
-                fontFamily = fontFamily400
+                style = textStyle_22_500.copy(fontSize = textSize),
+                color = colorOnSurface,
+                maxLines = 1
             )
         }
 

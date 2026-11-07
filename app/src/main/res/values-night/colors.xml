@@ -1,37 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    // Button
-    <color name="color_on_surface">#DBDBDB</color>
-    <color name="color_surface">#000000</color>
-    <color name="color_primary">#8BC34A</color>
-    <color name="color_primary_dark">#4F702A</color>
-    <color name="color_on_primary">#000000</color>
-    <color name="color_primary_container">#5D7342</color>
-    <color name="color_on_primary_container">#9FCA9F</color>
-    <color name="color_secondary">#4CAF50</color>
-    <color name="color_on_secondary">#FEFEFE</color>
-    <color name="color_secondary_container">#DBE5CC</color>
-    <color name="color_on_secondary_container">#151E0E</color>
-    <color name="color_tertiary">#316668</color>
-    <color name="color_on_tertiary">#FEFEFE</color>
-    <color name="color_tertiary_container">#B6ECEE</color>
-    <color name="color_on_tertiary_container">#081E20</color>
-    <color name="timer_alarm_color">#BF360C</color>
-    <color name="timer_simple_color">#5D5D5D</color>
-    <color name="black">#000000</color>
-    <color name="white">#FFFFFF</color>
-    <color name="divider">?attr/colorPrimary</color>
-    <color name="text_color">#FFFFFF</color>
-    <color name="widget_background_color_start">#000000</color>
-    <color name="widget_background_color_end">#404040</color>
-    <color name="transparent">#00000000</color>
+    // Build 975
 
-    <color name="title">#000000</color>
-    <color name="drawer_menu_selected">#DBDBDB</color>
-    <color name="drawer_menu_unselected">#DBDBDB</color>
-    <color name="button_text_active">#000000</color>
-    <color name="button_text_inactive">#DBDBDB</color>
-    <color name="button_background_active">#7CAA46</color>
-    <color name="button_background_inactive">#454545</color>
+    <!-- Brand greens -->
+    <color name="color_primary">#FFA7D372</color>
+    <color name="color_primary_dark">#FF6F9C3B</color>
+    <color name="color_on_primary">#FF132904</color>
+    <color name="color_primary_container">#FF3B5722</color>
+    <color name="color_on_primary_container">#FFD4EDBA</color>
+    <color name="color_secondary">#FFBACEA1</color>
+    <color name="color_on_secondary">#FF253318</color>
+    <color name="color_secondary_container">#FF3B492D</color>
+    <color name="color_on_secondary_container">#FFD6E5BB</color>
+    <color name="color_tertiary">#FF8FD0CB</color>
+    <color name="color_on_tertiary">#FF003735</color>
+    <color name="color_tertiary_container">#FF164B48</color>
+    <color name="color_on_tertiary_container">#FFA8ECE7</color>
+
+    <!-- Neutrals -->
+    <color name="color_background">#FF101410</color>
+    <color name="color_on_background">#FFE2E7DD</color>
+    <color name="color_surface">#FF101410</color>
+    <color name="color_on_surface">#FFE2E7DD</color>
+    <color name="color_surface_variant">#FF42493C</color>
+    <color name="color_on_surface_variant">#FFC3C9B8</color>
+    <color name="color_surface_container">#FF191E18</color>
+    <color name="color_surface_container_high">#FF232922</color>
+    <color name="color_outline">#FF8B9382</color>
+    <color name="color_outline_variant">#FF42493C</color>
+
+    <!-- Status -->
+    <color name="color_error">#FFFFB4AB</color>
+    <color name="color_on_error">#FF690005</color>
+    <color name="color_error_container">#FF93000A</color>
+    <color name="color_on_error_container">#FFFFDAD6</color>
+
+    <!-- Semantic states -->
+    <color name="drawer_menu_selected">#FFA8ECE7</color>
+    <color name="drawer_menu_unselected">#FFC3C9B8</color>
+    <color name="title">#FFE2E7DD</color>
+    <color name="button_text_active">#FF132904</color>
+    <color name="button_text_inactive">#FF8B9382</color>
+    <color name="button_background_active">#FFA7D372</color>
+    <color name="button_background_inactive">#FF232922</color>
+
+    <!-- Timer accents -->
+    <color name="timer_simple_color">#FFA7D372</color>
+    <color name="timer_alarm_color">#FFFFC864</color>
+
+    <!-- Legacy aliases used by the app widget and XML themes -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="divider">?attr/colorPrimary</color>
+    <color name="text_color">#FFE2E7DD</color>
+    <color name="light_blue_50">#FFE1F5FE</color>
+    <color name="light_blue_200">#FF81D4FA</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
+    <color name="widget_background_color_start">#FF000000</color>
+    <color name="widget_background_color_end">#FF404040</color>
+    <color name="transparent">#00000000</color>
 
 </resources>
