@@ -30,6 +30,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_NO
+import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -56,9 +58,26 @@ fun TimersScreen() {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val viewModel: MainViewModel = koinInject()
+    val viewModel: MainViewModel? = if (LocalInspectionMode.current) null else koinInject()
 
-    val counters = viewModel.counters.collectAsState().value
+    val counters = viewModel?.counters?.collectAsState()?.value ?: listOf(
+        Counter(
+            id = 0,
+            currentProgress = 10000,
+            maxProgress = 20000,
+            startTime = 10000,
+            state = CounterState.RUN,
+            title = "Приготовление супа"
+        ),
+        Counter(
+            id = 1,
+            currentProgress = 25000,
+            maxProgress = 30000,
+            startTime = 2000000,
+            state = CounterState.PAUSED,
+            title = "Прилёт флота"
+        )
+    )
 
 
 
@@ -84,7 +103,7 @@ fun TimersScreen() {
             cancelButtonText = stringResource(R.string.button_text_no),
             onAccept = {
                 counterIdToDeleting?.let {
-                    viewModel.deleteCounter(it)
+                    viewModel?.deleteCounter(it)
                 }
                 counterIdToDeleting = null
             },
@@ -95,7 +114,7 @@ fun TimersScreen() {
 
     TimersScreenBody(
         counters = counters,
-        onMove = { from, to -> viewModel.swapCounters(from, to) },
+        onMove = { from, to -> viewModel?.swapCounters(from, to) },
         onDelete = {
             if (counters.size > 1)
                 counterIdToDeleting = it
@@ -179,7 +198,7 @@ data class SwipeState(
     val isSwiped: Boolean = false // Флаг, указывающий, был ли элемент сдвинут
 )
 
-@Preview()
+@Preview(locale = "RU", uiMode = UI_MODE_NIGHT_NO)
 @Composable
 private fun MyLazyColumnPreview() {
     val context = LocalContext.current

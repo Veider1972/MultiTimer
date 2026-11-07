@@ -324,6 +324,8 @@ private fun StringSettings(
     val measurer = rememberTextMeasurer()
     val style = textStyle_14_700
     val textWidth = remember(value) { density.run { measurer.measure(value, style).size.width.toDp() } }
+    val stringSettingsPadding = 12.dp
+    val contentWidth = textWidth + stringSettingsPadding * 2
 
     Row(
         modifier = Modifier
@@ -344,13 +346,13 @@ private fun StringSettings(
             text = value,
             style = style,
             modifier = Modifier
-                .width(max(width, textWidth))
+//                .width(max(width, contentWidth))
                 .background(colorSurfaceContainer, RoundedCornerShape(8.dp))
-                .padding(horizontal = 12.dp, vertical = 6.dp)
                 .clickable {
                     onClick()
-                },
-            textAlign = if (width >= textWidth) TextAlign.Center else TextAlign.End
+                }
+                .padding(horizontal = stringSettingsPadding, vertical = 6.dp),
+            textAlign = if (width >= contentWidth) TextAlign.Center else TextAlign.End
         )
     }
 }

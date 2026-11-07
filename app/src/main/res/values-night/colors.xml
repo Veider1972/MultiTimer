@@ -3,8 +3,8 @@
     // Build 975
 
     <!-- Brand greens -->
-    <color name="color_primary">#FFA7D372</color>
-    <color name="color_primary_dark">#FF6F9C3B</color>
+    <color name="color_primary">#56713D</color>
+    <color name="color_primary_dark">#32451A</color>
     <color name="color_on_primary">#FF132904</color>
     <color name="color_primary_container">#FF3B5722</color>
     <color name="color_on_primary_container">#FFD4EDBA</color>
@@ -21,7 +21,7 @@
     <color name="color_background">#FF101410</color>
     <color name="color_on_background">#FFE2E7DD</color>
     <color name="color_surface">#FF101410</color>
-    <color name="color_on_surface">#FFE2E7DD</color>
+    <color name="color_on_surface">#B7BCB5</color>
     <color name="color_surface_variant">#FF42493C</color>
     <color name="color_on_surface_variant">#FFC3C9B8</color>
     <color name="color_surface_container">#FF191E18</color>
@@ -38,10 +38,10 @@
     <!-- Semantic states -->
     <color name="drawer_menu_selected">#FFA8ECE7</color>
     <color name="drawer_menu_unselected">#FFC3C9B8</color>
-    <color name="title">#FFE2E7DD</color>
+    <color name="title">#B7BCB5</color>
     <color name="button_text_active">#FF132904</color>
     <color name="button_text_inactive">#FF8B9382</color>
-    <color name="button_background_active">#FFA7D372</color>
+    <color name="button_background_active">#485930</color>
     <color name="button_background_inactive">#FF232922</color>
 
     <!-- Timer accents -->

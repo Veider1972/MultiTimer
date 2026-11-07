@@ -93,7 +93,7 @@ fun ActionCounterItem(
         CounterItem(
             modifier = Modifier
                 .offset { IntOffset(offsetX.value.toInt(), 0) }
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+                .padding(horizontal = 2.dp, vertical = 1.dp),
             counter = counter
         )
     }
@@ -104,7 +104,7 @@ data class HorizontalSwipeState(
     val isSwiped: Boolean = false // Флаг, указывающий, был ли элемент сдвинут
 )
 
-@Preview(widthDp = 300, heightDp = 50, apiLevel = 35)
+@Preview(widthDp = 500, heightDp = 150, apiLevel = 35)
 @Composable
 private fun ActionCounterItemPreview() {
     ActionCounterItem(

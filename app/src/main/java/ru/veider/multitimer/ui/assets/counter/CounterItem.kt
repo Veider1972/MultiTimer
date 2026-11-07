@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,12 +60,15 @@ fun CounterItem(
     counter: Counter
 ) {
 
-    val viewModel: MainViewModel = koinInject()
-    val prefs: Preferences = koinInject()
+    val inspectionMode = LocalInspectionMode.current
+    val viewModel: MainViewModel? = if (inspectionMode) null else koinInject()
+    val prefs: Preferences? = if (inspectionMode) null else koinInject()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val currentCounter by rememberUpdatedState(counter)
+
+    val timeEditorIsMulti = prefs?.timeEditorIsMulti?.collectAsState()?.value ?: false
 
     var titleEditorView by remember { mutableStateOf(false) }
     if (titleEditorView)
@@ -72,7 +76,7 @@ fun CounterItem(
             title = counter.title,
             onTitleChange = {
                 scope.launch {
-                    viewModel.updateTitle(counter.id, it)
+                    viewModel?.updateTitle(counter.id, it)
                     titleEditorView = false
                 }
             },
@@ -87,10 +91,10 @@ fun CounterItem(
     if (timerEditorView)
         TimeEditor(
             time = counter.maxProgress,
-            isMulti = prefs.timeEditorIsMulti.collectAsState().value,
+            isMulti = timeEditorIsMulti,
             onAccept = {
                 scope.launch {
-                    viewModel.updateMaxProgress(counter.id, it)
+                    viewModel?.updateMaxProgress(counter.id, it)
                     timerEditorView = false
                 }
 
@@ -115,10 +119,10 @@ fun CounterItem(
                 }
         },
         onCounterStart = {
-            prefs.runCounter.value++
-            viewModel.startCounter(counter.id) },
-        onCounterPause = { viewModel.pauseCounter(counter.id) },
-        onCounterStop = { viewModel.stopCounter(counter.id) }
+            prefs?.runCounter?.value++
+            viewModel?.startCounter(counter.id) },
+        onCounterPause = { viewModel?.pauseCounter(counter.id) },
+        onCounterStop = { viewModel?.stopCounter(counter.id) }
     )
 }
 
@@ -163,13 +167,6 @@ private fun CounterItemBody(
                 color = if (counter.title.isNotEmpty()) colorOnSurface else colorTimerSimple,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2
-            )
-            Text(
-                text = counter.statusLabel(),
-                style = textStyle_13_500,
-                color = colorOnSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
             )
             Row(
                 modifier = Modifier.padding(top = 10.dp),
